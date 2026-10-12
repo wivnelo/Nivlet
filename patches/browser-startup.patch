@@ -1,0 +1,52 @@
+--- a/extensions/urlevent/liburlevent.m
++++ b/extensions/urlevent/liburlevent.m
+@@ -40,6 +40,7 @@
+                                 andEventID:kAEGetURL];
+ 
+         MJAppDelegate *delegate = (MJAppDelegate *)[[NSApplication sharedApplication] delegate];
++        self.appDelegate = delegate;
+         delegate.openFileDelegate = self;
+     }
+     return self;
+@@ -77,8 +78,9 @@
+ 
+ - (void)handleStartupEvents {
+     if (_appDelegate.startupEvent) {
+-        [self handleAppleEvent:_appDelegate.startupEvent withReplyEvent:nil];
++        NSAppleEventDescriptor *event = _appDelegate.startupEvent;
+         _appDelegate.startupEvent = nil;
++        [self handleAppleEvent:event withReplyEvent:nil];
+     }
+ 
+     if (_appDelegate.startupFile) {
+@@ -92,7 +94,7 @@
+     MJDockIconSetVisible(MJDockIconVisible());
+ 
+     // get the process id for the application that sent the current Apple Event
+-    NSAppleEventDescriptor *appleEventDescriptor = [[NSAppleEventManager sharedAppleEventManager] currentAppleEvent];
++    NSAppleEventDescriptor *appleEventDescriptor = event;
+     NSAppleEventDescriptor* processSerialDescriptor = [appleEventDescriptor attributeDescriptorForKeyword:keyAddressAttr];
+     NSAppleEventDescriptor* pidDescriptor = [processSerialDescriptor coerceToDescriptorType:typeKernelProcessID];
+ 
+@@ -160,6 +162,13 @@
+ // ----------------------- C ---------------------
+ 
+ // Rather than manage complex callback state from C, we just have one path into Lua for all events, and events are directed to their callbacks from there
++// Called after the downstream HTTP callback is installed, without changing defaults.
++static int urleventProcessStartupEvents(lua_State *L) {
++    (void)L;
++    [eventHandler handleStartupEvents];
++    return 0;
++}
++
+ static int urleventSetCallback(lua_State *L) {
+     LuaSkin *skin = [LuaSkin sharedWithState:L];
+ 
+@@ -349,6 +358,7 @@
+ 
+ static const luaL_Reg urleventlib[] = {
+     {"setCallback", urleventSetCallback},
++    {"processStartupEvents", urleventProcessStartupEvents},
+     {"setRestoreHandler", urleventsetRestoreHandler},
+     {"setDefaultHandler", urleventsetDefaultHandler},
+     {"getDefaultHandler", urleventgetDefaultHandler},

@@ -1,0 +1,55 @@
+{
+  "format": "Nivlet",
+  "version": 1,
+  "modules": {
+    "general": {
+      "showMenu": true,
+      "appearance": "system",
+      "language": "system",
+      "sleepShortcut": false
+    },
+    "windows": {
+      "enabled": false,
+      "shortcuts": {}
+    },
+    "input": {
+      "enabled": false,
+      "rules": []
+    },
+    "clipboard": {
+      "enabled": false,
+      "limit": 50,
+      "minutes": 30,
+      "images": true,
+      "persistent": false,
+      "excluded": [
+        "com.apple.Passwords",
+        "com.1password.1password",
+        "com.agilebits.onepassword7",
+        "com.bitwarden.desktop"
+      ]
+    },
+    "popupShortcut": false,
+    "system": {
+      "network": true,
+      "cpu": true,
+      "memory": true,
+      "disk": true,
+      "ipv4": true,
+      "ipv6": true,
+      "mac": true,
+      "date": true,
+      "lunar": true
+    },
+    "browser": {
+      "enabled": false,
+      "defaultBrowser": "com.apple.Safari",
+      "rules": [],
+      "appRules": []
+    },
+    "launcher": {
+      "enabled": false,
+      "rules": []
+    }
+  }
+}

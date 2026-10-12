@@ -1,0 +1,36 @@
+--- a/extensions/urlevent/liburlevent.m
++++ b/extensions/urlevent/liburlevent.m
+@@ -193,13 +193,14 @@
+     return 0;
+ }
+ 
+-/// hs.urlevent.setDefaultHandler(scheme[, bundleID])
++/// hs.urlevent.setDefaultHandler(scheme[, bundleID[, urlOnly]])
+ /// Function
+ /// Sets the default system handler for URLs of a given scheme
+ ///
+ /// Parameters:
+ ///  * scheme - A string containing the URL scheme to change. This must be 'http' or 'https' (although entering either will change the handler for both)
+ ///  * bundleID - An optional string containing an application bundle identifier for the application to set as the default handler. Defaults to `org.hammerspoon.Hammerspoon`.
++///  * urlOnly - Optional boolean; when true, leave all content-type associations unchanged. Defaults to false.
+ ///
+ /// Returns:
+ ///  * None
+@@ -208,7 +209,7 @@
+ ///  * Changing the default handler for http/https URLs will display a system prompt asking the user to confirm the change
+ static int urleventsetDefaultHandler(lua_State *L) {
+     LuaSkin *skin = [LuaSkin sharedWithState:L];
+-    [skin checkArgs:LS_TSTRING, LS_TSTRING|LS_TOPTIONAL, LS_TBREAK];
++    [skin checkArgs:LS_TSTRING, LS_TSTRING|LS_TOPTIONAL, LS_TBOOLEAN|LS_TOPTIONAL, LS_TBREAK];
+ 
+     OSStatus status;
+     NSString *scheme = [[NSString stringWithUTF8String:lua_tostring(L, 1)] lowercaseString];
+@@ -227,7 +228,7 @@
+ 
+     if ([scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"]) {
+         // If we're dealing with http/https, also register ourselves for various filetypes that are relevant
+-        for (NSString *type in defaultContentTypes) {
++        for (NSString *type in (lua_toboolean(L, 3) ? @[] : defaultContentTypes)) {
+             status = LSSetDefaultRoleHandlerForContentType((__bridge CFStringRef)type, kLSRolesViewer, (__bridge CFStringRef)bundleID);
+             if (status != noErr) {
+                 [skin logWarn:[NSString stringWithFormat:@"Unable to set role handler for %@: %@", type, [[NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil] localizedDescription]]];

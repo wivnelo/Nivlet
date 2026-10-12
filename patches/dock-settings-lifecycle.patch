@@ -1,0 +1,25 @@
+--- a/Hammerspoon/MJDockIcon.m
++++ b/Hammerspoon/MJDockIcon.m
+@@ -2,18 +2,19 @@
+ #import "variables.h"
+ 
+ static void reflect_defaults(void);
++// Nivlet only shows the Dock icon while Settings is open; never persist it.
++static BOOL settingsDockVisible = NO;
+ 
+ void MJDockIconSetup(void) {
+     reflect_defaults();
+ }
+ 
+ BOOL MJDockIconVisible(void) {
+-    return [[NSUserDefaults standardUserDefaults] boolForKey:MJShowDockIconKey];
++    return settingsDockVisible;
+ }
+ 
+ void MJDockIconSetVisible(BOOL visible) {
+-    [[NSUserDefaults standardUserDefaults] setBool:visible
+-                                            forKey:MJShowDockIconKey];
++    settingsDockVisible = visible;
+     reflect_defaults();
+ }
+ 

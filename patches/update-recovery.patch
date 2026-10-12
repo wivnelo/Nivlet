@@ -1,0 +1,53 @@
+--- a/Hammerspoon/MJLua.m
++++ b/Hammerspoon/MJLua.m
+@@ -829,7 +829,32 @@
+ - (BOOL)canCheckForUpdates;
+ - (void)checkForUpdates:(id)sender;
+ @end
++static NSString * const NivletPendingUpdateBuildKey = @"NivletPendingUpdateBuild";
++@interface NivletUpdateRecoveryDelegate : NSObject
++@end
++@implementation NivletUpdateRecoveryDelegate
++- (void)updaterWillRelaunchApplication:(id)updater {
++    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
++    [defaults setObject:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"] forKey:NivletPendingUpdateBuildKey];
++    [defaults synchronize];
++}
++- (void)updater:(id)updater didAbortWithError:(NSError *)error {
++    [[NSUserDefaults standardUserDefaults] removeObjectForKey:NivletPendingUpdateBuildKey];
++}
++@end
++static NivletUpdateRecoveryDelegate *nivletUpdateRecoveryDelegate;
+ static id<NivletUpdaterAPI> nivletUpdaterController;
++static int core_nivletTakeUpdateRecovery(lua_State *L) {
++    LuaSkin *skin = [LuaSkin sharedWithState:L];
++    [skin checkArgs:LS_TBREAK];
++    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
++    NSString *previous = [defaults stringForKey:NivletPendingUpdateBuildKey];
++    BOOL incomplete = previous && [previous isEqualToString:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]];
++    [defaults removeObjectForKey:NivletPendingUpdateBuildKey];
++    [defaults synchronize];
++    lua_pushboolean(L, incomplete);
++    return 1;
++}
+ static int core_nivletCheckForUpdates(lua_State *L) {
+     LuaSkin *skin = [LuaSkin sharedWithState:L];
+     [skin checkArgs:LS_TBREAK];
+@@ -841,7 +866,8 @@
+         }
+         Class controllerClass = NSClassFromString(@"SPUStandardUpdaterController");
+         if (!controllerClass) { lua_pushboolean(L, NO); return 1; }
+-        nivletUpdaterController = [(id<NivletUpdaterAPI>)[controllerClass alloc] initWithStartingUpdater:NO updaterDelegate:nil userDriverDelegate:nil];
++        nivletUpdateRecoveryDelegate = [NivletUpdateRecoveryDelegate new];
++        nivletUpdaterController = [(id<NivletUpdaterAPI>)[controllerClass alloc] initWithStartingUpdater:NO updaterDelegate:nivletUpdateRecoveryDelegate userDriverDelegate:nil];
+         if (![[nivletUpdaterController updater] startUpdater:&error]) {
+             nivletUpdaterController = nil;
+             [skin logError:[NSString stringWithFormat:@"Nivlet updater failed to start: %@", error.localizedDescription]];
+@@ -862,6 +888,7 @@
+ }
+ 
+ static luaL_Reg corelib[] = {
++    {"nivletTakeUpdateRecovery", core_nivletTakeUpdateRecovery},
+     {"nivletQuit", core_nivletQuit},
+     {"nivletCheckForUpdates", core_nivletCheckForUpdates},
+     {"preferencesDarkMode", preferencesDarkMode},

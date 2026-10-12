@@ -1,0 +1,35 @@
+--- a/Hammerspoon/MJPreferencesWindowController.m
++++ b/Hammerspoon/MJPreferencesWindowController.m
+@@ -81,10 +81,8 @@
+ }
+ 
+ - (void) showWindow:(id)sender {
+-    if (![[self window] isVisible])
+-        [[self window] center];
+-    [super showWindow: sender];
+-    [self reflectDefaults];
++    // Nivlet has a single settings surface, including keyboard and startup entry points.
++    MJLuaRunString(@"if desktopToolkit then desktopToolkit.openSettings('generalSection') end");
+ }
+ 
+ - (NSString*) windowNibName {
+--- a/Hammerspoon/MainMenu.xib
++++ b/Hammerspoon/MainMenu.xib
+@@ -37,7 +37,7 @@
+                                 </connections>
+                             </menuItem>
+                             <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
+-                            <menuItem title="Preferences…" keyEquivalent="," id="9Kc-1f-Fv2">
++                            <menuItem title="Settings…" keyEquivalent="," id="9Kc-1f-Fv2">
+                                 <connections>
+                                     <action selector="showPreferencesWindow:" target="Voe-Tx-rLC" id="AdW-ZP-V8p"/>
+                                 </connections>
+@@ -393,7 +393,7 @@
+                         <action selector="showConsoleWindow:" target="Voe-Tx-rLC" id="1wg-Dg-jnP"/>
+                     </connections>
+                 </menuItem>
+-                <menuItem title="Preferences..." id="RGq-yR-Y0Q">
++                <menuItem title="Settings…" id="RGq-yR-Y0Q">
+                     <modifierMask key="keyEquivalentModifierMask"/>
+                     <connections>
+                         <action selector="showPreferencesWindow:" target="Voe-Tx-rLC" id="0WV-v0-6Fl"/>

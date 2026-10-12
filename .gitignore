@@ -1,0 +1,15 @@
+.DS_Store
+/build/
+/vendor/
+/RUNTIME-VALIDATION.md
+*.xcuserstate
+xcuserdata/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+*.p12
+*.pfx
+id_rsa
+id_ed25519

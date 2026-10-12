@@ -1,0 +1,46 @@
+"""Sign a release ZIP using the Nivlet Keychain key and write its Sparkle feed."""
+from pathlib import Path
+import plistlib
+import subprocess
+import sys
+import xml.etree.ElementTree as ET
+import zipfile
+root = Path(__file__).resolve().parent.parent
+archive = Path(sys.argv[1]).resolve()
+subprocess.run([sys.executable, str(root / 'scripts/check-privacy.py'), '--repo', str(root)], check=True)
+subprocess.run([sys.executable, str(root / 'scripts/check-privacy.py'), '--zip', str(archive)], check=True)
+with zipfile.ZipFile(archive) as package:
+    if package.testzip() is not None:
+        raise SystemExit('Invalid ZIP')
+    info = plistlib.loads(package.read('Nivlet.app/Contents/Info.plist'))
+assert info['CFBundleIdentifier'] == 'dev.local.DesktopToolkit'
+assert info['SUFeedURL'] == 'https://wivnelo.github.io/Nivlet/appcast.xml'
+tool = root / 'vendor/sparkle-2.10.0/bin/sign_update'
+command = [str(tool), '--account', 'dev.local.DesktopToolkit.updates']
+signature = subprocess.check_output(command + ['-p', str(archive)], text=True).strip()
+subprocess.run(command + ['--verify', str(archive), signature], check=True)
+ns = 'http://www.andymatuschak.org/xml-namespaces/sparkle'
+ET.register_namespace('sparkle', ns)
+rss = ET.Element('rss', version='2.0')
+channel = ET.SubElement(rss, 'channel')
+ET.SubElement(channel, 'title').text = 'Nivlet for Mac Updates'
+ET.SubElement(channel, 'link').text = 'https://wivnelo.github.io/Nivlet/'
+item = ET.SubElement(channel, 'item')
+version, build = info['CFBundleShortVersionString'], info['CFBundleVersion']
+ET.SubElement(item, 'title').text = f'Nivlet {version} · Build {build}'
+ET.SubElement(item, f'{{{ns}}}version').text = build
+ET.SubElement(item, f'{{{ns}}}shortVersionString').text = version
+ET.SubElement(item, f'{{{ns}}}minimumSystemVersion').text = '13.0'
+ET.SubElement(item, f'{{{ns}}}hardwareRequirements').text = 'arm64'
+ET.SubElement(item, 'link').text = f'https://github.com/wivnelo/Nivlet/releases/tag/v{version}'
+ET.SubElement(item, 'description').text = 'Nivlet 1.0.0: the first public release. 首个推广正式版。'
+ET.SubElement(item, 'enclosure', {
+    'url': f'https://github.com/wivnelo/Nivlet/releases/download/v{version}/{archive.name}',
+    'length': str(archive.stat().st_size),
+    'type': 'application/octet-stream',
+    f'{{{ns}}}edSignature': signature,
+})
+# Old artifacts were explicitly retired during privacy remediation.
+ET.indent(rss)
+ET.ElementTree(rss).write(root / 'docs/appcast.xml', encoding='utf-8', xml_declaration=True)
+print(f'Signed update feed generated: {version} Build {build}')

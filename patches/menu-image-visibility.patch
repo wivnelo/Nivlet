@@ -1,0 +1,17 @@
+--- a/extensions/menubar/libmenubar.m
++++ b/extensions/menubar/libmenubar.m
+@@ -276,7 +276,13 @@
+             lua_getfield(L, -1, "image") ;
+             if (luaL_testudata(L, -1, "hs.image")) {
+                 NSImage *image = [skin luaObjectAtIndex:-1 toClass:"NSImage"] ;
+-                if (image) [menuItem setImage:[image copy]] ;
++                if (image) {
++                    [menuItem setImage:[image copy]];
++                    // macOS 27 hides menu images by default, including clipboard thumbnails.
++                    if (@available(macOS 27.0, *)) {
++                        menuItem.preferredImageVisibility = NSMenuItemImageVisibilityVisible;
++                    }
++                }
+             }
+             lua_pop(L, 1) ;
+ 

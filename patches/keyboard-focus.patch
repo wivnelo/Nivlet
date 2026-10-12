@@ -1,0 +1,27 @@
+--- a/Hammerspoon/MJLua.m
++++ b/Hammerspoon/MJLua.m
+@@ -887,7 +887,24 @@
+     return 0;
+ }
+ 
++static int core_nivletCurrentKeyEvent(lua_State *L) {
++    LuaSkin *skin = [LuaSkin sharedWithState:L];
++    [skin checkArgs:LS_TBREAK];
++    NSEvent *event = [NSApp currentEvent];
++    if (event.type != NSEventTypeKeyDown || !(event.modifierFlags & NSEventModifierFlagCommand)) {
++        lua_pushnil(L);
++        return 1;
++    }
++    [skin pushNSObject:@{@"key": event.charactersIgnoringModifiers ?: @"",
++                         @"metaKey": @YES,
++                         @"ctrlKey": @((event.modifierFlags & NSEventModifierFlagControl) != 0),
++                         @"altKey": @((event.modifierFlags & NSEventModifierFlagOption) != 0),
++                         @"shiftKey": @((event.modifierFlags & NSEventModifierFlagShift) != 0)}];
++    return 1;
++}
++
+ static luaL_Reg corelib[] = {
++    {"nivletCurrentKeyEvent", core_nivletCurrentKeyEvent},
+     {"nivletTakeUpdateRecovery", core_nivletTakeUpdateRecovery},
+     {"nivletQuit", core_nivletQuit},
+     {"nivletCheckForUpdates", core_nivletCheckForUpdates},

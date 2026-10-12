@@ -1,0 +1,36 @@
+--- a/extensions/webview/libwebview.m
++++ b/extensions/webview/libwebview.m
+@@ -2173,6 +2173,33 @@
+         theWindow.titleFollow = NO ;
+ 
+         [theWindow setTitle:[skin toNSObjectAtIndex:2]] ;
++        if ([theWindow.title isEqualToString:@"Nivlet for Mac"]) {
++            NSView *titlebar = [theWindow standardWindowButton:NSWindowCloseButton].superview;
++            if (titlebar && ![titlebar.subviews filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"identifier == %@", @"NivletBrand"]].count) {
++                theWindow.titleVisibility = NSWindowTitleHidden;
++                NSImageView *icon = [[NSImageView alloc] initWithFrame:NSMakeRect(0, 0, 16, 16)];
++                icon.image = [NSApp applicationIconImage];
++                icon.imageScaling = NSImageScaleProportionallyUpOrDown;
++                icon.accessibilityLabel = @"Nivlet";
++                NSTextField *label = [NSTextField labelWithString:@"Nivlet for Mac"];
++                label.font = [NSFont boldSystemFontOfSize:13];
++                label.textColor = [NSColor secondaryLabelColor];
++                NSStackView *brand = [NSStackView stackViewWithViews:@[icon, label]];
++                brand.identifier = @"NivletBrand";
++                brand.orientation = NSUserInterfaceLayoutOrientationHorizontal;
++                brand.alignment = NSLayoutAttributeCenterY;
++                brand.spacing = 6;
++                brand.translatesAutoresizingMaskIntoConstraints = NO;
++                [titlebar addSubview:brand];
++                [NSLayoutConstraint activateConstraints:@[
++                    [icon.widthAnchor constraintEqualToConstant:16],
++                    [icon.heightAnchor constraintEqualToConstant:16],
++                    [brand.centerXAnchor constraintEqualToAnchor:titlebar.centerXAnchor],
++                    [brand.centerYAnchor constraintEqualToAnchor:[theWindow standardWindowButton:NSWindowCloseButton].centerYAnchor]
++                ]];
++            }
++        }
++
+     }
+ 
+     lua_settop(L, 1) ;

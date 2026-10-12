@@ -1,0 +1,63 @@
+--- a/extensions/webview/libwebview.m
++++ b/extensions/webview/libwebview.m
+@@ -124,6 +124,18 @@
+ 
+ - (BOOL)windowShouldClose:(id __unused)sender {
+     if ((self.styleMask & NSWindowStyleMaskClosable) != 0) {
++        LuaSkin *skin = [LuaSkin sharedWithState:NULL];
++        lua_State *L = skin.L;
++        if ([skin checkGCCanary:self.lsCanary] && _windowCallback != LUA_NOREF) {
++            int top = lua_gettop(L);
++            [skin pushLuaRef:refTable ref:_windowCallback];
++            [skin pushNSObject:@"shouldClose"];
++            [skin pushNSObject:self];
++            BOOL ok = [skin protectedCallAndError:@"hs.webview:windowCallback:shouldClose" nargs:2 nresults:1];
++            BOOL allow = ok && (!lua_isboolean(L, -1) || lua_toboolean(L, -1));
++            lua_settop(L, top);
++            return allow;
++        }
+         return YES ;
+     } else {
+         return NO ;
+--- a/Hammerspoon/MJAppDelegate.m
++++ b/Hammerspoon/MJAppDelegate.m
+@@ -338,6 +338,21 @@
+ }
+ 
+ - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
++    LuaSkin *skin = [LuaSkin sharedWithState:NULL];
++    lua_State *L = skin.L;
++    if (!L) return NSTerminateNow;
++    int top = lua_gettop(L);
++    lua_getglobal(L, "hs");
++    if (lua_istable(L, -1)) {
++        lua_getfield(L, -1, "nivletShouldTerminate");
++        if (lua_isfunction(L, -1)) {
++            BOOL ok = [skin protectedCallAndError:@"Nivlet termination guard" nargs:0 nresults:1];
++            BOOL allow = ok && lua_toboolean(L, -1);
++            lua_settop(L, top);
++            if (!allow) return NSTerminateCancel;
++        }
++    }
++    lua_settop(L, top);
+     MJLuaDestroy();
+     return NSTerminateNow;
+ }
+--- a/Hammerspoon/MJLua.m
++++ b/Hammerspoon/MJLua.m
+@@ -854,7 +854,15 @@
+     return 1;
+ }
+ 
++static int core_nivletQuit(lua_State *L) {
++    [[LuaSkin sharedWithState:L] checkArgs:LS_TBREAK];
++    // Do not destroy the Lua state while a Lua callback is still on its stack.
++    dispatch_async(dispatch_get_main_queue(), ^{ [NSApp terminate:nil]; });
++    return 0;
++}
++
+ static luaL_Reg corelib[] = {
++    {"nivletQuit", core_nivletQuit},
+     {"nivletCheckForUpdates", core_nivletCheckForUpdates},
+     {"preferencesDarkMode", preferencesDarkMode},
+     {"openConsoleOnDockClick", core_openConsoleOnDockClick},

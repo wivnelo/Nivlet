@@ -1,0 +1,22 @@
+--- a/extensions/urlevent/liburlevent.m
++++ b/extensions/urlevent/liburlevent.m
+@@ -94,17 +94,8 @@
+     MJDockIconSetVisible(MJDockIconVisible());
+ 
+     // get the process id for the application that sent the current Apple Event
+-    NSAppleEventDescriptor *appleEventDescriptor = event;
+-    NSAppleEventDescriptor* processSerialDescriptor = [appleEventDescriptor attributeDescriptorForKeyword:keyAddressAttr];
+-    NSAppleEventDescriptor* pidDescriptor = [processSerialDescriptor coerceToDescriptorType:typeKernelProcessID];
+-
+-    pid_t pid;
+-
+-    if (pidDescriptor) {
+-        pid = *(pid_t *)[[pidDescriptor data] bytes];
+-    } else {
+-        pid = -1;
+-    }
++    NSAppleEventDescriptor *pidDescriptor = [event attributeDescriptorForKeyword:keySenderPIDAttr];
++    pid_t pid = pidDescriptor ? (pid_t)[pidDescriptor int32Value] : -1;
+ 
+     [self callbackWithURL:[[event paramDescriptorForKeyword:keyDirectObject] stringValue] senderPID:pid];
+ }

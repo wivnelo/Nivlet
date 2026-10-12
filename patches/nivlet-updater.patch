@@ -1,0 +1,44 @@
+--- a/Hammerspoon/MJLua.m
++++ b/Hammerspoon/MJLua.m
+@@ -821,7 +821,41 @@
+     return 0;
+ }
+ 
++// Nivlet uses its own signed update feed, never the upstream Runtime feed.
++@protocol NivletUpdaterAPI
++- (instancetype)initWithStartingUpdater:(BOOL)start updaterDelegate:(id)delegate userDriverDelegate:(id)driver;
++- (id<NivletUpdaterAPI>)updater;
++- (BOOL)startUpdater:(NSError **)error;
++- (BOOL)canCheckForUpdates;
++- (void)checkForUpdates:(id)sender;
++@end
++static id<NivletUpdaterAPI> nivletUpdaterController;
++static int core_nivletCheckForUpdates(lua_State *L) {
++    LuaSkin *skin = [LuaSkin sharedWithState:L];
++    [skin checkArgs:LS_TBREAK];
++    if (!nivletUpdaterController) {
++        NSString *path = [[[NSBundle mainBundle] privateFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
++        NSError *error = nil;
++        if (![[NSBundle bundleWithPath:path] loadAndReturnError:&error]) {
++            lua_pushboolean(L, NO); return 1;
++        }
++        Class controllerClass = NSClassFromString(@"SPUStandardUpdaterController");
++        if (!controllerClass) { lua_pushboolean(L, NO); return 1; }
++        nivletUpdaterController = [(id<NivletUpdaterAPI>)[controllerClass alloc] initWithStartingUpdater:NO updaterDelegate:nil userDriverDelegate:nil];
++        if (![[nivletUpdaterController updater] startUpdater:&error]) {
++            nivletUpdaterController = nil;
++            [skin logError:[NSString stringWithFormat:@"Nivlet updater failed to start: %@", error.localizedDescription]];
++            lua_pushboolean(L, NO); return 1;
++        }
++    }
++    if (![[nivletUpdaterController updater] canCheckForUpdates]) { lua_pushboolean(L, NO); return 1; }
++    [nivletUpdaterController checkForUpdates:nil];
++    lua_pushboolean(L, YES);
++    return 1;
++}
++
+ static luaL_Reg corelib[] = {
++    {"nivletCheckForUpdates", core_nivletCheckForUpdates},
+     {"preferencesDarkMode", preferencesDarkMode},
+     {"openConsoleOnDockClick", core_openConsoleOnDockClick},
+     {"openConsole", core_openconsole},

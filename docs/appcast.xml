@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+  <channel>
+    <title>Nivlet for Mac Updates</title>
+    <link>https://wivnelo.github.io/Nivlet/</link>
+    <item>
+      <title>Nivlet 1.0.0 · Build 32</title>
+      <sparkle:version>32</sparkle:version>
+      <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+      <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.0</link>
+      <description>Nivlet 1.0.0: the first public release. 首个推广正式版。</description>
+      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.0/Nivlet-1.0.0-build32-arm64-local-release.zip" length="10956127" type="application/octet-stream" sparkle:edSignature="wEqV8G/YRcGpUxa/tVPwadL0KcO+Jzs+4Qn3L/uLMrZyQjCJCDk5gT8tbe3Dl9mgOlAQ2FR6F8JyFDS/83iwDA==" />
+    </item>
+  </channel>
+</rss>
