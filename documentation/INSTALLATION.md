@@ -1,19 +1,19 @@
 # 安装、升级与卸载
 
-适用版本：v1.0.0 / 1.0.0 Build 32，GitHub 正式发行版，仍未通过 Apple 公证。
+适用版本：v1.0.1 / 1.0.1 Build 41，GitHub 正式发行版，仍未通过 Apple 公证。
 
 ## 系统要求
 
 - macOS 13.0 或更高版本。
 - **当前仅支持 Apple Silicon Mac（arm64），不支持 Intel Mac（x86_64/x86）。** 可在“关于本机”查看芯片类型。
-- 当前正式版为 v1.0.0 / Build 32，仅含 arm64。
+- 当前正式版为 v1.0.1 / Build 41，仅含 arm64。
 
 ## 首次安装
 
-1. 从 [GitHub Release](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.0) 下载 DMG 或 ZIP，任选一种；不要运行多个副本。
+1. 从 [GitHub Release](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.1) 下载 DMG 或 ZIP，任选一种；不要运行多个副本。
 2. DMG 打开后将 Nivlet.app 拖入 Applications；ZIP 解压后将 App 放入 Applications。
 3. 从 Applications 打开，使用菜单栏 N 图标进入设置。无需另外安装 Hammerspoon。
-4. 先按需要配置并保存；窗口管理和 Option 直接粘贴需要辅助功能权限，其他模块不因此要求授权。
+4. 先按需要配置并保存；窗口管理、Option 直接粘贴和打开浏览器清除窗口需要辅助功能权限。
 5. 浏览器规则先保存，再在其他应用点击链接验证分流，再主动设置 Nivlet 为系统默认浏览器；未匹配时使用所选的实际浏览器。
 
 ### 首次打开被 macOS 拦截
@@ -29,7 +29,7 @@
 
 ### 辅助功能授权
 
-首次启动后，通用页点击“打开辅助功能设置”，在“隐私与安全性 → 辅助功能”允许 `/Applications/Nivlet.app`。切回设置窗口会自动检测，也可以点击右侧“重新检测”。这项权限用于窗口管理和 Option 直接粘贴；不使用这两项时无需授权。升级 ad-hoc 包后可能需重新允许新副本，避免选择测试或备份 App。
+首次启动后，通用页点击“打开辅助功能设置”，在“隐私与安全性 → 辅助功能”允许 `/Applications/Nivlet.app`。切回设置窗口会自动检测，也可以点击右侧“重新检测”。这项权限用于窗口管理、Option 直接粘贴和打开浏览器清除窗口。升级 ad-hoc 包后可能需重新允许新副本，避免选择测试或备份 App。
 
 `/Applications` 的 App 可由多个 macOS 用户共享，而用户配置与历史各自独立。提示 App 完全一致时无需重复覆盖；同机新用户测试不代表新硬件兼容性通过。
 
@@ -38,7 +38,7 @@
 把 ZIP、DMG 及同版本的 .sha256 文件放在同一文件夹，在该文件夹运行：
 
 ```sh
-shasum -a 256 -c Nivlet-1.0.0-build32-arm64-local-release.sha256
+shasum -a 256 -c Nivlet-1.0.1-build41-arm64-local-release.sha256
 ```
 
 两个安装包都在时应各显示 OK；缺少其中一个会报该文件不存在，不代表另一个损坏。校验文件检测传输一致性，不替代 Apple 签名公证。
@@ -64,9 +64,9 @@ shasum -a 256 -c Nivlet-1.0.0-build32-arm64-local-release.sha256
 
 ## 已知限制与反馈
 
-- 尚无 Developer ID 签名和 Apple 公证；Build 32 自动回归通过，人工及多屏验收对应此前功能基线，本版用户人工验收仍待进行；其他 Apple Silicon Mac/macOS、跨机器与完整 Gatekeeper 流程未全面覆盖。当前不支持 Intel。
+- 尚无 Developer ID 签名和 Apple 公证；Build 41 自动回归通过，人工及多屏验收对应此前功能基线，新增浏览器入口及再次唤起行为已在本机检查；其他 Apple Silicon Mac/macOS、跨机器与完整 Gatekeeper 流程未全面覆盖。Intel 包作为待真机验证的候选提供。
 - 同机新用户配置使用已由用户反馈暂无明显重大问题；登录启动按反馈转观察，暂不继续排查。
-- 关于页已接入官网和手动更新通道；捐赠尚未接入。当前公开下载为 1.0.0 / Build 32，更新通道仅向 arm64 提供此版本。
+- 关于页已接入官网和手动更新通道；捐赠尚未接入。当前公开下载为 1.0.1 / Build 41，更新通道仅向 arm64 提供此版本。
 - 报告问题请提供应用版本/Build、macOS、芯片、操作步骤与提示；不要上传敏感剪贴板内容、完整私人配置或凭据。
 
 现有模块使用方式见 [README](../README.md)，当前验证状态见 [BASELINE](../BASELINE.md)，工程验收见 [DISTRIBUTION](DISTRIBUTION.md)。

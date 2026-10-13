@@ -1,4 +1,4 @@
-> Current release: 1.0.0 / Build 32.
+> Current release: 1.0.1 / Build 41.
 
 # Nivlet User Guide
 
@@ -73,3 +73,7 @@ Unsaved pages have a small soft orange dot centered below their tabs; text stays
 ## Interface consistency
 
 Disclosure arrows share the same size, spacing and expanded direction. The excluded-app Add button stays right aligned; centered unsaved dots and tab text are retained.
+
+### Clear browsing data and reopen settings
+
+Click Clear Browsing Data… at the top right of Browser. After the Accessibility check, choose Safari or Chrome and confirm the scope in the browser. Nivlet does not confirm deletion. Reopening an existing settings window through an app shortcut or the Dock preserves its page; first open goes to General.

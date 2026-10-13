@@ -33,7 +33,7 @@ ET.SubElement(item, f'{{{ns}}}shortVersionString').text = version
 ET.SubElement(item, f'{{{ns}}}minimumSystemVersion').text = '13.0'
 ET.SubElement(item, f'{{{ns}}}hardwareRequirements').text = 'arm64'
 ET.SubElement(item, 'link').text = f'https://github.com/wivnelo/Nivlet/releases/tag/v{version}'
-ET.SubElement(item, 'description').text = 'Nivlet 1.0.0: the first public release. 首个推广正式版。'
+ET.SubElement(item, 'description').text = f'Nivlet {version}: browser data entry and settings reopen fixes. 浏览数据入口与再次唤起修复。'
 ET.SubElement(item, 'enclosure', {
     'url': f'https://github.com/wivnelo/Nivlet/releases/download/v{version}/{archive.name}',
     'length': str(archive.stat().st_size),

@@ -11,6 +11,7 @@ input.start()
 local clipboard = require("modules.clipboard")
 local system = require("modules.sys_info")
 local browser = require("modules.browser")
+local browserData=require("modules.browser_data")
 browser.start()
 clipboard.start()
 local launcher=require("modules.launcher")
@@ -234,6 +235,7 @@ local function configuredAppIcons()
     end
     for _,rule in ipairs(browser.config.appRules or {}) do icons[rule.bundleID]=appIcons.get(rule.bundleID) end
     for _,id in ipairs(clipboard.config.excluded) do icons[id]=appIcons.get(id) end
+    for _,id in ipairs({"com.apple.Safari","com.google.Chrome"}) do icons[id]=appIcons.get(id) end
     return icons
 end
 local function excludedAppNames()
@@ -243,9 +245,9 @@ local function excludedAppNames()
     end
     return names
 end
-local function reply(ok, message, action)
+local function reply(ok, message, action, requestID)
     local permission=permissionState()
-    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,language=i18n.language(),translations=i18n.dictionary,general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),excludedAppNames=excludedAppNames(),appIcons=configuredAppIcons(),popupShortcut=app.popupShortcut or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}) .. ")") end
+    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,requestID=requestID,language=i18n.language(),translations=i18n.dictionary,general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),excludedAppNames=excludedAppNames(),appIcons=configuredAppIcons(),popupShortcut=app.popupShortcut or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}) .. ")") end
 end
 local function showSettingsWindow(view)
     hs.dockicon.show()
@@ -298,6 +300,15 @@ function app.openSettings(section, focus)
         if body.action=="checkUpdates" then
             local ok=hs.nivletCheckForUpdates and hs.nivletCheckForUpdates()
             if not ok then reply(false,i18n.t("暂时无法检查更新，请稍后重试或查看版本记录。"),body.action) end
+            return
+        end
+        if body.action=="prepareBrowserData" then
+            local ok=permissions.snapshot().accessibility=="granted"
+            reply(ok,ok and "" or i18n.t("请在通用设置中检查并开启辅助功能权限"),body.action,body.requestID)
+            return
+        end
+        if body.action=="openBrowserData" then
+            browserData.open(body.bundleID,function(ok,message) reply(ok,message,"openBrowserData") end)
             return
         end
         if body.action=="setDefaultBrowser" then
@@ -448,7 +459,9 @@ function app.arrangeMenus()
     if system.draw then system.draw() end
 end
 if app.general.showMenu then app.arrangeMenus() end
-hs.dockIconClickCallback = function() app.openSettings("generalSection") end
+hs.dockIconClickCallback = function()
+    if app.settings then app.openSettings() else app.openSettings("generalSection") end
+end
 print("Nivlet ready", hs.configdir, hs.settings.bundleID, "bindings", #app.bindings)
 
 -- Route the embedded runtime API to the same settings page.

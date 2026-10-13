@@ -42,6 +42,12 @@ local original=desktopToolkit.openSettings
 desktopToolkit.openSettings=function(section) opened=section end
 hs.dockIconClickCallback()
 assert(opened=="generalSection")
+local settingsWindow=desktopToolkit.settings
+desktopToolkit.settings={}
+opened="unexpected"
+hs.dockIconClickCallback()
+assert(opened==nil,"Reopening existing settings must not force General")
+desktopToolkit.settings=settingsWindow
 desktopToolkit.openSettings=original
 print("General settings validation, persistence and reopen dispatch passed")
 

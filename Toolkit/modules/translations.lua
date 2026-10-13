@@ -1,5 +1,13 @@
 -- Simplified Chinese source strings and English UI translations.
 return {
+    ["清理浏览数据的浏览器"] = "Browser for clearing browsing data",
+    ["清除浏览数据…"] = "Clear Browsing Data…",
+    ["正在打开浏览器，请稍候"] = "Opening browser, please wait",
+    ["浏览器未安装或暂不支持"] = "Browser is not installed or supported",
+    ["无法启动浏览器"] = "Unable to launch browser",
+    ["已请求打开清除窗口，请在浏览器中确认"] = "Requested the clear-data dialog. Confirm in your browser.",
+    ["无法打开清除窗口，请在浏览器菜单中手动打开"] = "Unable to open the dialog. Open it manually from the browser menu.",
+
     ["点击菜单栏图标：查看历史"] = "Click the menu bar icon to view history",
     ["点击历史项：复制"] = "Click a history item to copy",
     ["按住 ⌥ 点击历史项：粘贴到有焦点的输入框"] = "Option-click a history item to paste into the focused input field",
