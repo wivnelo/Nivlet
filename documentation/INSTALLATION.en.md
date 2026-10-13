@@ -39,7 +39,7 @@ Both archives should report OK. If you downloaded only one, the missing archive 
 
 Save or discard drafts and export saved configuration in General. Use About → Check for Updates and confirm installation, or quit Nivlet and replace the app in Applications manually. Updates are not installed silently. Keep the previous package for recovery; do not remove the user data directory.
 
-Configuration and persisted history stay local. Nonpersistent clipboard history is cleared on exit; persisted entries remain subject to retention limits. Accessibility may need to be granted again for the new app. Configuration exports do not contain clipboard history, system permissions, login items or the system default browser.
+Configuration and persisted history stay local. Nonpersistent clipboard history is cleared on exit; persisted entries remain subject to retention limits. Accessibility may need to be granted again for the new app. If the switch is already on but Nivlet still reports no access, remove the old Nivlet entry from the permissions list, add `/Applications/Nivlet.app` again with the + button, enable it, and click Check Again in Nivlet. This removes only the old permission entry, not the app or user data. Configuration exports do not contain clipboard history, system permissions, login items or the system default browser.
 
 The app lives in `/Applications/Nivlet.app`; user data lives in `~/Library/Application Support/dev.local.DesktopToolkit`, with preferences in the `dev.local.DesktopToolkit` domain. Personal Hammerspoon data is separate. Do not assume older versions support a future configuration format when downgrading.
 

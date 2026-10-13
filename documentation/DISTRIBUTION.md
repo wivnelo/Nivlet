@@ -1,8 +1,8 @@
 # Nivlet for Mac 分发准备与验收
 
-## 当前工程基准（2026-10-13）
+## 当前工程基准（2026-10-14）
 
-当前发行版本为 1.0.4 / Build 45（arm64 / x86_64），新增应用状态与浏览器列表刷新、图标缓存刷新和卸载后的浏览器改选。最终构建与回归见 [Build 45 验收](VALIDATION.md)，安装及发布状态以 [BASELINE.md](../BASELINE.md) 为准。旧构建记录仅作历史证据。
+当前发行版本为 1.0.4 / Build 45（arm64 / x86_64），包含底部统一错误、名称后未安装标签、应用状态与浏览器列表刷新及卸载后的浏览器改选。最终构建与回归见 [Build 45 验收](VALIDATION.md)，安装及发布状态以 [BASELINE.md](../BASELINE.md) 为准。旧构建记录仅作历史证据。
 
 - Runtime 固定来源；构建通过 `scripts/prepare-updater.sh` 准备固定 Sparkle 2.10.0，许可收集包含其原文。
 - Release 构建使用完整 Xcode：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=45 sh scripts/build-release.sh`。45 为本次 1.0.4 发行 Build；下一构建继续递增 Build；构建不自动安装。

@@ -1,13 +1,13 @@
-> 当前正式发行：1.0.1 / Build 41；下方 Intel Build 33 为历史构建示例。正式构建请使用新的隔离目录及 NIVLET_BUILD_NUMBER=41。
+> 当前正式发行：1.0.4 / Build 45；下方 Intel Build 33 为历史构建示例。正式构建请使用新的隔离目录及 NIVLET_BUILD_NUMBER=45。
 
 # 开发与构建
 
-## 当前工程基准（2026-10-12）
+## 当前工程基准（2026-10-14）
 
-当前发行版本为 1.0.0 / Build 32（arm64-only），纳入默认浏览器关联修复、权限检测、底部居中圆点及统一折叠箭头。最终构建与回归见 [Build 32 验收](VALIDATION.md)，安装及发布状态以 [BASELINE.md](../BASELINE.md) 为准。
+当前发行版本为 1.0.4 / Build 45（arm64 / x86_64），包含应用状态刷新、底部统一错误和双架构更新源。最终构建与回归见 [Build 45 验收](VALIDATION.md)，安装及发布状态以 [BASELINE.md](../BASELINE.md) 为准。
 
 - Runtime 固定来源；构建通过 `scripts/prepare-updater.sh` 准备固定 Sparkle 2.10.0，许可收集包含其原文。
-- Release 构建使用完整 Xcode：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=32 sh scripts/build-release.sh`。32 为本次 1.0.0 发行 Build；下一构建继续递增 Build；构建不自动安装。
+- Release 构建使用完整 Xcode：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=45 sh scripts/build-release.sh`。45 为本次 1.0.4 发行 Build；下一构建继续递增 Build；构建不自动安装。
 - 更新入口位于关于页，原生 Sparkle 桥接由 `patches/nivlet-updater.patch` 注入；有草稿先处理，默认手动检查、用户确认安装。
 - Feed 为 `docs/appcast.xml`，使用 `scripts/generate-update-feed.py <ZIP>` 生成、`tests/updates.py` 验证。Ed25519 私钥留 Keychain，不导出到源码、日志或安装包。
 - 发布顺序：新版本/Build → 构建和回归 → 打包/签名校验 → 上传新附件 → 发布 feed → 实测升级及最新检查 → 保留回滚备份。
@@ -20,7 +20,7 @@ Release 入口现在先检查当前仓库和 Git 提交身份，再把固定源�
 ```sh
 python3 tests/privacy.py
 python3 scripts/check-privacy.py --repo .
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=32 sh scripts/build-release.sh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=45 sh scripts/build-release.sh
 NIVLET_BUILD_CONFIGURATION=Release sh scripts/package-local.sh
 ```
 
@@ -57,4 +57,4 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=x86_64 NIVL
 NIVLET_BUILD_CONFIGURATION=Release NIVLET_DERIVED_DATA_PATH="$PWD/build/intel-1.0.0-build33/DerivedData" sh scripts/package-local.sh
 ```
 
-当前公开 appcast 仍仅面向 arm64。本次本地 Intel 打包不修改 feed；未来发布 Intel 更新前需单独完善双架构更新条目和选择验证，不能用现有 arm64-only feed 生成脚本直接发布 Intel 包。
+以上为 Build 33 历史示例，当时 feed 仅 arm64。当前 1.0.4 已支持双架构更新；生成 feed 必须同时传入 ARM 和 Intel ZIP，具体命令与选择规则见 DISTRIBUTION.md。
