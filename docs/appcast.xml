@@ -4,23 +4,23 @@
     <title>Nivlet for Mac Updates</title>
     <link>https://wivnelo.github.io/Nivlet/</link>
     <item>
-      <title>Nivlet 1.0.2 · Build 43</title>
-      <sparkle:version>43</sparkle:version>
-      <sparkle:shortVersionString>1.0.2</sparkle:shortVersionString>
+      <title>Nivlet 1.0.3 · Build 44</title>
+      <sparkle:version>44</sparkle:version>
+      <sparkle:shortVersionString>1.0.3</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
       <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.2</link>
-      <description>Nivlet 1.0.2: refresh installed apps and browsers without restarting; update icons and select an available browser when needed. 无需重启刷新应用和浏览器，更新图标与卸载后的浏览器选择。</description>
-      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.2/Nivlet-1.0.2-build43-arm64-local-release.zip" length="10962721" type="application/octet-stream" sparkle:edSignature="LPzI5a2GsqmhWNrGen2ArDL8x3gs5syUfoCVMhQvAoNBRqoEMRXfhjuK3XVINhrW3AHfMbvlApLTPBiArmXJDQ==" />
+      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.3</link>
+      <description>Nivlet 1.0.3: localized app availability labels and Apple Silicon / Intel updates. 应用名称后显示本地化未安装状态，支持 ARM 与 Intel 更新。</description>
+      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.3/Nivlet-1.0.3-build44-arm64-local-release.zip" length="10962626" type="application/octet-stream" sparkle:edSignature="XaCWhQz+ir1x1HjrWdHu6ebHhxgusqNbiQ8wNWk7uEh4knbiu6uegXjhWToSNz84nVqKhAcJpajS+YgNh0RJBQ==" />
     </item>
     <item>
-      <title>Nivlet 1.0.2 · Build 43</title>
-      <sparkle:version>43</sparkle:version>
-      <sparkle:shortVersionString>1.0.2</sparkle:shortVersionString>
+      <title>Nivlet 1.0.3 · Build 44</title>
+      <sparkle:version>44</sparkle:version>
+      <sparkle:shortVersionString>1.0.3</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.2</link>
-      <description>Nivlet 1.0.2: refresh installed apps and browsers without restarting; update icons and select an available browser when needed. 无需重启刷新应用和浏览器，更新图标与卸载后的浏览器选择。</description>
-      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.2/Nivlet-1.0.2-build43-x86_64-local-release.zip" length="11197416" type="application/octet-stream" sparkle:edSignature="jxT3i8zwIwXeXiUu2N9/RSKnZ6pXqlLwDina2n3c5ZXyX2hKeJMmK2iguFVYk0arbJ2tN/bg2YdWilv5bm1YBQ==" />
+      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.3</link>
+      <description>Nivlet 1.0.3: localized app availability labels and Apple Silicon / Intel updates. 应用名称后显示本地化未安装状态，支持 ARM 与 Intel 更新。</description>
+      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.3/Nivlet-1.0.3-build44-x86_64-local-release.zip" length="11196864" type="application/octet-stream" sparkle:edSignature="9krPIe+CZw4/n1GaRlT/g5ioULMxsARBTHqQADen2sXINySnEr+cbfFK58xbUdIv8mbTMMapvxW5NyEkXD5bAA==" />
     </item>
   </channel>
 </rss>

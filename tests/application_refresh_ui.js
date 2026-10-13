@@ -19,7 +19,12 @@ window.runApplicationRefreshRegression=function(data){
  const before=pageSnapshot('launcherSection');
  window.receive({...data,action:'refreshApplications',browsers:[safari],appIcons:{'com.example.test':false},applicationStates:{'com.example.test':{installed:false,name:'Test'}}});
  const row=document.querySelector('#launcherRules [data-bundle="com.example.test"]');
- check(row.querySelector('.application-state').textContent===t('未安装'),'Missing app status');check(pageSnapshot('launcherSection')===before,'Missing app erased shortcut');
+ check(row.querySelector('.application-state').textContent==='（'+t('未安装')+'）','Missing app status');check(pageSnapshot('launcherSection')===before,'Missing app erased shortcut');
+ check(row.querySelector('span').contains(row.querySelector('.application-state')),'Status must follow name inside label');
+ const colorProbe=document.createElement('span');colorProbe.style.color='var(--error)';document.body.append(colorProbe);check(getComputedStyle(row.querySelector('.application-state')).color===getComputedStyle(colorProbe).color,'Status must use existing error color');colorProbe.remove();
+ window.receive({...data,action:'refreshApplications',language:'en',browsers:[safari],applicationStates:{'com.example.test':{installed:false,name:'Test'}}});
+ check(row.querySelector('.application-state').textContent===' (Not installed)','English parentheses and translation');
+
  window.receive({...data,action:'refreshApplications',browsers:[safari],appIcons:{'com.example.test':fallbackAppIcon},applicationStates:{'com.example.test':{installed:true,name:'Restored'}}});
  check(row.querySelector('.application-state').hidden&&row.querySelector('span').textContent==='Restored','Reinstall refresh');check(pageSnapshot('launcherSection')===before,'Reinstall erased draft');
  window.receive({...data,action:'load',browsers:[safari],browser:{...data.browser,defaultBrowser:chrome.id}});

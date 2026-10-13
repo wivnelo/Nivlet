@@ -99,3 +99,11 @@ GitHub v1.0.2 / Build 43 已作为 Latest 正式发布，tag 指向 3e82b4d；ar
 用户在 Intel Build 42 检查更新时出现“Your Mac is too old / requires a new Apple silicon Mac”。根因是公开 feed 只列 ARM 更新项；Intel 安装包本身已发布。未重新打包 App，使用原有 1.0.2 / Build 43 ZIP 增加 Intel Ed25519 签名项。
 
 核对 Sparkle 2.10.0 官方 SUAppcastDriver.m：filterSupportedAppcast 按 arm64HardwareRequirementIsOK 过滤，bestItemFromAppcastItems 同版本保留首项。因此固定同版本 ARM 受限项在前、Intel 无硬件限制回退项在后，不添加不受支持的 x86_64 hardwareRequirements。生成器强制双包、真实主程序架构与版本/Build/公钥一致；缺包、传反及重复架构拒绝且原 feed 不变。双包 CRC、SHA-256、签名与篡改拒绝及两种硬件选择回归通过。Intel 真机端本次检查更新/安装结果仍待用户复验；未修改系统权限或本机安装。
+
+## 1.0.3 / Build 44 · 2026-10-14
+
+按用户反馈，将未安装状态从行末移至应用名称后，在名称 label 内显示中文“（未安装）”或英文“ (Not installed)”，复用 var(--error) 与现有字号；安装后隐藏状态。应用启动、输入法、浏览器来源与剪贴板排除规则共用此显示，不改变配置或快捷键。
+
+全部 Lua 回归与实际 WKWebView 六组回归通过，新增验证状态在名称内部、中英文括号/翻译、主题 error 色、重装隐藏及草稿保留；隔离布局预览已检查。颜色测试最初误用禁用的清除按钮作比较，改为直接比较主题 error 色；未降低断言。双架构全新中性目录 Release 构建为 1.0.3 / Build 44，各 101 个 Mach-O 架构、Toolkit 与源码、严格签名及隐私门禁通过；双包 ZIP CRC/普通文件逐字节核对通过。双架构更新源继续采用 ARM 优先、Intel 回退同版本项及防遗漏生成校验。旧包不覆盖，本机 App 和个人数据不改动。
+
+此前 1.0.2 双架构更新源 772a13b 已部署成功，线上 appcast 与已签名源码逐字节一致；Intel 安装与更新的用户复验仍单独记录，不将静态分流校验写成 Intel 真机升级。
