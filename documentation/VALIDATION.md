@@ -87,3 +87,9 @@ GitHub v1.0.1 已正式发布，包含 ARM 与 Intel 各 DMG/ZIP/SHA-256 六个�
 全部 Lua 回归、隐私回归、Dock 检查、应用更换及退出协调测试通过。隔离实际 WKWebView 六组通过：应用刷新、浏览器清除菜单、保存反馈、退出草稿确认、配置导入、双语 UI。配置导入初次夹具未初始化导致失败，按生产 load 流程初始化后通过，未降低断言。
 
 arm64 / x86_64 均从全新中性目录完整 Release 源码构建为 1.0.2 / Build 43；各 101 个 Mach-O 架构检查、全部 Toolkit 与源码逐文件核对、ZIP CRC/普通文件逐字节比对、严格 ad-hoc 签名、仓库/App/ZIP 隐私扫描、SHA-256 通过。构建继续采用此前临时 poison-system-directories 兼容参数，未修改第三方构建告警策略。用户的 Build 42 反馈不代替 Build 43 新增刷新行为的真机验证；本轮未替换 /Applications 中 App 或清理个人数据。发布与线上回核随后追加。
+
+### 1.0.2 发布完成
+
+GitHub v1.0.2 / Build 43 已作为 Latest 正式发布，tag 指向 3e82b4d；arm64 与 x86_64 各 DMG/ZIP/SHA-256 共六个附件，全部公开下载与本地逐字节一致。Ed25519 feed 签名、真实发行 ZIP 校验及篡改拒绝通过；双架构 DMG 完整性通过。Pages 已部署 ff3c106，公开首页和签名 appcast 与源码逐字节一致。feed 继续仅向 arm64 提供更新，Intel 使用独立下载包。v1.0.0、v1.0.1 旧正式版保留；未覆盖旧附件、安装本机 App 或清理用户数据。本轮不包含通过公开 Sparkle 实际安装 Build 43 的验收，此前 Build 41 更新渠道实测记录保留。
+
+公开 README、官网、双语安装说明、发行包 Read Me 与 Release 说明去掉过时的“未经过其他机器验证”/Intel 候选提示，不增加用户个人测试说明；签名及公证事实继续保留。未跟踪 HANDOFF.md 与独立 website/ 排除在全部提交之外。
