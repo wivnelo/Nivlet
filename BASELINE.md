@@ -2,7 +2,7 @@
 
 更新日期：2026-10-13。
 
-当前发布目标：**1.0.1 / Build 41**，macOS 13.0+。Apple Silicon 为正式更新通道；Intel x86_64 包供人工测试，尚待真机验收。发布完成状态见[当前验收](documentation/VALIDATION.md)。
+当前正式发行：**1.0.1 / Build 41**，macOS 13.0+。Apple Silicon 为正式更新通道；Intel x86_64 包供人工测试，尚待真机验收。发布与本机更新渠道验收完成，详情见[当前验收](documentation/VALIDATION.md)。
 
 新增 Safari / Chrome 清除浏览数据入口（只打开原生确认界面）、菜单状态修复及再次唤起保留当前页；现有窗口、剪贴板、输入法、应用启动、浏览器分流、系统信息、配置导入导出和手动确认更新保留。
 

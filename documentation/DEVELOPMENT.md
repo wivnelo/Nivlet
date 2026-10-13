@@ -1,4 +1,4 @@
-> 当前发布目标：1.0.1 / Build 41；下方 Intel Build 33 为历史构建示例。正式构建请使用新的隔离目录及 NIVLET_BUILD_NUMBER=41。
+> 当前正式发行：1.0.1 / Build 41；下方 Intel Build 33 为历史构建示例。正式构建请使用新的隔离目录及 NIVLET_BUILD_NUMBER=41。
 
 # 开发与构建
 

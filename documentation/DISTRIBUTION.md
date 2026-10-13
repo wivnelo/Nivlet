@@ -20,3 +20,7 @@
 - 当前 ad-hoc 与 Ed25519 包签名不等于 Developer ID/Apple 公证；跨机器验证边界必须对外明确。当前仅支持 Apple Silicon（arm64），Intel（x86_64）仅提供待真机验证的测试包；发布前核验 feed 的架构兼容性筛选，避免向 Intel Mac 提供 arm64-only 更新。
 
 用户安装与恢复操作见 [安装指南](INSTALLATION.md)，许可核查见 [第三方许可核查](THIRD-PARTY-AUDIT.md)。
+
+## 1.0.1 构建兼容说明
+
+本次 Xcode 27 中性目录构建遇到第三方 Runtime 的 `poison-system-directories` 诊断升级为错误。临时 xcconfig 仅添加 `OTHER_CFLAGS = $(inherited) -Wno-error=poison-system-directories` 与 `OTHER_CPLUSPLUSFLAGS = $(inherited) -Wno-error=poison-system-directories`，通过 `XCODE_XCCONFIG_FILE` 传入；该诊断仍保留为警告，其余错误检查不变。双架构从源码完整构建，架构裁剪、dSYM、严格签名和隐私门禁全部通过。原生依赖构建兼容性仍需后续独立修正，不应把这里的临时参数泛化成关闭其他警告。
