@@ -1,10 +1,10 @@
 // Run inside the real settings WebView with the current backend payload.
 window.runI18nRegression=function(data){
     const check=(value,message)=>{if(!value)throw new Error(message)};
-    const key=document.getElementById('left-key'),originalKey=key.value;
+    const key=document.getElementById('left-key'),originalKey=key.value,control=document.getElementById('left-ctrl'),originalControl=control.checked;
     const inputID='com.example.nivlet-i18n';
     try{
-        key.value='Z';
+        key.value='Z';control.checked=true;
         window.addInputRule({bundleID:inputID,name:'通用',sourceID:data.sources[0].id});
         const update=(language,message,paused)=>window.receive({...data,ok:true,language,message,action:'refreshClipboard',clipboard:{...data.clipboard,paused,entries:[{id:999999,time:Date.now()/1000,text:'复制'}]}});
         update('en','已保存',false);
@@ -23,7 +23,7 @@ window.runI18nRegression=function(data){
         check(key.value==='Z','Language switch discarded draft');
         return 'English/Chinese switching, changing status, pause/resume, draft and user content preservation passed';
     }finally{
-        document.querySelector('#inputRows [data-bundle="'+inputID+'"]')?.remove();key.value=originalKey;
+        document.querySelector('#inputRows [data-bundle="'+inputID+'"]')?.remove();key.value=originalKey;control.checked=originalControl;
         window.receive({...data,ok:true,message:'',action:'refreshClipboard'});
     }
 };

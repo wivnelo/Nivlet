@@ -1,6 +1,6 @@
 # Installation, updates and removal
 
-Current release: **v1.0.3 / Build 44**, macOS 13.0+, Apple Silicon (arm64) or Intel (x86_64). [简体中文](INSTALLATION.md)
+Current release: **v1.0.4 / Build 45**, macOS 13.0+, Apple Silicon (arm64) or Intel (x86_64). [简体中文](INSTALLATION.md)
 
 ## Signing status
 
@@ -8,7 +8,7 @@ Current release: **v1.0.3 / Build 44**, macOS 13.0+, Apple Silicon (arm64) or In
 
 ## Install
 
-1. Download either the DMG or ZIP from [this project's release](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.3).
+1. Download either the DMG or ZIP from [this project's release](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.4).
 2. Open the DMG and drag `Nivlet.app` to Applications, or extract the ZIP and move the app to Applications. Eject the DMG; use only the installed copy.
 3. Launch `/Applications/Nivlet.app`. If blocked because the developer cannot be verified or Apple cannot check it, and you trust the source, follow the steps below.
 4. Open Settings from the N menu bar icon. Enable the tools you need, configure rules and click Save Settings. No separate Hammerspoon installation is needed.
@@ -30,7 +30,7 @@ For browser routing, save rules first, then choose Nivlet as the system default 
 Place the DMG, ZIP and `.sha256` file together, then run:
 
 ```sh
-shasum -a 256 -c Nivlet-1.0.3-build44-arm64-local-release.sha256
+shasum -a 256 -c Nivlet-1.0.4-build45-arm64-local-release.sha256
 ```
 
 Both archives should report OK. If you downloaded only one, the missing archive reports a missing-file error; inspect the result for the archive you have. Checksums do not replace Apple signing or notarization.

@@ -650,9 +650,7 @@ document.getElementById('checkUpdates').onclick=()=>{if(document.querySelector('
 const projectLinks={'https://wivnelo.github.io/Nivlet/':'website','https://github.com/wivnelo/Nivlet':'project','https://github.com/wivnelo/Nivlet/issues':'issues','https://github.com/wivnelo/Nivlet/releases':'releases','https://github.com/wivnelo/Nivlet/blob/main/LICENSE':'license'};
 for(const link of document.querySelectorAll('#aboutSection a'))link.onclick=event=>{event.preventDefault();send({action:'openProjectLink',link:projectLinks[link.getAttribute('href')]})};
 function ruleNotice(host,message,row){
-    let note=document.getElementById(host.id+'-notice');
-    if(!note){note=document.createElement('p');note.id=host.id+'-notice';note.className='rule-notice';note.setAttribute('role','status');host.before(note)}
-    note.textContent=message;note.hidden=!message;
+    const section=host.closest('.panel').id;if(message)footerErrors.set(section,message);else footerErrors.delete(section);
     if(row){const search=document.getElementById(host.id+'-search');if(search){search.value='';refreshRuleLists()}row.scrollIntoView({block:'nearest'});row.querySelector('input,select,button')?.focus();row.classList.add('duplicate-highlight');setTimeout(()=>row.classList.remove('duplicate-highlight'),1800)}
 }
 function existingApp(hostID,rule){
@@ -695,13 +693,7 @@ function refreshConflictHints(){
         if(previous){problems.push({entries:[previous,entry],message:t('快捷键重复：')+previous.label+' ↔ '+entry.label+'（'+entry.mods.map(mod=>mods[mod]).join('')+entry.key+'）'})}
         else seen.set(entry.signature,entry);
     }
-    for(const section of ['generalSection','windowSection','clipSection','launcherSection']){
-        const panel=document.getElementById(section);let note=panel.querySelector('.shortcut-conflicts');
-        if(!note){note=document.createElement('p');note.className='shortcut-conflicts';note.setAttribute('role','status');panel.querySelector('h2').after(note)}
-        const relevant=problems.filter(problem=>problem.entries.some(entry=>entry.section===section));
-        note.textContent=relevant.map(problem=>problem.message).join('\n');note.hidden=!relevant.length;
-    }
-    for(const entry of entries){const messages=problems.filter(problem=>problem.entries.includes(entry)).map(problem=>problem.message+(problem.entries.length>1?' '+t('更换或清空其中一个快捷键。'):''));if(messages.length){entry.input.setAttribute('aria-invalid','true');entry.input.dataset.conflict=messages.join('\n');fieldError(entry.input,messages.join('\n'))}}
+    for(const entry of entries){const messages=problems.filter(problem=>problem.entries.includes(entry)).map(problem=>problem.message+(problem.entries.length>1?' '+t('更换或清空其中一个快捷键。'):''));if(messages.length){entry.input.setAttribute('aria-invalid','true');entry.input.dataset.conflict=messages.join('\n');fieldError(entry.input,problems.some(problem=>problem.entries.includes(entry)&&problem.entries.length>1)?t('快捷键重复，请修改红框中的设置。'):problems.find(problem=>problem.entries.includes(entry)).message.split('：').at(-1))}}
     return problems;
 }
 function canSaveShortcuts(section){
@@ -709,15 +701,15 @@ function canSaveShortcuts(section){
     if(!problem)return true;
     const input=problem.entries.find(entry=>entry.section===section).input;
     if(section==='windowSection'){const action=input.id.replace(/-key$/,'');for(const [group,ids] of Object.entries(windowGroups))if(ids.includes(action)){document.getElementById('windowGroup').value=group;showWindowGroup();break}}
-    input.scrollIntoView({block:'nearest'});input.focus();return false;
+    renderValidationStatus();input.scrollIntoView({block:'nearest'});input.focus();return false;
 }
 function browserDomainConflicts(){
     const host=document.getElementById('browserRules'),seen=new Map();let duplicate=null;
     for(const row of host.children){const input=row.querySelector('input[type=text]');input.removeAttribute('aria-invalid');fieldError(input,'');const name=input.value.trim().toLowerCase().replace(/\.$/,'');if(!name)continue;
         if(seen.has(name)){input.setAttribute('aria-invalid','true');seen.get(name).setAttribute('aria-invalid','true');duplicate=duplicate||{name,input}}else seen.set(name,input);
     }
-    for(const input of host.querySelectorAll('[aria-invalid=true]'))fieldError(input,t('域名规则重复：')+input.value.trim()+' '+t('删除重复规则，或改为不同域名。'));
-    ruleNotice(host,duplicate?t('域名规则重复：')+duplicate.name:'');return duplicate;
+    for(const input of host.querySelectorAll('[aria-invalid=true]'))fieldError(input,t('域名重复，请修改红框中的设置。'));
+    return duplicate;
 }
 for(const [id,section] of Object.entries({save:'windowSection',savePopup:'clipSection',saveClip:'clipSection',saveLauncher:'launcherSection'})){
     const button=document.getElementById(id),save=button.onclick;
@@ -726,47 +718,34 @@ for(const [id,section] of Object.entries({save:'windowSection',savePopup:'clipSe
 const saveGeneralButton=document.getElementById('saveGeneral'),saveGeneralSettings=saveGeneralButton.onclick;
 saveGeneralButton.onclick=()=>{if(canSaveShortcuts('generalSection'))saveGeneralSettings()};
 const saveBrowserButton=document.getElementById('saveBrowser'),saveBrowserRules=saveBrowserButton.onclick;
-saveBrowserButton.onclick=()=>{const duplicate=browserDomainConflicts();if(duplicate){duplicate.input.focus();return}saveBrowserRules()};
+saveBrowserButton.onclick=()=>{const duplicate=browserDomainConflicts();if(duplicate){renderValidationStatus();duplicate.input.focus();return}saveBrowserRules()};
 document.addEventListener('change',event=>{if(event.target.closest('#rows,#popupShortcut,#launcherRules'))refreshConflictHints();if(event.target.closest('#browserRules'))browserDomainConflicts()});
 document.addEventListener('input',event=>{if(event.target.matches('[data-shortcut-key]'))refreshConflictHints();if(event.target.closest('#browserRules'))browserDomainConflicts()});
 
 
 // Feedback never acknowledges saves; the leave guard only consumes backend responses.
-let statusTimer,fieldErrorSerial=0;
-function clearStatus(){clearTimeout(statusTimer);statusTimer=null;const status=document.getElementById('status');status.textContent='';delete status.dataset.result;}
+let statusTimer;
+const footerErrors=new Map();
+function clearStatus(){clearTimeout(statusTimer);statusTimer=null;const status=document.getElementById('status');status.textContent='';delete status.dataset.result;delete status.dataset.validation;}
 function setStatus(message,ok,temporary=false){
     clearStatus();const status=document.getElementById('status');status.textContent=message;status.dataset.result=ok?'success':'error';
     if(message&&temporary)statusTimer=setTimeout(clearStatus,3000);
 }
 function fieldError(input,message){
-    let id=input.dataset.errorNote;
-    if(!id){id='field-error-'+(++fieldErrorSerial);input.dataset.errorNote=id;}
-    let note=document.getElementById(id);
-    if(!note){note=document.createElement('span');note.id=id;note.className='field-error';note.setAttribute('role','status');
-        const host=input.closest('tr')?.firstElementChild||input.closest('.launcher-rule,.browser-rule')||input.parentElement;host.append(note);}
-    note.textContent=message;note.hidden=!message;
-    const descriptions=(input.getAttribute('aria-describedby')||'').split(' ').filter(value=>value&&value!==id);
-    if(message)descriptions.push(id);
-    if(descriptions.length)input.setAttribute('aria-describedby',descriptions.join(' '));else input.removeAttribute('aria-describedby');
+    if(message){input.dataset.validationMessage=message;input.setAttribute('aria-describedby','status')}
+    else {delete input.dataset.validationMessage;if(input.getAttribute('aria-describedby')==='status')input.removeAttribute('aria-describedby')}
 }
-function clearSaveError(section){document.getElementById(section)?.querySelectorAll('.save-error').forEach(note=>note.remove());}
+function clearSaveError(section){footerErrors.delete(section)}
 function saveError(section,data){
-    clearSaveError(section);
-    const panel=document.getElementById(section);
-    const targets={generalSection:'h2',windowSection:'#rows',inputSection:'#inputRows',clipSection:'.clip-config',systemSection:'#systemFields',browserSection:'#browserRules',launcherSection:'#launcherRules'};
-    let target=panel.querySelector(targets[section]),help='修改相关设置后重新保存；仍失败时可取消本页修改，恢复已保存值。';
-    if(section==='generalSection'){
-        if(!document.getElementById('openLoginSettings').hidden){target=document.getElementById('autoLaunch').closest('p');help='打开登录项设置检查后，再重新保存。';}
-    }else if(section==='inputSection')help='检查应用和输入法是否可用，重新选择后保存。';
-    else if(['windowSection','launcherSection'].includes(section))help='检查快捷键是否被系统占用，更换或清空后重新保存。';
-    else if(section==='browserSection')help='检查域名和浏览器是否有效，修正后重新保存。';
-    else if(section==='clipSection'){
-        if(String(data.message).includes(t('排除应用须填写有效 Bundle ID'))){target=document.getElementById('clipExcludedRows');target.closest('details').open=true;help='移除无效排除项，再通过添加应用重新选择。';}
-        else if([t('无法创建独立剪贴板缓存目录'),t('图片缓存写入失败')].some(message=>String(data.message).includes(message))){target=document.getElementById('clipPersistent').parentElement;help='检查本地缓存目录的写入权限，或关闭跨重启保留后重新保存。';}
-    }
-    const note=document.createElement('p');note.className='save-error';note.setAttribute('role','alert');
-    note.textContent=(data.message||t('保存失败，修改尚未保存。'))+' '+t(help);
-    if(target===panel.querySelector('.clip-config'))target.prepend(note);else target.after(note);
+    footerErrors.set(section,data.message||t('保存失败，修改尚未保存。'));
+    if(section==='clipSection'&&String(data.message).includes(t('排除应用须填写有效 Bundle ID')))document.getElementById('clipExcludedRows').closest('details').open=true;
+}
+function renderValidationStatus(){
+    const panel=document.querySelector('.panel:not([hidden])');if(!panel)return;
+    const messages=[...new Set([...panel.querySelectorAll('[aria-invalid=true]')].map(input=>input.dataset.validationMessage).filter(Boolean))];
+    const message=messages.length>1?t('有多项设置需要修正，请检查红框。'):messages[0]||footerErrors.get(panel.id);
+    if(message){setStatus(message,false);document.getElementById('status').dataset.validation='true'}
+    else if(document.getElementById('status').dataset.validation)clearStatus();
 }
 
 // One save action per page; drafts survive navigation and background refreshes.
@@ -781,6 +760,7 @@ function pageSnapshot(section){
 function updateSaveState(){
     refreshShortcutDisplays();
     refreshRuleLists();
+    refreshConflictHints();browserDomainConflicts();renderValidationStatus();
     const section=document.querySelector('[role=tab][aria-selected=true]').getAttribute('aria-controls');
     const button=document.getElementById('saveSettings'),hint=document.getElementById('draftHint');
     button.hidden=!pageSaves[section];button.textContent=t('保存设置');
@@ -826,11 +806,11 @@ window.receive=data=>{
     }
     if(feedbackSection){
         if(data.ok){clearSaveError(feedbackSection);if(!document.getElementById(feedbackSection).hidden)setStatus(data.message||t('设置已保存'),true,true);else clearStatus();}
-        else {saveError(feedbackSection,data);if(!document.getElementById(feedbackSection).hidden)setStatus(t('保存失败，请检查本页提示。'),false);}
+        else saveError(feedbackSection,data);
     }
     updateSaveState();
     leaveGuard.receive(actions[data.action],data.ok===true);
-    if(feedbackSection&&data.ok===false&&!document.getElementById(feedbackSection).hidden)document.querySelector('#'+feedbackSection+' .save-error')?.scrollIntoView({block:'nearest'});
+
 };
 const showSettingsSection=window.showSection;
 window.showSection=section=>{const previous=document.querySelector('[role=tab][aria-selected=true]').getAttribute('aria-controls');if(section!=='browserSection')closeBrowserDataMenu();showSettingsSection(section);if(previous!==document.querySelector('[role=tab][aria-selected=true]').getAttribute('aria-controls'))clearStatus();updateSaveState()};

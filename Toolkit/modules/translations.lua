@@ -1,5 +1,8 @@
 -- Simplified Chinese source strings and English UI translations.
 return {
+    ["快捷键重复，请修改红框中的设置。"] = "Duplicate shortcut. Update the fields marked in red.",
+    ["域名重复，请修改红框中的设置。"] = "Duplicate domain. Update the fields marked in red.",
+    ["有多项设置需要修正，请检查红框。"] = "Several settings need correction. Check the fields marked in red.",
     ["未安装"] = "Not installed",
     ["没有可用浏览器"] = "No browser available",
     ["原浏览器已不可用，已改选可用浏览器；保存后生效。"] = "The previous browser is unavailable. An available browser was selected; save to apply.",
