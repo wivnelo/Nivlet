@@ -43,3 +43,16 @@ git diff --check
 ```
 
 构建前需要完整 Xcode、Python 3 和固定 Runtime；首次使用 `sh scripts/fetch-runtime.sh` 准备 Runtime，已有目录不自动覆盖。不要自动升级依赖或替换已安装 App。
+
+## 按架构独立构建（2026-10-13）
+
+`NIVLET_ARCH` 支持 `arm64`（默认）与 `x86_64`。主程序、原生 system-probe 及全部内嵌 Mach-O 必须具有目标架构；优化阶段统一裁剪，缺少切片即停止。Release 仍要求匹配架构的 dSYM，并保留隐私检查与严格签名检查。
+
+Intel 本地候选包沿用 1.0.0 功能，使用 Build 33，要求 macOS 13.0+；与已发布 Build 32 arm64 包分开，不能视为已经在 Intel 真机通过验收。
+
+```sh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=x86_64 NIVLET_BUILD_NUMBER=33 NIVLET_DERIVED_DATA_PATH="$PWD/build/intel-1.0.0-build33/DerivedData" sh scripts/build-release.sh
+NIVLET_BUILD_CONFIGURATION=Release NIVLET_DERIVED_DATA_PATH="$PWD/build/intel-1.0.0-build33/DerivedData" sh scripts/package-local.sh
+```
+
+当前公开 appcast 仍仅面向 arm64。本次本地 Intel 打包不修改 feed；未来发布 Intel 更新前需单独完善双架构更新条目和选择验证，不能用现有 arm64-only feed 生成脚本直接发布 Intel 包。
