@@ -1,6 +1,6 @@
 # Installation, updates and removal
 
-Current release: **v1.0.1 / Build 41**, macOS 13.0+, Apple Silicon (arm64). An Intel (x86_64) candidate is available for manual testing and has not passed Intel hardware validation. [简体中文](INSTALLATION.md)
+Current release: **v1.0.2 / Build 43**, macOS 13.0+, Apple Silicon (arm64) or Intel (x86_64). [简体中文](INSTALLATION.md)
 
 ## Signing status
 
@@ -8,7 +8,7 @@ Current release: **v1.0.1 / Build 41**, macOS 13.0+, Apple Silicon (arm64). An I
 
 ## Install
 
-1. Download either the DMG or ZIP from [this project's release](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.1).
+1. Download either the DMG or ZIP from [this project's release](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.2).
 2. Open the DMG and drag `Nivlet.app` to Applications, or extract the ZIP and move the app to Applications. Eject the DMG; use only the installed copy.
 3. Launch `/Applications/Nivlet.app`. If blocked because the developer cannot be verified or Apple cannot check it, and you trust the source, follow the steps below.
 4. Open Settings from the N menu bar icon. Enable the tools you need, configure rules and click Save Settings. No separate Hammerspoon installation is needed.
@@ -30,7 +30,7 @@ For browser routing, save rules first, then choose Nivlet as the system default 
 Place the DMG, ZIP and `.sha256` file together, then run:
 
 ```sh
-shasum -a 256 -c Nivlet-1.0.1-build41-arm64-local-release.sha256
+shasum -a 256 -c Nivlet-1.0.2-build43-arm64-local-release.sha256
 ```
 
 Both archives should report OK. If you downloaded only one, the missing archive reports a missing-file error; inspect the result for the archive you have. Checksums do not replace Apple signing or notarization.
@@ -49,4 +49,4 @@ If Nivlet is your default browser, switch back to Safari or another browser firs
 
 ## Validation and reporting
 
-Build 41 passed automated regression. Earlier manual and multiple-display acceptance applies to the functional baseline; the new browser entry and reopen behavior were checked locally. This does not establish compatibility with every Mac, macOS version or display arrangement. Report the version/Build, macOS, chip, steps and exact error through [GitHub Issues](https://github.com/wivnelo/Nivlet/issues). Do not share private clipboard contents, full personal configurations or credentials.
+Report the version/Build, macOS, chip, steps and exact error through [GitHub Issues](https://github.com/wivnelo/Nivlet/issues). Do not share private clipboard contents, full personal configurations or credentials.

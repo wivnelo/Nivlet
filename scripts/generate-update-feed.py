@@ -33,7 +33,7 @@ ET.SubElement(item, f'{{{ns}}}shortVersionString').text = version
 ET.SubElement(item, f'{{{ns}}}minimumSystemVersion').text = '13.0'
 ET.SubElement(item, f'{{{ns}}}hardwareRequirements').text = 'arm64'
 ET.SubElement(item, 'link').text = f'https://github.com/wivnelo/Nivlet/releases/tag/v{version}'
-ET.SubElement(item, 'description').text = f'Nivlet {version}: browser data entry and settings reopen fixes. 浏览数据入口与再次唤起修复。'
+ET.SubElement(item, 'description').text = f'Nivlet {version}: refresh installed apps and browsers without restarting; update icons and select an available browser when needed. 无需重启刷新应用和浏览器，更新图标与卸载后的浏览器选择。'
 ET.SubElement(item, 'enclosure', {
     'url': f'https://github.com/wivnelo/Nivlet/releases/download/v{version}/{archive.name}',
     'length': str(archive.stat().st_size),

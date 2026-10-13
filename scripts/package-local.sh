@@ -38,12 +38,12 @@ cat >> "$stage/安装说明-Read-Me.txt" <<'TXT'
 在通用设置配置外观和语言；窗口、剪贴板、输入法、浏览器及应用快捷启动按需开启。
 窗口管理和 Option 直接粘贴需要在系统设置中允许辅助功能。
 配置与历史保存在本机；升级时只替换 App，不删除数据目录。
-此包使用开发签名，尚未经过 Developer ID 签名、公证与其他机器验收。
+此包使用 ad-hoc 签名，尚无 Developer ID 签名或 Apple 公证。
 
 Drag Nivlet.app into Applications. No separate Hammerspoon installation is needed.
 Enable modules in Settings. Window management and Option-paste require Accessibility permission.
 Settings and history are stored locally. Updating the App does not require deleting its data.
-This build has no Developer ID signature or notarization and has not passed cross-machine validation.
+This build uses ad-hoc signing and has no Developer ID signature or Apple notarization.
 TXT
 ditto -c -k --sequesterRsrc --keepParent "$app_path" "$output/$base.zip"
 python3 "$project_dir/scripts/check-privacy.py" --zip "$output/$base.zip"

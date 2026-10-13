@@ -273,11 +273,23 @@ function translateUI(){
     }
 }
 
-window.showSection=function(id){if(!document.getElementById(id))id='windowSection';for(const panel of document.querySelectorAll('.panel'))panel.hidden=panel.id!==id;for(const tab of document.querySelectorAll('[role=tab]')){const selected=tab.getAttribute('aria-controls')===id;tab.setAttribute('aria-selected',String(selected));tab.tabIndex=selected?0:-1}document.querySelector('main').scrollTop=0;if(id==='systemSection')send({action:'refreshSystemValues'});if(id==='generalSection')send({action:'refreshPermissions',silent:true})};
+window.showSection=function(id){if(!document.getElementById(id))id='windowSection';for(const panel of document.querySelectorAll('.panel'))panel.hidden=panel.id!==id;for(const tab of document.querySelectorAll('[role=tab]')){const selected=tab.getAttribute('aria-controls')===id;tab.setAttribute('aria-selected',String(selected));tab.tabIndex=selected?0:-1}document.querySelector('main').scrollTop=0;if(['browserSection','inputSection','launcherSection','clipSection'].includes(id))refreshApplications();if(id==='systemSection')send({action:'refreshSystemValues'});if(id==='generalSection')send({action:'refreshPermissions',silent:true})};
 const tabs=[...document.querySelectorAll('[role=tab]')];for(const tab of tabs){tab.onclick=()=>{if(tab.dataset.suppressClick){delete tab.dataset.suppressClick;return;}window.showSection(tab.getAttribute('aria-controls'))};tab.onkeydown=e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const tabs=[...document.querySelectorAll('[role=tab]')];let i=tabs.indexOf(tab);i=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;delete tabs[i].dataset.suppressClick;tabs[i].click();tabs[i].focus()}}}
 
+function refreshApplications(){send({action:'refreshApplications',bundleIDs:[...new Set([...document.querySelectorAll('[data-bundle]')].map(row=>row.dataset.bundle))]})}
+let applicationStates={};
+function updateApplicationState(row){
+    const state=applicationStates[row.dataset.bundle];if(!state)return;
+    let note=row.querySelector('.application-state');
+    if(!note){note=document.createElement('small');note.className='application-state';row.append(note)}
+    note.textContent=state.installed?'':t('未安装');note.hidden=state.installed;
+    const label=row.querySelector('span');if(state.installed&&label){label.textContent=state.name;row.dataset.name=state.name}
+}
 let installedBrowsers=[];
-function fillBrowsers(select,value){select.replaceChildren();for(const browser of installedBrowsers){const option=document.createElement('option');option.value=browser.id;option.textContent=browser.name;select.append(option)}if(value)select.value=value}
+function fillBrowsers(select,value){select.replaceChildren();for(const browser of installedBrowsers){const option=document.createElement('option');option.value=browser.id;option.textContent=browser.name;select.append(option)}select.disabled=!installedBrowsers.length;
+    if(!installedBrowsers.length){const option=document.createElement('option');option.value='';option.textContent=t('没有可用浏览器');select.append(option)}
+    if(value&&installedBrowsers.some(browser=>browser.id===value))select.value=value;
+}
 window.addBrowserAppRule=function(rule){if(existingApp('browserAppRules',rule))return;const row=document.createElement('div');row.className='browser-app-rule input-rule';row.dataset.bundle=rule.bundleID;row.dataset.name=rule.name;const label=document.createElement('span');label.textContent=rule.name;const select=document.createElement('select');select.setAttribute('aria-label',rule.name+'打开浏览器');fillBrowsers(select,rule.browser||document.getElementById('browserDefault').value);const remove=document.createElement('button');remove.textContent=t('移除');remove.onclick=()=>{row.remove();ruleNotice(document.getElementById('browserAppRules'),'');};row.append(label,select,remove);document.getElementById('browserAppRules').append(row);addRuleOrdering(row);};
 document.getElementById('chooseBrowserApp').onclick=()=>send({action:'chooseBrowserApp'});
 function updateBrowserOrder(){const rows=[...document.querySelectorAll('.browser-rule')];rows.forEach((row,index)=>{row.querySelector('[data-move=up]').disabled=index===0;row.querySelector('[data-move=down]').disabled=index===rows.length-1});browserDomainConflicts()}
@@ -498,6 +510,14 @@ window.receive=function(data){
     if(data.general&&(initial||data.action==='saveTabOrder'||update('saveGeneral'))){applyTabOrder(data.general.tabOrder||[]);}
     if(update('saveGeneral')&&data.general){document.getElementById('sleepShortcut').checked=!!data.general.sleepShortcut;document.getElementById('showMenu').checked=data.general.showMenu;document.getElementById('appearance').value=data.general.appearance;document.getElementById('language').value=data.general.language||'system';}
     installedBrowsers=data.browsers||[];
+    applicationStates={...applicationStates,...data.applicationStates};
+    let browserReplaced=false;
+    for(const select of document.querySelectorAll('#browserDefault,#browserRules select,#browserAppRules select')){
+        const value=select.value;
+        const ids=[...select.options].map(option=>option.value);
+        const next=installedBrowsers.length?installedBrowsers.map(browser=>browser.id):[''];
+        if(JSON.stringify(ids)!==JSON.stringify(next)){fillBrowsers(select,value);if(value&&value!==select.value)browserReplaced=true}
+    }
     const dataBrowsers=installedBrowsers.filter(browser=>['com.apple.Safari','com.google.Chrome'].includes(browser.id));
     const menuSignature=JSON.stringify(dataBrowsers.map(browser=>[browser.id,browser.name,appIcons[browser.id]]));
     if(menuSignature!==browserDataMenuSignature){
@@ -518,6 +538,8 @@ window.receive=function(data){
     if(data.browserStatus){document.getElementById('browserRoutingStatus').dataset.state=data.browserStatus.active?'granted':'inactive';document.getElementById('setDefaultBrowser').hidden=data.browserStatus.active;document.getElementById('openDefaultBrowserSettings').hidden=data.browserStatus.active;document.querySelector('.routing-actions').hidden=data.browserStatus.active;document.getElementById('browserRoutingStatus').textContent=t(data.browserStatus.active?'已接管系统网页链接':'尚未接管系统网页链接：请在 macOS 默认网页浏览器中选择 Nivlet，来源应用规则才能生效。');}
     if(update('saveLauncher')&&data.launcher){document.getElementById('launcherEnabled').checked=data.launcher.enabled;document.getElementById('launcherRules').replaceChildren();for(const rule of data.launcher.rules)window.addLauncherRule(rule)}
     if(update('saveBrowser')&&data.browser){
+        const configured=[data.browser.defaultBrowser,...data.browser.rules.map(rule=>rule.browser),...(data.browser.appRules||[]).map(rule=>rule.browser)];
+        if(configured.some(id=>!installedBrowsers.some(browser=>browser.id===id)))browserReplaced=true;
         document.getElementById('browserEnabled').checked=data.browser.enabled;
         fillBrowsers(document.getElementById('browserDefault'),data.browser.defaultBrowser);
         document.getElementById('browserRules').replaceChildren();
@@ -536,7 +558,9 @@ window.receive=function(data){
     if(initial||data.action==='saveGeneral')document.getElementById('openLoginSettings').hidden=!(data.ok===false&&String(data.message||'').includes(t('无法修改启动设置，请在系统设置中检查登录项')));
     if(data.ok)settingsLoaded=true;
     refreshConflictHints();browserDomainConflicts();
-    if(data.action!=='refreshPermissionsSilent'){setStatus(data.message||'',data.ok);}
+    for(const row of document.querySelectorAll('[data-bundle]'))updateApplicationState(row);
+    if(data.action!=='refreshPermissionsSilent'&&data.action!=='refreshApplications'){setStatus(data.message||'',data.ok);}
+    if(browserReplaced)setStatus(t('原浏览器已不可用，已改选可用浏览器；保存后生效。'),true,true);
     if(['refreshPermissions','refreshPermissionsSilent'].includes(data.action))for(const button of document.querySelectorAll('.refresh-permissions'))button.textContent=t('重新检测');
     const state=data.permissions?.accessibility||(data.accessibility===true?'granted':data.accessibility===false?'denied':'error');
     for(const label of document.querySelectorAll('.permission-state')){label.textContent=t(state==='granted'?'辅助功能权限已开启':state==='denied'?'辅助功能权限未开启':'权限检测失败，请重新检测');label.dataset.state=state;label.hidden=state==='denied'}
@@ -618,7 +642,7 @@ for(const button of document.querySelectorAll('.refresh-permissions'))button.onc
 for(const button of document.querySelectorAll('.open-accessibility'))button.onclick=()=>send({action:'openAccessibility'});
 window.receiveSystemValues=function(data){for(const id of Object.keys(systemFields)){const value=document.getElementById('system-value-'+id),raw=data.ok?data.values[id]:null;value.textContent=raw&&raw!=='N/A'?raw:t('暂不可用');value.title=value.textContent}};
 setInterval(()=>{if(document.visibilityState==='visible'&&!document.getElementById('systemSection').hidden)send({action:'refreshSystemValues'})},2000);
-window.addEventListener('focus',()=>send({action:'refreshPermissions',silent:true}));
+window.addEventListener('focus',()=>{refreshApplications();send({action:'refreshPermissions',silent:true})});
 document.getElementById('checkUpdates').onclick=()=>{if(document.querySelector('#draftHint').dataset.dirty==='true'){document.getElementById('status').textContent=t('请先保存或取消未保存的修改，再检查更新。');return;}send({action:'checkUpdates'});};
 const projectLinks={'https://wivnelo.github.io/Nivlet/':'website','https://github.com/wivnelo/Nivlet':'project','https://github.com/wivnelo/Nivlet/issues':'issues','https://github.com/wivnelo/Nivlet/releases':'releases','https://github.com/wivnelo/Nivlet/blob/main/LICENSE':'license'};
 for(const link of document.querySelectorAll('#aboutSection a'))link.onclick=event=>{event.preventDefault();send({action:'openProjectLink',link:projectLinks[link.getAttribute('href')]})};
@@ -790,7 +814,13 @@ window.receive=data=>{
         for(const section of Object.keys(pageSaves))if(!savedResponses.has(section)||data.action==='load'||actions[data.action]===section||(data.action==='applyConfiguration'&&savedPages.get(section)===pageSnapshot(section)))savedResponses.set(section,structuredClone(data));
     }
     const feedbackSection=actions[data.action]||(data.action==='savePopup'?'clipSection':null);
-    if(data.action==='load')for(const section of Object.keys(pageSaves))clearSaveError(section);
+    if(data.action==='load'){
+        for(const section of Object.keys(pageSaves))clearSaveError(section);
+        if(data.browser){
+            const configured=[data.browser.defaultBrowser,...data.browser.rules.map(rule=>rule.browser),...(data.browser.appRules||[]).map(rule=>rule.browser)];
+            if(configured.some(id=>!installedBrowsers.some(browser=>browser.id===id)))savedPages.set('browserSection','unavailable-browser');
+        }
+    }
     if(feedbackSection){
         if(data.ok){clearSaveError(feedbackSection);if(!document.getElementById(feedbackSection).hidden)setStatus(data.message||t('设置已保存'),true,true);else clearStatus();}
         else {saveError(feedbackSection,data);if(!document.getElementById(feedbackSection).hidden)setStatus(t('保存失败，请检查本页提示。'),false);}

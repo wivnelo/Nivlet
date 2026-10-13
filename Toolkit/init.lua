@@ -228,15 +228,25 @@ end
 local function permissionState() return permissions.snapshot() end
 local appIcons=require("modules.app_icons")
 local appNames=require("modules.app_names")
+local requestedApps={}
 local function configuredAppIcons()
     local icons={}
     for _,config in ipairs({input.config,browser.config,launcher.config}) do
-        for _,rule in ipairs(config.rules or {}) do if rule.bundleID then icons[rule.bundleID]=appIcons.get(rule.bundleID) end end
+        for _,rule in ipairs(config.rules or {}) do if rule.bundleID then icons[rule.bundleID]=appIcons.get(rule.bundleID) or false end end
     end
-    for _,rule in ipairs(browser.config.appRules or {}) do icons[rule.bundleID]=appIcons.get(rule.bundleID) end
-    for _,id in ipairs(clipboard.config.excluded) do icons[id]=appIcons.get(id) end
-    for _,id in ipairs({"com.apple.Safari","com.google.Chrome"}) do icons[id]=appIcons.get(id) end
+    for _,rule in ipairs(browser.config.appRules or {}) do icons[rule.bundleID]=appIcons.get(rule.bundleID) or false end
+    for _,id in ipairs(clipboard.config.excluded) do icons[id]=appIcons.get(id) or false end
+    for _,id in ipairs({"com.apple.Safari","com.google.Chrome"}) do icons[id]=appIcons.get(id) or false end
+    for _,id in ipairs(requestedApps) do icons[id]=appIcons.get(id) or false end
     return icons
+end
+local function applicationStates()
+    local states={}
+    for id in pairs(configuredAppIcons()) do
+        local path=hs.application.pathForBundleID(id)
+        states[id]={installed=path and hs.fs.attributes(path,"mode")=="directory" or false,name=appNames.get(id)}
+    end
+    return states
 end
 local function excludedAppNames()
     local names={}
@@ -246,8 +256,9 @@ local function excludedAppNames()
     return names
 end
 local function reply(ok, message, action, requestID)
+    if action=="refreshApplications" or action=="refreshBrowserStatus" or action=="refreshPermissionsSilent" or action=="prepareBrowserData" or action==nil then appIcons.clear() end
     local permission=permissionState()
-    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,requestID=requestID,language=i18n.language(),translations=i18n.dictionary,general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),excludedAppNames=excludedAppNames(),appIcons=configuredAppIcons(),popupShortcut=app.popupShortcut or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}) .. ")") end
+    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,requestID=requestID,language=i18n.language(),translations=i18n.dictionary,general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),excludedAppNames=excludedAppNames(),appIcons=configuredAppIcons(),applicationStates=applicationStates(),popupShortcut=app.popupShortcut or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}) .. ")") end
 end
 local function showSettingsWindow(view)
     hs.dockicon.show()
@@ -315,6 +326,13 @@ function app.openSettings(section, focus)
             browser.requestDefault()
             reply(true,i18n.t("请完成系统确认，再点击重新检测；若未出现确认，请打开系统设置。"),body.action)
             return
+        end
+        if body.action=="refreshApplications" then
+            requestedApps={}
+            if type(body.bundleIDs)=="table" then for _,id in ipairs(body.bundleIDs) do
+                if #requestedApps<500 and type(id)=="string" and #id<256 and id:match("^[%w_%-]+%.[%w_.%-]+$") then table.insert(requestedApps,id) end
+            end end
+            reply(true,"",body.action);return
         end
         if body.action=="refreshBrowserStatus" then reply(true,"",body.action);return end
         if body.action=="openDefaultBrowserSettings" then
@@ -412,6 +430,7 @@ function app.openSettings(section, focus)
                     if body.action=="chooseLauncherApp" and type(body.replaceBundleID)=="string" then
                         app.settings:evaluateJavaScript("window.replaceLauncherApp("..hs.json.encode(value)..","..hs.json.encode({body.replaceBundleID}).."[0])")
                     else app.settings:evaluateJavaScript(callback .. hs.json.encode(value) .. ",true)") end
+                    reply(true,"","refreshApplications")
                 else reply(false, i18n.t("无法识别所选应用")) end
             end
         end

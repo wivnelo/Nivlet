@@ -4,14 +4,14 @@
     <title>Nivlet for Mac Updates</title>
     <link>https://wivnelo.github.io/Nivlet/</link>
     <item>
-      <title>Nivlet 1.0.1 · Build 41</title>
-      <sparkle:version>41</sparkle:version>
-      <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
+      <title>Nivlet 1.0.2 · Build 43</title>
+      <sparkle:version>43</sparkle:version>
+      <sparkle:shortVersionString>1.0.2</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
       <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.1</link>
-      <description>Nivlet 1.0.1: browser data entry and settings reopen fixes. 浏览数据入口与再次唤起修复。</description>
-      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.1/Nivlet-1.0.1-build41-arm64-local-release.zip" length="10961163" type="application/octet-stream" sparkle:edSignature="tNTsVudJF36EuwimNBYvBJIXCnsCTpo+oxGb3w4NV2BQe6a5S2SVhCu0aXbxNMiRAoO1Sc7ShZ9Jt4kc7dYyAA==" />
+      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.2</link>
+      <description>Nivlet 1.0.2: refresh installed apps and browsers without restarting; update icons and select an available browser when needed. 无需重启刷新应用和浏览器，更新图标与卸载后的浏览器选择。</description>
+      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.2/Nivlet-1.0.2-build43-arm64-local-release.zip" length="10962721" type="application/octet-stream" sparkle:edSignature="LPzI5a2GsqmhWNrGen2ArDL8x3gs5syUfoCVMhQvAoNBRqoEMRXfhjuK3XVINhrW3AHfMbvlApLTPBiArmXJDQ==" />
     </item>
   </channel>
 </rss>

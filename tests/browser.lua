@@ -48,3 +48,13 @@ hs.urlevent.setDefaultHandler=function(scheme,bundle,urlOnly) requested={scheme,
 b.requestDefault();assert(requested[1]=='https' and requested[2]=='dev.local.DesktopToolkit' and requested[3]==true)
 assert(b.openDefaultSettings());assert(opened[1]=='x-apple.systempreferences:com.apple.Desktop-Settings.extension' and opened[2]=='com.apple.systempreferences')
 print('Explicit default browser request and system settings fallback passed')
+
+-- Launch Services may retain an application path after the app is removed.
+hs.fs={attributes=function(path,field) assert(field=='mode');return path=='/installed.app' and 'directory' or nil end}
+hs.application.pathForBundleID=function(id)
+    if id=='com.apple.Safari' then return '/installed.app' end
+    if id=='com.google.Chrome' then return '/removed/Google Chrome.app' end
+end
+local installed=b.installed()
+assert(#installed==1 and installed[1].id=='com.apple.Safari','Removed Chrome must not appear in installed browsers')
+print('Installed browser list excludes stale application paths')

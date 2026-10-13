@@ -38,7 +38,10 @@ end
 M.config=M.defaults()
 function M.installed()
     local result={}
-    for _,browser in ipairs(M.browsers) do if hs.application.pathForBundleID(browser.id) then table.insert(result,browser) end end
+    for _,browser in ipairs(M.browsers) do
+        local path=hs.application.pathForBundleID(browser.id)
+        if path and hs.fs.attributes(path,"mode")=="directory" then table.insert(result,browser) end
+    end
     return result
 end
 function M.resolve(url,sourceBundle)

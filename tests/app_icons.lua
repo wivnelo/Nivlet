@@ -8,3 +8,10 @@ icons.get('test',true);assert(calls==3);assert(not icons.get(nil))
 hs.application={pathForBundleID=function(id)return id~='uninstalled' and '/Applications/Test.app' or nil end}
 local before=calls;assert(not icons.get('uninstalled'));assert(calls==before)
 print('App icons: display metadata, bounded size, success/miss caching and refresh passed')
+
+local present=false
+hs.fs={attributes=function()return present and 'directory' or nil end}
+icons.clear();assert(not icons.get('test'))
+present=true;icons.clear();assert(icons.get('test'))
+present=false;icons.clear();assert(not icons.get('test'))
+print('Icon refresh recovers missing apps and clears removed apps')

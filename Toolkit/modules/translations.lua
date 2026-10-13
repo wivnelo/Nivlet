@@ -1,5 +1,8 @@
 -- Simplified Chinese source strings and English UI translations.
 return {
+    ["未安装"] = "Not installed",
+    ["没有可用浏览器"] = "No browser available",
+    ["原浏览器已不可用，已改选可用浏览器；保存后生效。"] = "The previous browser is unavailable. An available browser was selected; save to apply.",
     ["清理浏览数据的浏览器"] = "Browser for clearing browsing data",
     ["清除浏览数据…"] = "Clear Browsing Data…",
     ["正在打开浏览器，请稍候"] = "Opening browser, please wait",

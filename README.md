@@ -80,9 +80,9 @@ Features are opt-in, and shortcuts are yours to configure. Window management and
 
 ## Before installing: no Apple Developer ID signature yet
 
-**v1.0.1 / Build 41 is distributed with ad-hoc signing. It has no Apple Developer ID signature or Apple notarization.** macOS may block first launch; this is separate from the signed in-app update channel.
+**v1.0.2 / Build 43 is distributed with ad-hoc signing. It has no Apple Developer ID signature or Apple notarization.** macOS may block first launch; this is separate from the signed in-app update channel.
 
-Download only from this project's [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.1). Open the DMG and drag `Nivlet.app` to **Applications**, or extract the ZIP and move the app there. Eject the DMG and launch the copy in Applications.
+Download only from this project's [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.2). Open the DMG and drag `Nivlet.app` to **Applications**, or extract the ZIP and move the app there. Eject the DMG and launch the copy in Applications.
 
 If macOS says the developer cannot be verified or Apple cannot check the app, and you trust the download:
 
@@ -92,9 +92,9 @@ If macOS says the developer cannot be verified or Apple cannot check the app, an
 
 If macOS reports malware, damage, or a checksum mismatch, stop and report the exact message rather than treating it as an ordinary developer warning. The exception may be unavailable on managed Macs. See [Apple's guidance](https://support.apple.com/en-us/102445) and the [full installation, upgrade and removal guide](documentation/INSTALLATION.en.md).
 
-**Requirements:** macOS 13.0+ and Apple Silicon (arm64). An Intel (x86_64) candidate package is also provided for manual testing; Intel hardware validation is pending. Old installation packages, including the historical Intel build, have been withdrawn for privacy remediation.
+**Requirements:** macOS 13.0+, Apple Silicon (arm64) or Intel (x86_64). Old installation packages, including the historical Intel build, have been withdrawn for privacy remediation.
 
-**Validation:** Build 41 passed automated source and native UI regression. Manual and multiple-display acceptance applies to the prior functional baseline; the new browser entry and reopen behavior were checked locally. Other Mac models and macOS versions have not all been tested. Ad-hoc updates may require granting Accessibility permission again; select `/Applications/Nivlet.app` in System Settings and click Check Again in General.
+Ad-hoc updates may require granting Accessibility permission again; select `/Applications/Nivlet.app` in System Settings and click Check Again in General.
 
 ## Local processing, optional recording
 
@@ -116,4 +116,4 @@ Report problems or suggestions through [GitHub Issues](https://github.com/wivnel
 
 Nivlet uses the [MIT License](LICENSE). Its embedded Runtime is based on [Hammerspoon](https://github.com/Hammerspoon/hammerspoon). Third-party components retain their own licenses; see [third-party notices](THIRD-PARTY-NOTICES.md).
 
-1.0.1 adds a Safari / Chrome clear-data entry and preserves the current settings page when reopening. See [release notes](documentation/RELEASE-v1.0.1.md).
+1.0.2 adds a Safari / Chrome clear-data entry and preserves the current settings page when reopening. See [release notes](documentation/RELEASE-v1.0.2.md).

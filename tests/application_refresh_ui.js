@@ -1,0 +1,28 @@
+window.runApplicationRefreshRegression=function(data){
+ const check=(ok,message)=>{if(!ok)throw Error(message)};
+ send=()=>{};
+ const safari={id:'com.apple.Safari',name:'Safari'},chrome={id:'com.google.Chrome',name:'Chrome'};
+ data.action='load';data.browsers=[safari];window.receive(data);window.showSection('browserSection');
+ const select=document.getElementById('browserDefault');check(select.options.length===1,'Initial Safari');
+ const host=document.querySelector('#browserRules input');host.value='draft.example';
+ window.receive({...data,action:'refreshApplications',browsers:[safari,chrome]});
+ check(select.options.length===2&&host.value==='draft.example','Install refresh or draft preservation');
+ select.value=chrome.id;document.querySelector('#browserRules select').value=chrome.id;document.querySelector('#browserAppRules select').value=chrome.id;
+ window.receive({...data,action:'refreshApplications',browsers:[safari]});
+ check([...document.querySelectorAll('#browserDefault,#browserRules select,#browserAppRules select')].every(s=>s.value===safari.id),'Removed browser fallback across all selectors');
+ check(savedPages.get('browserSection')!==pageSnapshot('browserSection'),'Fallback must require save');
+ check(host.value==='draft.example','Fallback erased domain draft');
+ check(browserDataMenu.children.length===1,'Removed Chrome in clear menu');
+ window.receive({...data,action:'refreshApplications',browsers:[]});check(select.disabled&&select.value===''&&browserDataButton.disabled,'Empty browsers');
+ window.receive({...data,action:'refreshApplications',browsers:[safari,chrome]});check(!select.disabled&&select.value===safari.id,'Recovery from empty');
+ window.addLauncherRule({bundleID:'com.example.test',name:'Test',shortcut:{key:'J',mods:['ctrl']}});
+ const before=pageSnapshot('launcherSection');
+ window.receive({...data,action:'refreshApplications',browsers:[safari],appIcons:{'com.example.test':false},applicationStates:{'com.example.test':{installed:false,name:'Test'}}});
+ const row=document.querySelector('#launcherRules [data-bundle="com.example.test"]');
+ check(row.querySelector('.application-state').textContent===t('未安装'),'Missing app status');check(pageSnapshot('launcherSection')===before,'Missing app erased shortcut');
+ window.receive({...data,action:'refreshApplications',browsers:[safari],appIcons:{'com.example.test':fallbackAppIcon},applicationStates:{'com.example.test':{installed:true,name:'Restored'}}});
+ check(row.querySelector('.application-state').hidden&&row.querySelector('span').textContent==='Restored','Reinstall refresh');check(pageSnapshot('launcherSection')===before,'Reinstall erased draft');
+ window.receive({...data,action:'load',browsers:[safari],browser:{...data.browser,defaultBrowser:chrome.id}});
+ check(select.value===safari.id&&savedPages.get('browserSection')!==pageSnapshot('browserSection'),'Initial stale browser must require save');
+ return 'PASS: install, removal, all selectors, empty recovery, draft preservation, save boundary and app status';
+};

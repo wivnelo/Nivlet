@@ -4,7 +4,7 @@ local first=assert(source:find('        if body.action == "chooseApp"',1,true))
 local last=assert(source:find('\n    end)\n    local file',first,true))
 local branch=source:sub(first,last-1)
 local result,encoded,errors,selection,info
-local env={appNames={get=function(id,_,path,info)assert(path=='/Applications/Synthetic.app');return info.CFBundleDisplayName or id end},appIcons={get=function()return nil end},body={action='chooseExcludedApp'},i18n={t=function(s)return s end},reply=function(ok,message)assert(not ok);errors=message end,
+local env={appNames={get=function(id,_,path,info)assert(path=='/Applications/Synthetic.app');return info.CFBundleDisplayName or id end},appIcons={get=function()return nil end},body={action='chooseExcludedApp'},i18n={t=function(s)return s end},reply=function(ok,message,action)if ok then assert(action=="refreshApplications");return end;errors=message end,
  app={settings={evaluateJavaScript=function(_,js)result=js end}},hs={
  dialog={chooseFileOrFolder=function(prompt,path,files,folders,multiple,types)assert(prompt=='选择不记录剪贴板的应用' and path=='/Applications' and files and not folders and not multiple and types[1]=='app');return selection end},
  application={infoForBundlePath=function(path)assert(path=='/Applications/Synthetic.app');return info end},
