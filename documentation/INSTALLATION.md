@@ -66,7 +66,7 @@ shasum -a 256 -c Nivlet-1.0.2-build43-arm64-local-release.sha256
 
 - 尚无 Developer ID 签名和 Apple 公证。
 - 同机新用户配置使用已由用户反馈暂无明显重大问题；登录启动按反馈转观察，暂不继续排查。
-- 关于页已接入官网和手动更新通道；捐赠尚未接入。当前公开下载为 1.0.2 / Build 43，更新通道仅向 arm64 提供此版本。
+- 关于页已接入官网和手动更新通道；捐赠尚未接入。当前公开下载为 1.0.2 / Build 43，更新通道按架构提供 arm64 或 x86_64 包。
 - 报告问题请提供应用版本/Build、macOS、芯片、操作步骤与提示；不要上传敏感剪贴板内容、完整私人配置或凭据。
 
 现有模块使用方式见 [README](../README.md)，当前验证状态见 [BASELINE](../BASELINE.md)，工程验收见 [DISTRIBUTION](DISTRIBUTION.md)。

@@ -5,7 +5,7 @@
 - 应用快捷启动、输入法规则、浏览器来源规则和剪贴板排除列表保留原配置；卸载应用标记“未安装”，重装后恢复显示。
 - 清除浏览数据仍仅支持已安装的 Safari / Chrome；保留按钮自然宽度和既有菜单样式。
 
-macOS 13.0+。Apple Silicon 更新 feed 保持 arm64；Intel 提供独立包。ad-hoc 签名，未 Developer ID 签名或公证。旧正式版本保留。
+macOS 13.0+。更新源支持 Apple Silicon 与 Intel，按架构提供安装包。ad-hoc 签名，未 Developer ID 签名或公证。旧正式版本保留。
 
 ## English
 
@@ -14,4 +14,4 @@ macOS 13.0+。Apple Silicon 更新 feed 保持 arm64；Intel 提供独立包。a
 - Preserve app rules and shortcuts, mark removed apps as not installed, and recover their display after reinstallation.
 - The clear-data action continues to support installed Safari and Chrome only.
 
-Requires macOS 13+. The update feed remains Apple Silicon only; a separate Intel package is included. No Developer ID signature or notarization. Previous releases are retained.
+Requires macOS 13+. The update feed supports Apple Silicon and Intel with the matching architecture package. No Developer ID signature or notarization. Previous releases are retained.

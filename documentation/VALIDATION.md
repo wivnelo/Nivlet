@@ -93,3 +93,9 @@ arm64 / x86_64 均从全新中性目录完整 Release 源码构建为 1.0.2 / Bu
 GitHub v1.0.2 / Build 43 已作为 Latest 正式发布，tag 指向 3e82b4d；arm64 与 x86_64 各 DMG/ZIP/SHA-256 共六个附件，全部公开下载与本地逐字节一致。Ed25519 feed 签名、真实发行 ZIP 校验及篡改拒绝通过；双架构 DMG 完整性通过。Pages 已部署 ff3c106，公开首页和签名 appcast 与源码逐字节一致。feed 继续仅向 arm64 提供更新，Intel 使用独立下载包。v1.0.0、v1.0.1 旧正式版保留；未覆盖旧附件、安装本机 App 或清理用户数据。本轮不包含通过公开 Sparkle 实际安装 Build 43 的验收，此前 Build 41 更新渠道实测记录保留。
 
 公开 README、官网、双语安装说明、发行包 Read Me 与 Release 说明去掉过时的“未经过其他机器验证”/Intel 候选提示，不增加用户个人测试说明；签名及公证事实继续保留。未跟踪 HANDOFF.md 与独立 website/ 排除在全部提交之外。
+
+## 1.0.2 Intel 更新源修复
+
+用户在 Intel Build 42 检查更新时出现“Your Mac is too old / requires a new Apple silicon Mac”。根因是公开 feed 只列 ARM 更新项；Intel 安装包本身已发布。未重新打包 App，使用原有 1.0.2 / Build 43 ZIP 增加 Intel Ed25519 签名项。
+
+核对 Sparkle 2.10.0 官方 SUAppcastDriver.m：filterSupportedAppcast 按 arm64HardwareRequirementIsOK 过滤，bestItemFromAppcastItems 同版本保留首项。因此固定同版本 ARM 受限项在前、Intel 无硬件限制回退项在后，不添加不受支持的 x86_64 hardwareRequirements。生成器强制双包、真实主程序架构与版本/Build/公钥一致；缺包、传反及重复架构拒绝且原 feed 不变。双包 CRC、SHA-256、签名与篡改拒绝及两种硬件选择回归通过。Intel 真机端本次检查更新/安装结果仍待用户复验；未修改系统权限或本机安装。
