@@ -11,7 +11,7 @@ window.runConflictsRegression=function(data){
             const select=row.querySelector('select'),input=row.querySelector('.launcher-key');if(select)select.value=rule.sourceID||rule.browser;if(input)input.value='Q';
             const original=row.innerHTML,values=JSON.stringify([...row.querySelectorAll('input,select')].map(field=>[field.value,field.checked]));add({...rule,bundleID:id.toUpperCase(),shortcut:{key:'X',mods:['ctrl']}});
             check(host.children.length===count,'Duplicate application inserted in '+hostID);check(row.innerHTML===original&&JSON.stringify([...row.querySelectorAll('input,select')].map(field=>[field.value,field.checked]))===values,'Duplicate overwrote original rule');
-            check(footerErrors.get(host.closest('.panel').id)?.includes(t('此应用已添加，已定位到原配置。')),'Duplicate app footer notice missing');row.remove();
+            check(!footerErrors.has(host.closest('.panel').id),'Duplicate app incorrectly persisted as an error');row.remove();
         }
         // The same application can be used by different modules.
         const shared={bundleID:'com.example.shared',name:'Shared fixture',sourceID:data.sources[0].id,shortcut:{key:'',mods:[]}};

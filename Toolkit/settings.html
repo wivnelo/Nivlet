@@ -649,7 +649,7 @@ document.getElementById('checkUpdates').onclick=()=>{if(document.querySelector('
 const projectLinks={'https://wivnelo.github.io/Nivlet/':'website','https://github.com/wivnelo/Nivlet':'project','https://github.com/wivnelo/Nivlet/issues':'issues','https://github.com/wivnelo/Nivlet/releases':'releases','https://github.com/wivnelo/Nivlet/blob/main/LICENSE':'license'};
 for(const link of document.querySelectorAll('#aboutSection a'))link.onclick=event=>{event.preventDefault();send({action:'openProjectLink',link:projectLinks[link.getAttribute('href')]})};
 function ruleNotice(host,message,row){
-    const section=host.closest('.panel').id;if(message)footerErrors.set(section,message);else footerErrors.delete(section);
+    if(message&&!host.closest('.panel').hidden){renderValidationStatus();if(!document.getElementById('status').dataset.validation)setStatus(message,true,true)}
     if(row){const search=document.getElementById(host.id+'-search');if(search){search.value='';refreshRuleLists()}row.scrollIntoView({block:'nearest'});row.querySelector('input,select,button')?.focus();row.classList.add('duplicate-highlight');setTimeout(()=>row.classList.remove('duplicate-highlight'),1800)}
 }
 function existingApp(hostID,rule){
