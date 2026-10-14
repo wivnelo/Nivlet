@@ -6,6 +6,7 @@ window.runI18nRegression=function(data){
     try{
         key.value='Z';control.checked=true;
         window.addInputRule({bundleID:inputID,name:'通用',sourceID:data.sources[0].id});
+        window.showSection('clipSection');
         const update=(language,message,paused)=>window.receive({...data,ok:true,language,message,action:'refreshClipboard',clipboard:{...data.clipboard,paused,entries:[{id:999999,time:Date.now()/1000,text:'复制'}]}});
         update('en','已保存',false);
         check(document.documentElement.lang==='en','English document language');

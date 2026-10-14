@@ -1,7 +1,7 @@
 // Synthetic clipboard only; assertions exercise the production DOM/receive path.
 window.runClipboardPageRegression=function(data){
  const check=(ok,message)=>{if(!ok)throw new Error(message)},oldSend=send,oldTimeout=window.setTimeout,oldClear=window.clearTimeout;
- let request,timer;const state=document.getElementById('clipRecordingState'),search=document.getElementById('clipSearch'),note=document.getElementById('clipActionStatus');
+ let request,timer;const state=document.getElementById('clipRecordingState'),search=document.getElementById('clipSearch'),note=document.getElementById('status');
  const now=Date.now()/1000,entries=[{id:701,kind:'text',time:now,text:'Synthetic Alpha'},{id:702,kind:'image',time:now,text:'Synthetic Image',preview:'data:image/png;base64,iVBORw0KGgo='}];
  const payload=(enabled,paused,items=entries)=>({...data,ok:true,action:'load',message:'',clipboard:{...data.clipboard,paused,config:{...data.clipboard.config,enabled,minutes:0},entries:items}});
  try{
@@ -19,8 +19,12 @@ window.runClipboardPageRegression=function(data){
   check(document.querySelectorAll('#clipHistory .clip-card').length===1&&document.getElementById('saveSettings').disabled,'Search count/draft wrong');
   document.querySelector('#clipHistory .clip-card-actions button').click();check(request.action==='copyClipboard'&&request.id===701,'Copy routed incorrectly');
   window.setTimeout=(fn,ms)=>{timer={fn,ms};return 700};window.clearTimeout=()=>{};
-  window.receive({...payload(true,true),action:'copyClipboard',message:t('已复制，请在目标应用手动粘贴')});check(!note.hidden&&note.dataset.result==='success'&&timer.ms===3000,'Copy success feedback missing');timer.fn();check(note.hidden,'Copy success did not expire');
-  window.receive({...payload(true,true),ok:false,action:'copyClipboard',message:t('复制失败')});check(!note.hidden&&note.dataset.result==='error'&&note.textContent===t('复制失败'),'Copy failure feedback missing');
+  const history=document.getElementById('clipHistory'),scroller=history.closest('.clip-history');
+  const top=history.getBoundingClientRect().top,scroll=scroller.scrollTop,toolbarHeight=document.querySelector('.clip-history-toolbar').getBoundingClientRect().height;
+  window.receive({...payload(true,true),action:'copyClipboard',message:t('已复制，请在目标应用手动粘贴')});check(note.textContent===t('已复制')&&note.closest('footer')&&note.dataset.result==='success'&&timer.ms===3000,'Copy footer feedback missing');
+  check(!document.getElementById('clipActionStatus')&&history.getBoundingClientRect().top===top&&scroller.scrollTop===scroll&&document.querySelector('.clip-history-toolbar').getBoundingClientRect().height===toolbarHeight,'Copy feedback shifted history');
+  timer.fn();check(!note.textContent&&history.getBoundingClientRect().top===top&&scroller.scrollTop===scroll,'Copy success expiry shifted history');
+  window.receive({...payload(true,true),ok:false,action:'copyClipboard',message:t('复制失败')});check(note.dataset.result==='error'&&note.textContent===t('复制失败'),'Copy failure feedback missing');
   search.value='NO MATCH';renderHistory();check(document.querySelector('#clipHistory [data-ui-empty]').textContent===t('没有匹配的历史'),'Search empty confused with no history');
   search.value='';receiveClipboard(payload(false,false,[]).clipboard,false);check(document.querySelector('#clipHistory [data-ui-empty]').textContent===t('暂无历史；启用并保存后开始记录'),'Off empty wrong');
   receiveClipboard(payload(true,true,[]).clipboard,false);check(document.querySelector('#clipHistory [data-ui-empty]').textContent===t('暂无历史；恢复记录后复制新内容'),'Paused empty wrong');
@@ -32,6 +36,7 @@ window.runClipboardPageRegression=function(data){
   window.receive({...payload(true,false),action:'refreshClipboard',message:''});check(note.textContent===t('历史已刷新'),'Refresh feedback missing');
   check(document.querySelector('.clip-recording').contains(document.getElementById('pauseClip')),'Pause not near running state');
   check(document.documentElement.scrollWidth<=innerWidth+1,'Clipboard page overflows horizontally');
-  return 'Live/draft separation, state transitions, counts/expiry, empty states, pause/copy/preview/refresh feedback and layout passed';
+  window.showSection('generalSection');setStatus('Other page',true);window.receive({...payload(true,false),action:'copyClipboard',message:'Late copy'});check(note.textContent==='Other page','Late clipboard response leaked to another page');
+  return 'Footer stability, page isolation, live/draft separation, state transitions, counts/expiry, empty states, pause/copy/preview/refresh feedback and layout passed';
  }finally{imageDialog.close();window.setTimeout=oldTimeout;window.clearTimeout=oldClear;search.value='';send=oldSend;clipboardFeedback('',true);window.receive({...data,ok:true,action:'load'})}
 };

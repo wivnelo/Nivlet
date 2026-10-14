@@ -80,9 +80,9 @@ Features are opt-in, and shortcuts are yours to configure. Window management and
 
 ## Before installing: no Apple Developer ID signature yet
 
-**v1.0.4 / Build 45 is distributed with ad-hoc signing. It has no Apple Developer ID signature or Apple notarization.** macOS may block first launch; this is separate from the signed in-app update channel.
+**v1.0.5 / Build 47 is distributed with ad-hoc signing. It has no Apple Developer ID signature or Apple notarization.** macOS may block first launch; this is separate from the signed in-app update channel.
 
-Download only from this project's [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.4). Open the DMG and drag `Nivlet.app` to **Applications**, or extract the ZIP and move the app there. Eject the DMG and launch the copy in Applications.
+Download only from this project's [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.5). Open the DMG and drag `Nivlet.app` to **Applications**, or extract the ZIP and move the app there. Eject the DMG and launch the copy in Applications.
 
 If macOS says the developer cannot be verified or Apple cannot check the app, and you trust the download:
 
@@ -116,4 +116,4 @@ Report problems or suggestions through [GitHub Issues](https://github.com/wivnel
 
 Nivlet uses the [MIT License](LICENSE). Its embedded Runtime is based on [Hammerspoon](https://github.com/Hammerspoon/hammerspoon). Third-party components retain their own licenses; see [third-party notices](THIRD-PARTY-NOTICES.md).
 
-1.0.4 adds a Safari / Chrome clear-data entry and preserves the current settings page when reopening. See [release notes](documentation/RELEASE-v1.0.4.md).
+1.0.5 adds a Safari / Chrome clear-data entry and preserves the current settings page when reopening. See [release notes](documentation/RELEASE-v1.0.5.md).

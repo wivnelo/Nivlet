@@ -4,23 +4,23 @@
     <title>Nivlet for Mac Updates</title>
     <link>https://wivnelo.github.io/Nivlet/</link>
     <item>
-      <title>Nivlet 1.0.4 · Build 45</title>
-      <sparkle:version>45</sparkle:version>
-      <sparkle:shortVersionString>1.0.4</sparkle:shortVersionString>
+      <title>Nivlet 1.0.5 · Build 47</title>
+      <sparkle:version>47</sparkle:version>
+      <sparkle:shortVersionString>1.0.5</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
       <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.4</link>
-      <description>Nivlet 1.0.4: unified footer errors and field highlighting, with Apple Silicon / Intel updates. 错误统一在底部显示，字段红框定位，支持 ARM 与 Intel 更新。</description>
-      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.4/Nivlet-1.0.4-build45-arm64-local-release.zip" length="10959499" type="application/octet-stream" sparkle:edSignature="my08lJrcrx02YbyFH3dptLOEXpu0wjKumZDwGH78NZ8bqeXxeeG4HysdzDUi6H+KhJSHZEJDiYGQ9IP0Dm3mBQ==" />
+      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.5</link>
+      <description>Nivlet 1.0.5: stable clipboard copy feedback in the footer, with Apple Silicon / Intel updates. 剪贴板复制提示统一底部，列表不跳动，支持 ARM 与 Intel 更新。</description>
+      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.5/Nivlet-1.0.5-build47-arm64-local-release.zip" length="10961712" type="application/octet-stream" sparkle:edSignature="nT25jMBacQ/pwlYar1qtXoqnE4YvwHoGET8L1gdqGumdiKHOkX9CuaYmyxtlb4nceD7Vhk7aaLk+n4+fA+i0DQ==" />
     </item>
     <item>
-      <title>Nivlet 1.0.4 · Build 45</title>
-      <sparkle:version>45</sparkle:version>
-      <sparkle:shortVersionString>1.0.4</sparkle:shortVersionString>
+      <title>Nivlet 1.0.5 · Build 47</title>
+      <sparkle:version>47</sparkle:version>
+      <sparkle:shortVersionString>1.0.5</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.4</link>
-      <description>Nivlet 1.0.4: unified footer errors and field highlighting, with Apple Silicon / Intel updates. 错误统一在底部显示，字段红框定位，支持 ARM 与 Intel 更新。</description>
-      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.4/Nivlet-1.0.4-build45-x86_64-local-release.zip" length="11196980" type="application/octet-stream" sparkle:edSignature="5JHYgTxTqgkJfLNvSml2ORO5fcYVh2pFRzKKTXt/1Bn+Q8ZOZhlthoqpBgLX31avgmLiBLkmr3MLS5lqvGr2AA==" />
+      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.5</link>
+      <description>Nivlet 1.0.5: stable clipboard copy feedback in the footer, with Apple Silicon / Intel updates. 剪贴板复制提示统一底部，列表不跳动，支持 ARM 与 Intel 更新。</description>
+      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.5/Nivlet-1.0.5-build47-x86_64-local-release.zip" length="11194679" type="application/octet-stream" sparkle:edSignature="I6gNCUBBK/v48qQA11uQCLj7+kgAzNO4AH27IhOAiZcyLE8SiJ/QClXX/LCjBlN6zKP4xn/kWSrbMYr+yYvrBw==" />
     </item>
   </channel>
 </rss>

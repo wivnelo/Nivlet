@@ -5,7 +5,7 @@
 - [使用指南](USAGE.md) / [English](USAGE.en.md)
 - [安装、升级与卸载](INSTALLATION.md) / [English](INSTALLATION.en.md)
 - [配置备份与导入](CONFIGURATION.md)
-- [1.0.4 版本说明](RELEASE-v1.0.4.md) · [1.0.3](RELEASE-v1.0.3.md) · [1.0.2](RELEASE-v1.0.2.md) · [1.0.1](RELEASE-v1.0.1.md) · [1.0.0](RELEASE-v1.0.0.md)
+- [1.0.5 版本说明](RELEASE-v1.0.5.md) · [1.0.4](RELEASE-v1.0.4.md) · [1.0.3](RELEASE-v1.0.3.md) · [1.0.2](RELEASE-v1.0.2.md) · [1.0.1](RELEASE-v1.0.1.md) · [1.0.0](RELEASE-v1.0.0.md)
 - [最新代码审计](CODE-REVIEW-2026-10-14.md)
 - [当前验收](VALIDATION.md)
 - [公开截图](SCREENSHOTS.md)

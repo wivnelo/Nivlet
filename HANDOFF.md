@@ -2,13 +2,15 @@
 
 ## 当前状态
 
-当前正式版本 1.0.4 / Build 45，macOS 13+，提供 arm64 / x86_64 六个正式附件；GitHub Latest 为 v1.0.4，tag 指向 9e4572d。1.0.0–1.0.3 历史正式版保留，不覆盖旧附件。
+当前待发布正式版本 1.0.5 / Build 47，macOS 13+，提供 arm64 / x86_64 六个正式附件；发布完成后 GitHub Latest 为 v1.0.5，tag 以 Git 为准。1.0.0–1.0.4 历史正式版保留，不覆盖旧附件。
 
-本机 /Applications/Nivlet.app 已手动安装并启动 Build 45，与发行 App 全部普通文件及源码 Toolkit 一致，严格签名通过。用户明确授权后，从系统权限列表移除旧 Nivlet 并重新添加当前 App，真实 UI 已检测“辅助功能权限已开启”。不需要再次操作权限或安装。
+本机 /Applications/Nivlet.app 当前为 1.0.4 / Build 46 本地复制反馈测试版：复用 Build 45 原生二进制/dSYM、更新资源和版本号后重签名，用户已确认整体正常。本轮正式 Build 47 为双架构全新源码构建，不自动替换本机 App。此前 Build 45 权限重新添加后已恢复；不能将该历史结果当作重签名后 Build 46/47 的当前授权状态。
 
-当前收尾任务：按本机安装版复跑回归、审计和同步文档。功能源码已经提交发布；本次只提交最新文档与审计，不新增功能、改包或改版本。最新提交以 git log 为准，避免本文件自引用提交号。
+当前任务：按用户明确授权，将复制提示修复发布为 1.0.5 / Build 47，构建双架构、验证签名和更新源、发布六附件并回核，保留旧版。最新提交以 git log 为准，避免本文件自引用提交号。
 
 ## 已完成
+
+- 复制成功提示进入底部，3 秒消失；移除历史工具栏提示行，列表和滚动位置不跳动；失败/预览/刷新复用底部，切页后迟到响应不串页。
 
 - 浏览数据入口只支持已安装 Safari / Chrome，原按钮自然宽度、同宽菜单和 24×24 图标保留；只打开浏览器原生确认窗口，不执行清除。
 - 应用安装/卸载后返回设置、切入相关页或添加应用会刷新状态、图标和浏览器选择；卸载后的浏览器改选首个可用项，保存后写入配置，无浏览器时禁用。应用规则/快捷键保留。
@@ -18,9 +20,9 @@
 
 ## 回归与发布证据
 
-先读 BASELINE.md、ROADMAP.md、documentation/VALIDATION.md、documentation/CODE-REVIEW-2026-10-14.md 和 documentation/RELEASE-v1.0.4.md。七组安装资源隔离真实 WebView、全部 Lua、相关 JS/隐私/Dock 回归及双包签名/篡改拒绝通过。公开六附件、官网与 feed 已回核；本机真实版本/权限已确认，手动检查更新返回当前已是 1.0.4 最新版。未发现范围内新的可确认 P0/P1/P2。
+先读 BASELINE.md、ROADMAP.md、documentation/VALIDATION.md、documentation/CODE-REVIEW-2026-10-14.md 和 documentation/RELEASE-v1.0.5.md。Build 45 七组安装资源隔离真实 WebView，Build 47 八组源码真实 WebView、全部 Lua、相关 JS/隐私/Dock 回归及双包签名/篡改拒绝通过。公开六附件、官网与 feed 已回核；Build 45 的本机版本/权限与检查更新历史记录保留，Build 47 不自动安装。未发现范围内新的可确认 P0/P1/P2。
 
-本地证据在 build/installed-regression45/ 与 build/refresh-1.0.2-verification/（后者累计包含 Build 43–45 的验证记录）；发行 App/dSYM 在 build/release-1.0.4-{arm64,x86_64}/；包在 build/packages/。证据和产物不提交。
+本地证据在 build/installed-regression45/ 与 build/refresh-1.0.2-verification/（后者累计包含 Build 43–45 的验证记录）；本轮验证在 build/release-1.0.5-verification/，发行 App/dSYM 在 build/release-1.0.5-{arm64,x86_64}/；包在 build/packages/。证据和产物不提交。
 
 ## 后续边界
 

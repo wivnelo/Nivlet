@@ -80,9 +80,9 @@ Nivlet 是一款免费开源的 macOS 菜单栏工具，将常用操作放在一
 
 ## 安装前请注意：尚无 Apple 开发者签名
 
-**正式版 v1.0.4 / Build 45 使用 ad-hoc 签名，尚无 Apple Developer ID 签名，也未经过 Apple 公证。** macOS 可能拦截首次启动；应用内更新包的签名校验与 Apple 公证是两回事。
+**正式版 v1.0.5 / Build 47 使用 ad-hoc 签名，尚无 Apple Developer ID 签名，也未经过 Apple 公证。** macOS 可能拦截首次启动；应用内更新包的签名校验与 Apple 公证是两回事。
 
-请只从本项目的 [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.4) 下载。打开 DMG，将 `Nivlet.app` 拖入**应用程序**；或者下载 ZIP，解压后移入应用程序。推出 DMG，再打开应用程序里的副本。
+请只从本项目的 [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.5) 下载。打开 DMG，将 `Nivlet.app` 拖入**应用程序**；或者下载 ZIP，解压后移入应用程序。推出 DMG，再打开应用程序里的副本。
 
 若提示“无法验证开发者”或“Apple 无法检查是否包含恶意软件”，且你确认下载可信：
 
@@ -116,4 +116,4 @@ ad-hoc 更新后辅助功能授权可能失效，需在系统设置重新允许 
 
 Nivlet 使用 [MIT License](LICENSE)。内置 Runtime 基于 [Hammerspoon](https://github.com/Hammerspoon/hammerspoon)；第三方组件保留各自许可证，见 [第三方声明](THIRD-PARTY-NOTICES.md)。
 
-1.0.4 新增浏览器页“清除浏览数据…”入口，支持 Safari / Chrome 原生确认窗口；再次唤起保留当前设置页。详见[版本说明](documentation/RELEASE-v1.0.4.md)。
+1.0.5 新增浏览器页“清除浏览数据…”入口，支持 Safari / Chrome 原生确认窗口；再次唤起保留当前设置页。详见[版本说明](documentation/RELEASE-v1.0.5.md)。
