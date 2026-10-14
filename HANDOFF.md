@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-当前发布准备：1.0.6 / Build 49，macOS 13+，arm64 / x86_64；正式发布后以 GitHub Latest 为准，tag 以 Git 核对。1.0.0–1.0.5 旧正式版保留。
+当前正式版本：1.0.6 / Build 49，macOS 13+，arm64 / x86_64；GitHub Latest 为 v1.0.6，tag 指向 49687b3。1.0.0–1.0.5 旧正式版保留。
 
 本机 /Applications/Nivlet.app 为 1.0.5 / Build 48 重复应用提示修复测试版，复用 Build 47 原生程序/dSYM、更新资源后重签名；已安装启动核对。本轮 Build 49 为双架构全新源码构建，不自动安装。此前 Build 45 权限恢复为历史证据，不能当作 Build 48/49 当前授权状态。
 
