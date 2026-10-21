@@ -152,7 +152,7 @@ function M.copy(id,target)
     M.prune()
     for _,entry in ipairs(M.entries) do
         if entry.id==id then
-            if target and not hs.accessibilityState() then return false,i18n.t("直接粘贴需要辅助功能权限，请前往通用设置检查") end
+            if target and not require("modules.permissions").isGranted() then return false,i18n.t("直接粘贴需要辅助功能权限，请前往通用设置检查") end
             local ok
             if entry.kind=="image" then ok=hs.pasteboard.writeObjects(entry.image) else ok=hs.pasteboard.setContents(entry.text) end
             if not ok then return false,i18n.t("复制失败") end

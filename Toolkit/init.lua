@@ -169,7 +169,7 @@ function app.save(value)
     if not config then return false, message end
     for _,shortcut in pairs(config.shortcuts) do if sleep.conflicts(shortcut) then return false,i18n.t("Command + L 与已有快捷键冲突") end;if launcher.conflicts(shortcut) then return false,i18n.t("快捷键与应用启动配置重复") end end
     if popupConflicts(app.popupShortcut, config) then return false,i18n.t("窗口快捷键与剪贴板菜单配置重复") end
-    if config.enabled and not hs.accessibilityState() then return false, i18n.t("请在通用设置中检查并开启辅助功能权限") end
+    if config.enabled and not permissions.isGranted() then return false, i18n.t("请在通用设置中检查并开启辅助功能权限") end
     clearBindings()
     local ok, errorMessage = install(config)
     if not ok then install(app.config); return false, errorMessage end
@@ -191,7 +191,7 @@ end
 local configKeys={general=generalKey,windows=key,popupShortcut=popupKey,input="desktoptoolkit.input.v1",clipboard="desktoptoolkit.clipboard.v1",system="desktoptoolkit.system.v1",browser="desktoptoolkit.browser.v1",launcher="desktoptoolkit.launcher.v1"}
 app.configuration=configuration.new(adapters,{
     systemAssigned=function(item) return preferences.systemAssigned(item.mods,item.key) end,
-    accessibility=hs.accessibilityState,
+    accessibility=permissions.isGranted,
     hasHistory=function() return #clipboard.entries>0 end,
     capture=function() local result={};for name,k in pairs(configKeys) do result[name]={value=hs.settings.get(k)} end;return result end,
     restore=function(saved) for name,k in pairs(configKeys) do if saved[name].value==nil then hs.settings.clear(k) else hs.settings.set(k,saved[name].value) end end end,
@@ -346,8 +346,9 @@ function app.openSettings(section, focus)
             return
         end
         if body.action=="refreshPermissions" then
-            local state=permissionState().accessibility
-            local message=state=="granted" and i18n.t("检测完成：辅助功能权限已开启") or state=="denied" and i18n.t("检测完成：辅助功能权限未开启") or i18n.t("权限检测失败，请重新检测")
+            local permission=permissionState()
+            local state=permission.accessibility
+            local message=permission.restartRequired and i18n.t("权限状态尚未同步，请退出并重新打开 Nivlet") or state=="granted" and i18n.t("检测完成：辅助功能权限已开启") or state=="denied" and i18n.t("检测完成：辅助功能权限未开启") or i18n.t("权限检测失败，请重新检测")
             reply(state~="error",body.silent and "" or message,body.silent and "refreshPermissionsSilent" or body.action)
         end
         if body.action=="openAccessibility" then
@@ -498,3 +499,4 @@ function app.showUpdateRecovery()
     end
 end
 app.showUpdateRecovery()
+permissions.watch(function() reply(true,"","refreshPermissionsSilent") end)

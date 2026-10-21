@@ -1,6 +1,15 @@
-# Nivlet 会话交接 · 2026-10-14
+# Nivlet 会话交接 · 2026-10-21
 
-## 当前状态
+## 本轮最新状态 · Build 51 权限恢复
+
+- 本机 /Applications/Nivlet.app 已正常退出备份后切换至 1.0.6 / Build 51 ARM Developer ID 公证测试版，启动、版本及权限重新检测通过。正式签名 Build 49 → 50 无需删除重加辅助功能授权；本轮未修改系统权限。
+- 新包复用 Build 49 原生程序及其匹配 dSYM，只更新 Toolkit 和版本元数据后以同一 Developer ID 重签名；并非原生源码重新编译。双架构 App 公证 Accepted、凭证附加和 Gatekeeper 通过；DMG 最终记录见 documentation/VALIDATION.md。
+- 统一权限判断，系统返回 false 时也做跨进程只读探测；信任与能力不一致仍拒绝受保护操作并提示退出重开。接入权限变化回调；仅提供退出重开文字引导，并说明非持久化历史退出后清空；按用户要求不新增退出按钮。
+- 全部 Lua 回归、真实中英 WebView 权限转换/草稿保留/退出取消、JS 语法、隐私与 diff 检查通过。工具未主动撤销本机权限；用户重授后的状态不同步已观察到，重启 Build 51 后恢复，没有新增 Intel 真机运行验收。
+- 公开 Release/tag/feed 均保持 1.0.6 / Build 49，公开附件没有替换；Build 51 仅本地候选。旧 Build 49 和 Build 50 安装副本分别保留于本地 build/permission-recovery50/installed-backup49/ 与 build/permission-recovery51/installed-backup50/。
+- 本轮代码与文档可按用户授权审计后提交推送；不据此自动新建 Release。website/ 继续排除。私钥和公证凭据只在钥匙串，不导出或提交。
+
+## 2026-10-14 历史发布状态
 
 当前正式版本：1.0.6 / Build 49，macOS 13+，arm64 / x86_64；GitHub Latest 为 v1.0.6，tag 指向 49687b3。1.0.0–1.0.5 旧正式版保留。
 

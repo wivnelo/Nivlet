@@ -28,3 +28,19 @@ print("Cross-process AX probe detects stale trusted status after signing and dis
 hs.urlevent.openURLWithBundle=function(url,bundle) assert(url=="x-apple.systempreferences:com.apple.LoginItems-Settings.extension" and bundle=="com.apple.systempreferences");return true end
 assert(p.openLoginSettings());hs.urlevent.openURLWithBundle=function() return false end;assert(not p.openLoginSettings())
 print("Login Items opener preserves system launch success/failure")
+
+-- Reauthorization: a false trust API must not skip the real AX probe, nor
+-- treat a readable AX role as proof that keyboard injection has recovered.
+hs.accessibilityState=function() return false end
+role="AXApplication";message=nil
+local state=p.snapshot()
+assert(state.accessibility=="denied" and state.restartRequired and not p.isGranted())
+local updates=0
+p.watch(function(value) updates=updates+1;assert(value.accessibility=="granted" and not value.restartRequired) end)
+hs.accessibilityState=function() return true end
+hs.accessibilityStateCallback();assert(updates==1 and p.isGranted())
+role=nil;message="The accessibility API is disabled"
+assert(not p.isGranted() and not p.snapshot().restartRequired)
+hs.accessibilityState=function() return false end
+message="Cannot complete";assert(p.snapshot().accessibility=="denied")
+print("Reauthorization probes stale false, stays fail closed, refreshes on notification and clears recovery state")
