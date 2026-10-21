@@ -1,15 +1,15 @@
-> 当前正式发行：1.0.6 / Build 49；下方 Intel Build 33 为历史构建示例。正式构建请使用新的隔离目录及 NIVLET_BUILD_NUMBER=49。
+> 当前正式发行：1.0.7 / Build 53；下方 Intel Build 33 为历史构建示例。正式构建请使用新的隔离目录及 NIVLET_BUILD_NUMBER=53。
 
 # 开发与构建
 
-## 当前工程基准（2026-10-14）
+## 当前工程基准（2026-10-21）
 
-当前发行版本为 1.0.6 / Build 49（arm64 / x86_64），包含应用状态刷新、底部统一错误和双架构更新源。最终构建与回归见 [Build 49 验收](VALIDATION.md)，安装及发布状态以 [BASELINE.md](../BASELINE.md) 为准。
+当前发行版本为 1.0.7 / Build 53（arm64 / x86_64），包含应用状态刷新、底部统一错误和双架构更新源。最终构建与回归见 [Build 53 验收](VALIDATION.md)，安装及发布状态以 [BASELINE.md](../BASELINE.md) 为准。
 
 - Runtime 固定来源；构建通过 `scripts/prepare-updater.sh` 准备固定 Sparkle 2.10.0，许可收集包含其原文。
-- Release 构建使用完整 Xcode：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=49 sh scripts/build-release.sh`。49 为本次 1.0.6 发行 Build；下一构建继续递增 Build；构建不自动安装。
+- Release 构建使用完整 Xcode：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=53 sh scripts/build-release.sh`。53 为本次 1.0.7 发行 Build；下一构建继续递增 Build；构建不自动安装。
 - 更新入口位于关于页，原生 Sparkle 桥接由 `patches/nivlet-updater.patch` 注入；有草稿先处理，默认手动检查、用户确认安装。
-- Feed 为 `docs/appcast.xml`，使用 `scripts/generate-update-feed.py <ZIP>` 生成、`tests/updates.py` 验证。Ed25519 私钥留 Keychain，不导出到源码、日志或安装包。
+- Feed 为 `docs/appcast.xml`，使用 `scripts/generate-update-feed.py <ARM64.zip> <X86_64.zip>` 生成、`tests/updates.py` 验证。Ed25519 私钥留 Keychain，不导出到源码、日志或安装包。
 - 发布顺序：新版本/Build → 构建和回归 → 打包/签名校验 → 上传新附件 → 发布 feed → 实测升级及最新检查 → 保留回滚备份。
 
 
@@ -20,7 +20,7 @@ Release 入口现在先检查当前仓库和 Git 提交身份，再把固定源�
 ```sh
 python3 tests/privacy.py
 python3 scripts/check-privacy.py --repo .
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=49 sh scripts/build-release.sh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=53 sh scripts/build-release.sh
 NIVLET_BUILD_CONFIGURATION=Release sh scripts/package-local.sh
 ```
 
@@ -57,4 +57,4 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=x86_64 NIVL
 NIVLET_BUILD_CONFIGURATION=Release NIVLET_DERIVED_DATA_PATH="$PWD/build/intel-1.0.0-build33/DerivedData" sh scripts/package-local.sh
 ```
 
-以上为 Build 33 历史示例，当时 feed 仅 arm64。当前 1.0.6 已支持双架构更新；生成 feed 必须同时传入 ARM 和 Intel ZIP，具体命令与选择规则见 DISTRIBUTION.md。
+以上为 Build 33 历史示例，当时 feed 仅 arm64。当前 1.0.7 支持双架构更新；生成 feed 必须同时传入 ARM 和 Intel ZIP，具体命令与选择规则见 DISTRIBUTION.md。

@@ -1,7 +1,5 @@
 -- Simplified Chinese source strings and English UI translations.
 return {
-    ["已在系统设置中授权但仍未生效？请退出并重新打开 Nivlet，无需反复删除授权。未持久化的剪贴板历史会随退出清空。"] = "Already allowed in System Settings but still not working? Quit and reopen Nivlet; do not repeatedly remove the permission. Clipboard history that is not persisted will be cleared on quit.",
-    ["权限状态尚未同步，请退出并重新打开 Nivlet"] = "Permission state has not synchronized. Quit and reopen Nivlet.",
     ["已复制"] = "Copied",
     ["快捷键重复，请修改红框中的设置。"] = "Duplicate shortcut. Update the fields marked in red.",
     ["域名重复，请修改红框中的设置。"] = "Duplicate domain. Update the fields marked in red.",

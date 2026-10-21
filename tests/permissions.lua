@@ -18,10 +18,10 @@ print("Accessibility settings uses explicit application opener and preserves fai
 
 hs.accessibilityState=function() return true end
 hs.application={get=function(id) assert(id=="com.apple.finder");return {} end}
-local role,message="AXApplication",nil
-hs.axuielement={applicationElement=function() return {attributeValue=function(_,attribute) assert(attribute=="AXRole");return role,message end} end}
+local windows,message={},nil
+hs.axuielement={applicationElement=function() return {attributeValue=function(_,attribute) assert(attribute=="AXWindows");return windows,message end} end}
 assert(p.snapshot().accessibility=="granted")
-role=nil;message="The accessibility API is disabled";assert(p.snapshot().accessibility=="denied")
+windows=nil;message="The accessibility API is disabled";assert(p.snapshot().accessibility=="denied")
 message="Cannot complete";assert(p.snapshot().accessibility=="error")
 print("Cross-process AX probe detects stale trusted status after signing and distinguishes transient errors")
 
@@ -29,18 +29,20 @@ hs.urlevent.openURLWithBundle=function(url,bundle) assert(url=="x-apple.systempr
 assert(p.openLoginSettings());hs.urlevent.openURLWithBundle=function() return false end;assert(not p.openLoginSettings())
 print("Login Items opener preserves system launch success/failure")
 
--- Reauthorization: a false trust API must not skip the real AX probe, nor
--- treat a readable AX role as proof that keyboard injection has recovered.
+-- Reauthorization: a successful live AXWindows request must override a stale
+-- false trust Boolean. An empty window list is a successful response too.
 hs.accessibilityState=function() return false end
-role="AXApplication";message=nil
+windows={};message=nil
 local state=p.snapshot()
-assert(state.accessibility=="denied" and state.restartRequired and not p.isGranted())
+assert(state.accessibility=="granted" and p.isGranted())
+windows="AXApplication";assert(p.snapshot().accessibility=="denied")
+windows={};assert(p.snapshot().accessibility=="granted")
 local updates=0
-p.watch(function(value) updates=updates+1;assert(value.accessibility=="granted" and not value.restartRequired) end)
+p.watch(function(value) updates=updates+1;assert(value.accessibility=="granted") end)
 hs.accessibilityState=function() return true end
 hs.accessibilityStateCallback();assert(updates==1 and p.isGranted())
-role=nil;message="The accessibility API is disabled"
-assert(not p.isGranted() and not p.snapshot().restartRequired)
+windows=nil;message="The accessibility API is disabled"
+assert(not p.isGranted())
 hs.accessibilityState=function() return false end
 message="Cannot complete";assert(p.snapshot().accessibility=="denied")
-print("Reauthorization probes stale false, stays fail closed, refreshes on notification and clears recovery state")
+print("Reauthorization probes stale false, recovers on live AX access, refreshes on notification and detects revocation")

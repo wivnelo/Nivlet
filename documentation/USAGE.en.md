@@ -1,4 +1,4 @@
-> Current release: 1.0.6 / Build 49.
+> Current release: 1.0.7 / Build 53.
 
 # Nivlet User Guide
 

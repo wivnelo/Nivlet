@@ -164,3 +164,21 @@ GitHub v1.0.2 / Build 43 已作为 Latest 正式发布，tag 指向 3e82b4d；ar
 用户随后主动重新操作了辅助功能授权，Build 50 旧进程显示信任与实际 AX 访问不同步；用户确认属于重新授权后的场景。按用户要求移除权限区域额外退出按钮后重新生成并安装 Build 51。Build 51 正常启动、版本核对和权限重新检测通过，未再次删除重加权限。Build 49 → 50 的普通签名升级沿用授权实测与此次重新授权后的进程恢复分开记录，不混同。
 
 最终包核验：Build 51 双架构 App 与 DMG 均 Accepted，App/DMG 凭证附加及 Gatekeeper 返回 Notarized Developer ID；ZIP CRC、源码资源、挂载 DMG 的普通文件逐字节核对、安装版 383 个文件与 ARM 候选一致、跨 Build designated requirement 一致性均通过。四个最终附件的 SHA-256 已生成；App、ZIP 和仓库隐私扫描通过。本轮只推送源码、测试及文档，不上传候选附件或改变公开 feed。
+
+## 2026-10-21 follow-up: live permission false negative
+
+The earlier Build 51 restart guidance was not a proven recovery requirement. In the same running process, the trust Boolean returned false while Finder AXWindows returned a table successfully; the user also confirmed window shortcuts still worked. The corrected detector accepts successful cross-process AXWindows access (including an empty list), preserves explicit API-disabled denial, and removes the inferred restart requirement. Existing recheck, focus refresh and permission notifications remain.
+
+All Lua tests, leave-guard tests and the real bilingual settings WebView regression passed. Loading only the corrected snapshot function into the existing process changed General to granted without a restart; clicking Recheck then confirmed granted. This was a live diagnostic validation, not a replacement of the signed installed bundle. The installed bundle remains Build 51 and will revert to its packaged detector on relaunch until a new signed package is installed. Permission revocation and transient failures are covered by mocks; another physical toggle cycle and Option-paste were not repeated in this follow-up. No release or push was performed.
+
+### Build 52 packaging and local installation
+
+ARM and Intel apps are Developer ID signed, Apple notarized and stapled. Build 52 reuses the Build 49 native executable with the corrected Toolkit resources. The installed ARM bundle matches all 383 ordinary files of the notarized candidate; the designated requirement matches Build 51. General shows granted, Recheck confirms granted, and About shows 1.0.6 / Build 52. No Accessibility permission settings were changed during this installation. Previous installed Build 51 is retained as a local backup. This supersedes the preceding “not packaged” status; no GitHub release or push was performed. A fresh permission-toggle cycle and Intel hardware execution were not repeated.
+
+## 1.0.7 / Build 53 · 正式签名发布 · 2026-10-21
+
+本次发行承接 Build 52 权限误报修复，版本递增为 1.0.7 / Build 53，保留旧正式版。复用 Build 49 原生程序/dSYM，仅更新 Toolkit 及版本元数据后 Developer ID 重签名；不称为原生全新编译。双架构 App 已 Apple 公证 Accepted、附加票据且 Gatekeeper 接受。DMG、公开下载和更新源发布回核将在完成后补记。
+
+全部 Lua、leave guard、launcher replacement、shortcut capture、tab boundary、privacy、第三方 81 份许可及 browser URL-only 回归通过；真实中英文设置 WebView 权限转换、草稿保留及普通退出保护通过。仓库隐私检查通过。未新增功能或改系统权限；本机仍为已验收的 Build 52。旧版本用户 Intel 实测反馈沿用其原范围，不代替 Build 53 最新包真机运行。
+
+Build 53 最终包验证：每架构 101 个 Mach-O 均为正确的单架构；双架构 App/DMG 公证 Accepted、票据验证、严格签名与 Gatekeeper 通过。DMG 校验及只读挂载 App 逐文件比对通过，ZIP CRC、全部普通文件与候选一致、Toolkit 与源码一致；六附件最终 SHA-256 已生成。双架构 feed 已按 ARM 优先、Intel 回退生成，版本、Build、实际主程序架构、Ed25519 校验与篡改拒绝均通过。

@@ -2,22 +2,22 @@ local M={}
 function M.snapshot()
     local ok,value=pcall(hs.accessibilityState)
     local state=ok and type(value)=="boolean" and (value and "granted" or "denied") or "error"
-    local restartRequired=false
     if hs.axuielement and hs.application then
         -- Probe even when the trust API is false: reauthorization can leave stale state.
         -- Probe another process: accessing our own windows does not prove permission.
-        local checked,role,message=pcall(function()
+        local checked,windows,message=pcall(function()
             local application=hs.application.get("com.apple.finder")
             if not application then return "unavailable" end
-            return hs.axuielement.applicationElement(application):attributeValue("AXRole")
+            return hs.axuielement.applicationElement(application):attributeValue("AXWindows")
         end)
         if checked and message=="The accessibility API is disabled" then state="denied"
-        elseif checked and role=="AXApplication" then
-            -- AX access alone does not prove keyboard event posting has recovered.
-            restartRequired=state=="denied"
-        elseif state=="granted" and (not checked or role==nil) then state="error" end
+        elseif checked and type(windows)=="table" then
+            -- A successful cross-process AX request reflects live access even when
+            -- the trust Boolean remains false after reauthorization. An empty list is valid.
+            state="granted"
+        elseif state=="granted" and (not checked or windows==nil) then state="error" end
     end
-    return {accessibility=state,restartRequired=restartRequired}
+    return {accessibility=state}
 end
 function M.isGranted()
     return M.snapshot().accessibility=="granted"

@@ -348,7 +348,7 @@ function app.openSettings(section, focus)
         if body.action=="refreshPermissions" then
             local permission=permissionState()
             local state=permission.accessibility
-            local message=permission.restartRequired and i18n.t("权限状态尚未同步，请退出并重新打开 Nivlet") or state=="granted" and i18n.t("检测完成：辅助功能权限已开启") or state=="denied" and i18n.t("检测完成：辅助功能权限未开启") or i18n.t("权限检测失败，请重新检测")
+            local message=state=="granted" and i18n.t("检测完成：辅助功能权限已开启") or state=="denied" and i18n.t("检测完成：辅助功能权限未开启") or i18n.t("权限检测失败，请重新检测")
             reply(state~="error",body.silent and "" or message,body.silent and "refreshPermissionsSilent" or body.action)
         end
         if body.action=="openAccessibility" then

@@ -52,7 +52,7 @@ for archive, architecture in zip(archives, ('arm64', 'x86_64')):
     if architecture == 'arm64':
         ET.SubElement(item, f'{{{ns}}}hardwareRequirements').text = 'arm64'
     ET.SubElement(item, 'link').text = f'https://github.com/wivnelo/Nivlet/releases/tag/v{version}'
-    ET.SubElement(item, 'description').text = f'Nivlet {version}: temporary duplicate-app notices with stable clipboard feedback and Apple Silicon / Intel updates. 重复应用提示自动消失，保留复制反馈稳定与 ARM / Intel 更新。'
+    ET.SubElement(item, 'description').text = f'Nivlet {version}: Developer ID signed and Apple notarized for Apple Silicon / Intel, with corrected Accessibility status detection. 正式开发者签名与 Apple 公证，修复辅助功能权限误报，提供 ARM / Intel 更新。'
     ET.SubElement(item, 'enclosure', {
         'url': f'https://github.com/wivnelo/Nivlet/releases/download/v{version}/{archive.name}',
         'length': str(archive.stat().st_size),

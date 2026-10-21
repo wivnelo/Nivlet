@@ -78,25 +78,15 @@ Nivlet 是一款免费开源的 macOS 菜单栏工具，将常用操作放在一
 
 功能按需开启，快捷键由你配置。窗口管理和 Option 直接粘贴需要**辅助功能权限**；浏览器分流需要将 **Nivlet 设为默认浏览器**。
 
-## 安装前请注意：尚无 Apple 开发者签名
+## 正式开发者签名与 Apple 公证
 
-**正式版 v1.0.6 / Build 49 使用 ad-hoc 签名，尚无 Apple Developer ID 签名，也未经过 Apple 公证。** macOS 可能拦截首次启动；应用内更新包的签名校验与 Apple 公证是两回事。
+**v1.0.7 / Build 53 已启用 Apple Developer ID 正式签名，并通过 Apple 公证。** Apple Silicon（arm64）与 Intel（x86_64）的 App、DMG 均附加公证票据。系统要求 macOS 13.0+。
 
-请只从本项目的 [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.6) 下载。打开 DMG，将 `Nivlet.app` 拖入**应用程序**；或者下载 ZIP，解压后移入应用程序。推出 DMG，再打开应用程序里的副本。
+从 [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.7) 下载对应芯片的 DMG 或 ZIP，将 `Nivlet.app` 放入应用程序后打开，无需另装 Hammerspoon。
 
-若提示“无法验证开发者”或“Apple 无法检查是否包含恶意软件”，且你确认下载可信：
+签名与公证不代替**辅助功能授权**。从旧 ad-hoc 版首次迁移可能需要重新授权；此后同一开发者身份的正常更新通常可沿用授权，具体仍取决于 macOS。授权后回通用页自动检测，或点击“重新检测”。无需关闭 Gatekeeper；若出现恶意软件、应用损坏或校验不符提示，请停止安装并反馈。
 
-1. 先尝试打开一次，然后关闭拦截提示。
-2. 进入**系统设置 → 隐私与安全性**，找到 Nivlet 的拦截记录，点击**仍要打开**。
-3. 再确认**打开**，按需验证身份。无需全局关闭 Gatekeeper。
-
-若提示恶意软件、应用损坏或校验和不符，请停止安装并反馈具体提示，不要当成普通开发者警告处理。受管理的 Mac 可能不允许添加例外。参考 [Apple 官方说明](https://support.apple.com/zh-cn/102445)与[完整安装、升级和卸载指南](documentation/INSTALLATION.md)。
-
-**系统要求：**macOS 13.0+，支持 Apple Silicon（arm64）与 Intel（x86_64）。旧安装包（包括历史 Intel 包）因隐私处理已撤下。
-
-ad-hoc 更新后辅助功能授权可能失效，需在系统设置重新允许 `/Applications/Nivlet.app`，再回通用页点击“重新检测”。
-
-关于页提供官网与“检查更新…”：发现新版后确认安装，自动下载、校验并重启。
+详见[安装、升级和卸载指南](documentation/INSTALLATION.md)。关于页保留手动“检查更新…”，确认后安装。
 
 ## 本地处理，按需记录
 
@@ -116,4 +106,4 @@ ad-hoc 更新后辅助功能授权可能失效，需在系统设置重新允许 
 
 Nivlet 使用 [MIT License](LICENSE)。内置 Runtime 基于 [Hammerspoon](https://github.com/Hammerspoon/hammerspoon)；第三方组件保留各自许可证，见 [第三方声明](THIRD-PARTY-NOTICES.md)。
 
-1.0.6 新增浏览器页“清除浏览数据…”入口，支持 Safari / Chrome 原生确认窗口；再次唤起保留当前设置页。详见[版本说明](documentation/RELEASE-v1.0.6.md)。
+1.0.7 启用正式开发者签名与 Apple 公证，修复辅助功能权限误报。详见[版本说明](documentation/RELEASE-v1.0.7.md)。

@@ -4,23 +4,23 @@
     <title>Nivlet for Mac Updates</title>
     <link>https://wivnelo.github.io/Nivlet/</link>
     <item>
-      <title>Nivlet 1.0.6 · Build 49</title>
-      <sparkle:version>49</sparkle:version>
-      <sparkle:shortVersionString>1.0.6</sparkle:shortVersionString>
+      <title>Nivlet 1.0.7 · Build 53</title>
+      <sparkle:version>53</sparkle:version>
+      <sparkle:shortVersionString>1.0.7</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
       <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.6</link>
-      <description>Nivlet 1.0.6: temporary duplicate-app notices with stable clipboard feedback and Apple Silicon / Intel updates. 重复应用提示自动消失，保留复制反馈稳定与 ARM / Intel 更新。</description>
-      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.6/Nivlet-1.0.6-build49-arm64-local-release.zip" length="10959872" type="application/octet-stream" sparkle:edSignature="14SENlUh2eJTQ6pKkba4thdpPBNiq9p9Xq2xiEAWakOYxividDZsrtR7ccN97HFjSfMjuNnuWRBBeUg5RYGACw==" />
+      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.7</link>
+      <description>Nivlet 1.0.7: Developer ID signed and Apple notarized for Apple Silicon / Intel, with corrected Accessibility status detection. 正式开发者签名与 Apple 公证，修复辅助功能权限误报，提供 ARM / Intel 更新。</description>
+      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.7/Nivlet-1.0.7-build53-arm64-developer-id.zip" length="11500023" type="application/octet-stream" sparkle:edSignature="zEvK/hPxHQtYDCpyIVM1OOJXWU+WZQ5ubs8nbNaQJ1IpFZtDh8tSObohpJzxfP3Nw1vVvj2BDTiLl9fgmOxjBw==" />
     </item>
     <item>
-      <title>Nivlet 1.0.6 · Build 49</title>
-      <sparkle:version>49</sparkle:version>
-      <sparkle:shortVersionString>1.0.6</sparkle:shortVersionString>
+      <title>Nivlet 1.0.7 · Build 53</title>
+      <sparkle:version>53</sparkle:version>
+      <sparkle:shortVersionString>1.0.7</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.6</link>
-      <description>Nivlet 1.0.6: temporary duplicate-app notices with stable clipboard feedback and Apple Silicon / Intel updates. 重复应用提示自动消失，保留复制反馈稳定与 ARM / Intel 更新。</description>
-      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.6/Nivlet-1.0.6-build49-x86_64-local-release.zip" length="11197173" type="application/octet-stream" sparkle:edSignature="3k1CO4h7HD7lBfQ7kvM6DCaw6HoejRVESSU0TnEiEX/Ng2t13KNCpgTmqNTBCdZBNP1Hv6p+9v0jwQcX7zaOBw==" />
+      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.7</link>
+      <description>Nivlet 1.0.7: Developer ID signed and Apple notarized for Apple Silicon / Intel, with corrected Accessibility status detection. 正式开发者签名与 Apple 公证，修复辅助功能权限误报，提供 ARM / Intel 更新。</description>
+      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.7/Nivlet-1.0.7-build53-x86_64-developer-id.zip" length="11735688" type="application/octet-stream" sparkle:edSignature="nXxP8ImRrrenlg6i2BSQ9OLsiH2dZeJjE9OyiYpLb7GQ6YW67RzJvaEvTcuvbhHz1xJL7yNDDD4nhAh/OpLFDQ==" />
     </item>
   </channel>
 </rss>

@@ -78,23 +78,15 @@ Interface reference: Browser uses 1.0.1 / Build 41; other pages retain 1.0.0 / B
 
 Features are opt-in, and shortcuts are yours to configure. Window management and Option-click paste require **Accessibility permission**. Browser routing requires choosing **Nivlet as your default browser**.
 
-## Before installing: no Apple Developer ID signature yet
+## Signed and notarized for macOS
 
-**v1.0.6 / Build 49 is distributed with ad-hoc signing. It has no Apple Developer ID signature or Apple notarization.** macOS may block first launch; this is separate from the signed in-app update channel.
+**v1.0.7 / Build 53 uses Apple Developer ID signing and has passed Apple notarization.** Both Apple Silicon (arm64) and Intel (x86_64) apps and DMGs include stapled notarization tickets. macOS 13.0+ is required.
 
-Download only from this project's [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.6). Open the DMG and drag `Nivlet.app` to **Applications**, or extract the ZIP and move the app there. Eject the DMG and launch the copy in Applications.
+Download the matching DMG or ZIP from [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.7), move `Nivlet.app` to Applications and launch that copy. No separate Hammerspoon installation is needed.
 
-If macOS says the developer cannot be verified or Apple cannot check the app, and you trust the download:
+Signing and notarization do not replace **Accessibility permission**. Moving from an older ad-hoc build may require reauthorization; subsequent updates with the same developer identity generally retain it, subject to macOS behavior. Return to General or click **Recheck** after granting access. Do not disable Gatekeeper. If macOS reports malware, damage or a checksum mismatch, stop and report the exact message.
 
-1. Try opening the app once, then dismiss the warning.
-2. Open **System Settings → Privacy & Security**, find the notice for Nivlet and choose **Open Anyway**.
-3. Confirm **Open** and authenticate if prompted. Do not disable Gatekeeper globally.
-
-If macOS reports malware, damage, or a checksum mismatch, stop and report the exact message rather than treating it as an ordinary developer warning. The exception may be unavailable on managed Macs. See [Apple's guidance](https://support.apple.com/en-us/102445) and the [full installation, upgrade and removal guide](documentation/INSTALLATION.en.md).
-
-**Requirements:** macOS 13.0+, Apple Silicon (arm64) or Intel (x86_64). Old installation packages, including the historical Intel build, have been withdrawn for privacy remediation.
-
-Ad-hoc updates may require granting Accessibility permission again; select `/Applications/Nivlet.app` in System Settings and click Check Again in General.
+See the [installation, upgrade and removal guide](documentation/INSTALLATION.en.md). About → Check for Updates remains manual; confirm before installation.
 
 ## Local processing, optional recording
 
@@ -116,4 +108,4 @@ Report problems or suggestions through [GitHub Issues](https://github.com/wivnel
 
 Nivlet uses the [MIT License](LICENSE). Its embedded Runtime is based on [Hammerspoon](https://github.com/Hammerspoon/hammerspoon). Third-party components retain their own licenses; see [third-party notices](THIRD-PARTY-NOTICES.md).
 
-1.0.6 adds a Safari / Chrome clear-data entry and preserves the current settings page when reopening. See [release notes](documentation/RELEASE-v1.0.6.md).
+1.0.7 introduces Developer ID signing, Apple notarization and corrected Accessibility status detection. See [release notes](documentation/RELEASE-v1.0.7.md).

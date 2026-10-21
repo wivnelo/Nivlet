@@ -9,8 +9,9 @@ window.runPermissionRecoveryRegression=function(data){
   window.receive({...data,ok:true,action:'load',message:''});window.showSection('generalSection');
   field.checked=!field.checked;updateSaveState();const draft=field.checked;requests=[];
   receive('denied');check(!document.querySelector('.permission-details').hidden,'Denied recovery guide hidden');
-  receive('denied',true);check(!document.querySelector('.permission-state').hidden,'Stale trust recovery state hidden');
-  check(document.querySelector('.permission-state').textContent===t('权限状态尚未同步，请退出并重新打开 Nivlet'),'Recovery message missing');
+  receive('granted');check(!document.querySelector('.permission-state').hidden,'Recovered permission state hidden');
+  check(document.querySelector('.permission-state').textContent===t('辅助功能权限已开启'),'Recovered state not displayed');
+  check(!document.querySelector('.permission-card').textContent.includes('请退出并重新打开'),'Unverified restart instruction remains');
   check(field.checked===draft&&dirtyPages().includes('generalSection'),'Permission notification overwrites draft');
   check(!document.getElementById('quitForPermissions'),'Unwanted quit button remains');
   window.requestLeave('quit');check(dialog.open&&!requests.some(r=>r.action==='confirmLeave'),'Standard quit bypasses dirty guard');
