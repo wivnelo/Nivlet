@@ -2,10 +2,13 @@
 
 ## 当前状态
 
-- 发行目标：**1.0.7 / Build 53**，macOS 13+，Apple Silicon / Intel，旧正式版 1.0.6 / Build 49 保留。
-- 双架构 App 已 Developer ID 签名、Apple 公证并附加票据；正式 DMG 也已公证、附加票据并通过 Gatekeeper。ZIP/DMG 内容、源码一致性、校验值、双架构更新签名和篡改拒绝均通过，待公开上传回核。
+- 当前正式版：**1.0.7 / Build 53**，macOS 13+，Apple Silicon / Intel，旧正式版 1.0.6 / Build 49 保留。
+- 双架构 App 已 Developer ID 签名、Apple 公证并附加票据；正式 DMG 也已公证、附加票据并通过 Gatekeeper。ZIP/DMG 内容、源码一致性、校验值、双架构更新签名和篡改拒绝均通过。六附件已公开重新下载，逐个 SHA-256 相同；官网与 appcast 和源码逐字节相同。
 - 本机 **1.0.6 / Build 52** 公证版：General 权限已开启、“重新检测”和 About 已验收。当前发布不自动替换本机或操作系统权限。
 - `website/` 是独立本地仓库，保持不动；真正 GitHub Pages 来源是本仓库 main 的 `docs/`。
+
+- [v1.0.7](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.7) 已发布为 Latest，tag 指向 `5137915`；main 后续只补发布验收与交接记录。官网 GitHub Pages 已部署。本机 Build 52 手动检查已发现 1.0.7，说明显示正确，选择稍后提醒；未安装。
+- 个人知识库的 Nivlet 项目笔记、项目说明与首页索引已同步，备份与核对清单位于本地证据目录；未复制凭据、代码或安装包。
 
 ## 本轮最终变更
 

@@ -182,3 +182,7 @@ ARM and Intel apps are Developer ID signed, Apple notarized and stapled. Build 5
 全部 Lua、leave guard、launcher replacement、shortcut capture、tab boundary、privacy、第三方 81 份许可及 browser URL-only 回归通过；真实中英文设置 WebView 权限转换、草稿保留及普通退出保护通过。仓库隐私检查通过。未新增功能或改系统权限；本机仍为已验收的 Build 52。旧版本用户 Intel 实测反馈沿用其原范围，不代替 Build 53 最新包真机运行。
 
 Build 53 最终包验证：每架构 101 个 Mach-O 均为正确的单架构；双架构 App/DMG 公证 Accepted、票据验证、严格签名与 Gatekeeper 通过。DMG 校验及只读挂载 App 逐文件比对通过，ZIP CRC、全部普通文件与候选一致、Toolkit 与源码一致；六附件最终 SHA-256 已生成。双架构 feed 已按 ARM 优先、Intel 回退生成，版本、Build、实际主程序架构、Ed25519 校验与篡改拒绝均通过。
+
+发布回核：v1.0.7 已作为正式 Latest 发布，tag 指向 5137915；1.0.6 及旧正式版保留。六附件服务端 digest 与本地一致，随后从公开下载地址完整下载六文件，逐个 SHA-256 与最终本地文件相同。GitHub Pages 构建成功，线上 index.html 和双架构 appcast.xml 与 docs/ 源码逐字节相同。main 和 tag 远端核对通过。相关中英文说明、官网、推广用语及个人知识库三个导航/项目笔记已同步。本机仍为 Build 52，无系统权限或数据清理操作；没有把包级检查写成最新 Intel 真机验证。
+
+本机更新入口回核：在已安装 Build 52 的关于页点击“检查更新”，真实 Sparkle 窗口成功提示 1.0.7 可下载，并显示正式签名、公证和权限修复的中英文说明。点击“稍后提醒我”返回；没有下载或安装、没有改变版本和权限。此项验证更新发现与展示，不等同完整更新安装/回滚验收。
