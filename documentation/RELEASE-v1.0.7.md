@@ -1,5 +1,7 @@
 # Nivlet 1.0.7 · Build 53
 
+当前正式发行及后续开发基准。相较 Build 52 本地候选，主要交付是将 Apple Developer ID 签名与 Apple 公证纳入公开正式发行；沿用 Build 52 已验收的权限修复，不新增业务功能。Build 52 的签名、公证候选记录保留为历史。
+
 - **正式启用 Apple Developer ID 签名，并通过 Apple 公证。** Apple Silicon（arm64）与 Intel（x86_64）的 App 和 DMG 均已公证并附加票据。
 - 修复重新授权后辅助功能状态误报：通过实际跨应用访问核实权限，避免功能可用却显示未授权。
 - 接入系统权限变化通知，保留回到 App 自动检测与“重新检测”；统一窗口设置、配置导入和 Option 直接粘贴的权限判断。
@@ -14,6 +16,8 @@ macOS 13+，免费开源，无需账号。请选择对应芯片的 DMG 或 ZIP�
 [安装与升级指南](https://github.com/wivnelo/Nivlet/blob/main/documentation/INSTALLATION.md) · [官网](https://wivnelo.github.io/Nivlet/) · [反馈 Issue](https://github.com/wivnelo/Nivlet/issues)
 
 ## English
+
+This is the current release and development baseline. Compared with the local Build 52 candidate, the main delivery is the public release with Apple Developer ID signing and Apple notarization, retaining the validated permission fix without new product features. Build 52 signing and notarization checks remain historical candidate evidence.
 
 - **Now signed with Apple Developer ID and notarized by Apple.** Apple Silicon (arm64) and Intel (x86_64) apps and DMGs are notarized with stapled tickets.
 - Fix false Accessibility status after reauthorization by checking live cross-app access instead of relying only on a stale trust Boolean.

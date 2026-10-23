@@ -2,6 +2,8 @@
 
 # Nivlet User Guide
 
+The baseline is 1.0.7 / Build 53. Apps and DMGs for both architectures are signed with Apple Developer ID, notarized by Apple, and stapled. Signing and notarization do not grant Accessibility access. See the [installation guide](INSTALLATION.en.md).
+
 [Back to README](../README.md) · [简体中文](USAGE.md)
 
 ## Usage
