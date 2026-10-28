@@ -2,7 +2,7 @@
 
 ## 独立任务恢复 · 2026-10-26
 
-- **项目与目标**：Nivlet 是独立的免费开源 macOS 菜单栏工具，集中提供剪贴板、窗口管理、应用快捷启动、输入法切换与浏览器分流等操作。仓库为 [wivnelo/Nivlet](https://github.com/wivnelo/Nivlet)，本地路径为 `/Users/wmhou/Project/011_Codes/011_1_pub/Nivlet`；不与其他项目混用开发上下文。
+- **项目与目标**：Nivlet 是独立的免费开源 macOS 菜单栏工具，集中提供剪贴板、窗口管理、应用快捷启动、输入法切换与浏览器分流等操作。仓库为 [wivnelo/Nivlet](https://github.com/wivnelo/Nivlet)，本地路径为 `本地 Nivlet 项目目录`；不与其他项目混用开发上下文。
 - **已完成**：本轮完成项目身份、路径、交接与远端状态盘点。GitHub Latest 仍为 [1.0.7 / Build 53](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.7)；本地 main 与远端最新提交均为 [`823ae44`](https://github.com/wivnelo/Nivlet/commit/823ae4488d0e27a2a980c767cb98bbf7a12e21fb)。本轮已只读核对本机安装版本元数据为 1.0.7 / 53。既有发行与测试证据沿用下文及 VALIDATION，不视为本轮复测。
 - **当前状态：等待确认**。尚未接到新的开发任务；没有正在执行的代码开发、修复或发布。外部 [Issue #1](https://github.com/wivnelo/Nivlet/issues/1) 仍开放，报告添加 FinalShell 输入法规则后无法保存；[评论](https://github.com/wivnelo/Nivlet/issues/1#issuecomment-6368291282) 提供 bundle ID 为 `st`、无点号的线索。此为外部报告，尚未复现或确认根因，也不代表用户已授权修复。
 - **下一步建议／待用户确认**：先选择优先级：诊断 Issue #1 的保存问题，或继续 ROADMAP 中未开始的 A15 配置导入摘要预览。功能或设计改动须先说明影响，再由用户决定；本轮不启动任一开发项。
