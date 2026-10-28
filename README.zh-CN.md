@@ -80,9 +80,9 @@ Nivlet 是一款免费开源的 macOS 菜单栏工具，将常用操作放在一
 
 ## 正式开发者签名与 Apple 公证
 
-**v1.0.7 / Build 53 已启用 Apple Developer ID 正式签名，并通过 Apple 公证。** Apple Silicon（arm64）与 Intel（x86_64）的 App、DMG 均附加公证票据。系统要求 macOS 13.0+。
+**v1.0.8 / Build 54 已启用 Apple Developer ID 正式签名，并通过 Apple 公证。** Apple Silicon（arm64）与 Intel（x86_64）的 App、DMG 均附加公证票据。系统要求 macOS 13.0+。
 
-从 [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.7) 下载对应芯片的 DMG 或 ZIP，将 `Nivlet.app` 放入应用程序后打开，无需另装 Hammerspoon。
+从 [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 下载对应芯片的 DMG 或 ZIP，将 `Nivlet.app` 放入应用程序后打开，无需另装 Hammerspoon。
 
 签名与公证不代替**辅助功能授权**。从旧 ad-hoc 版首次迁移可能需要重新授权；此后同一开发者身份的正常更新通常可沿用授权，具体仍取决于 macOS。授权后回通用页自动检测，或点击“重新检测”。无需关闭 Gatekeeper；若出现恶意软件、应用损坏或校验不符提示，请停止安装并反馈。
 
@@ -106,4 +106,4 @@ Nivlet 是一款免费开源的 macOS 菜单栏工具，将常用操作放在一
 
 Nivlet 使用 [MIT License](LICENSE)。内置 Runtime 基于 [Hammerspoon](https://github.com/Hammerspoon/hammerspoon)；第三方组件保留各自许可证，见 [第三方声明](THIRD-PARTY-NOTICES.md)。
 
-1.0.7 启用正式开发者签名与 Apple 公证，修复辅助功能权限误报。详见[版本说明](documentation/RELEASE-v1.0.7.md)。
+1.0.8 修复 FinalShell 等无点号 Bundle ID 应用无法保存规则的问题，继续采用正式开发者签名与 Apple 公证。详见[版本说明](documentation/RELEASE-v1.0.8.md)。

@@ -1,15 +1,17 @@
 # Nivlet 当前基准
 
-更新日期：2026-10-23。
+更新日期：2026-10-28。
 
-当前发行版本：**1.0.7 / Build 53**，macOS 13+，Apple Silicon（arm64）与 Intel（x86_64）。双架构 App 和 DMG 已启用 Apple Developer ID 正式签名，通过 Apple 公证并附加票据。正式上传、公开下载及更新源回核状态见 HANDOFF 和 VALIDATION；历史正式版保留。
+当前正式发行与开发基准：**1.0.8 / Build 54**，macOS 13+，Apple Silicon（arm64）与 Intel（x86_64）。GitHub Latest 为 v1.0.8，发布于 2026-10-28；tag 解引用至 `0772475`。双架构 App 和 DMG 继续使用 Apple Developer ID 签名、Apple 公证与附加票据。
 
-以 1.0.7 / Build 53 作为后续开发、验收和文档的统一基准。相较 Build 52 本地候选，Build 53 的主要交付是将 Apple Developer ID 正式签名与 Apple 公证纳入 1.0.7 公开发行及双架构分发流程，沿用已验收的权限修复，不新增业务功能。Build 52 已有签名、公证候选验收记录，保留为历史，不作为当前版本。
+本次修复 [Issue #1](https://github.com/wivnelo/Nivlet/issues/1)：FinalShell 的 Bundle ID 为 `st`，旧校验错误要求包含点号，导致规则无法保存。`6cfa035` 统一后端 Bundle ID 校验，并同步前端检查及应用状态刷新入口，覆盖输入法、应用启动、浏览器来源与剪贴板排除；不新增业务功能。1.0.7 的权限误报修复继续保留。
 
-本次修复重新授权后的权限误报：系统信任布尔值可能过期，现通过 Finder AXWindows 实际跨进程访问核实状态；明确禁用仍拒绝。权限变化通知、回到 App 和“重新检测”使用统一判断。保持原有布局，没有新增退出按钮或强制重开流程。
+同步前本地 main 与 origin/main 均为 `6568a6d`，无提交差异；远端只有 main 分支。本地 `codex/screenshot` 位于 `30ec30e`，是 main 的祖先，落后 27 个提交，无独有提交，无需合并或删除。该数量仅对应此次文档同步前快照。
 
-已完成的窗口管理、应用快捷启动、输入法切换、浏览器分流、剪贴板、系统信息、底部错误、未安装标记和应用刷新功能继续保留。当前功能和推广说明见 README、RELEASE-v1.0.7 与 PROMOTION。
+本轮全部 Lua 回归及应用更换、退出保护、快捷键录入、标签边界 JS 回归通过；双架构更新源、ZIP CRC、SHA-256、签名及篡改拒绝通过。正式双架构 App 严格代码签名、App/DMG 公证票据验证通过；六附件本地 SHA-256 与 GitHub 服务端 digest 相同。未重新公开下载全部附件或执行实际更新安装、回滚及 Intel 真机验收。详见 [VALIDATION](documentation/VALIDATION.md)。
 
-构建：复用 Build 49 原生程序/dSYM，更新资源和版本元数据后以稳定 Developer ID 重签名。签名、公证、更新完整性与系统权限分别验证，不混同。Intel 历史用户实测已有反馈，本轮未重复最新包真机运行；具体测试边界见 VALIDATION。
+2026-10-28 只读核对本机应用版本为 **1.0.8 / Build 54**；这不等同全功能实测。本轮仅同步文档，不修改用户配置、剪贴板、默认浏览器或系统权限。
 
-2026-10-23 只读核对本机 /Applications/Nivlet.app 的版本元数据为 1.0.7 / Build 53；Build 52 的权限页和重新检测验收保留为历史证据，不能代替 Build 53 的完整实测。个人配置、剪贴板数据、系统权限、默认浏览器和个人 Hammerspoon 不变。website/ 是独立本地仓库，不纳入当前 Git；线上官网来自本仓库 docs/。
+下一开发建议仍为 A15 配置导入摘要预览，未开始；真实环境、双语辅助功能与特殊许可人工复核仍开放，见 [ROADMAP](ROADMAP.md)。
+
+官网来源为本仓库 `docs/`；独立本地 `website/` 不纳入当前提交。知识库使用 GitHub 与标准 Markdown，只同步项目摘要、决策和入口，不复制代码、安装包、配置或凭据。旧版本及原有验收证据保留，不能当作 Build 54 本轮实测。

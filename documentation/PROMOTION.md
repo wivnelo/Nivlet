@@ -1,6 +1,6 @@
 # Nivlet 正式发布与推广用语
 
-适用版本：1.0.7 / Build 53。
+适用版本：1.0.8 / Build 54。
 
 ## 简短介绍
 
@@ -10,7 +10,7 @@ Nivlet 是一款从日常自用需求慢慢整理出来的 macOS 桌面工具箱
 
 - 官网：https://wivnelo.github.io/Nivlet/
 - 源码：https://github.com/wivnelo/Nivlet
-- 下载：https://github.com/wivnelo/Nivlet/releases/tag/v1.0.7
+- 下载：https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8
 - 反馈：https://github.com/wivnelo/Nivlet/issues
 
 ## 对外说明边界

@@ -191,3 +191,13 @@ Build 53 最终包验证：每架构 101 个 Mach-O 均为正确的单架构；�
 ## 当前基准同步 · 2026-10-23
 
 统一以 1.0.7 / Build 53 为当前开发、文档和验收基准。主要发行交付为 Apple Developer ID 正式签名与 Apple 公证，沿用 Build 52 已验收的权限修复；Build 52 候选已签名、公证的历史记录保留。只读核对 /Applications/Nivlet.app 的 CFBundleShortVersionString 为 1.0.7、CFBundleVersion 为 53，更新 BASELINE 和 HANDOFF 中已过时的本机 Build 52 状态。本次仅同步文档，没有重新签名、公证、构建、安装、发布或重复全功能验收；此前跨硬件和完整升级验证边界不变。
+
+
+## 1.0.8 / Build 54 · 发布后核对与文档同步 · 2026-10-28
+
+- GitHub Latest 为 v1.0.8，今日 11:20（Asia/Manila）发布，非预发布；六附件已上传。tag 解引用至 `0772475`，随后 `6568a6d` 发布双架构 feed 并更新测试。同步前本地 main 与远端 main 无提交差异；codex/screenshot 是 main 祖先，落后 27 个提交、无独有提交。
+- `6cfa035` 修复无点号 Bundle ID 校验，FinalShell `st` 是 Issue #1 的具体触发标识。Issue 已关闭；本轮全部 Lua 测试及 launcher_replace、leave_guard、shortcut_capture、tabs_boundary 四项 JS 测试通过，不代替报告者真实 FinalShell 升级复验。
+- `tests/updates.py` 对当前正式双架构 ZIP 验证版本/Build、架构分流、ZIP CRC、SHA-256、Ed25519 签名与篡改拒绝，全部通过。首次沙箱内执行受 Keychain 访问限制中止，授权后原测试完整通过，未更改测试或导出密钥。
+- 双架构正式 App `codesign --verify --deep --strict` 通过，App 和 DMG 的 `stapler validate` 均通过。六附件本地 SHA-256 与 GitHub API 返回的服务端 digest 逐个相同；不是重新公开下载全部附件的回核。
+- 只读安装版 Info.plist 为 1.0.8 / Build 54。本轮不替换应用、不更改配置或权限，不读取个人历史。未新增真实 UI、Intel 真机、实际 Sparkle 安装/回滚或历史保留验收；1.0.7 的旧证据保留原范围。
+- 同步 README、当前基准、交接、路线图、配置/安装/使用/分发/开发说明、官网及知识库摘要。正式 feed 的 URL、版本和签名不改动，历史版本说明保持不变。

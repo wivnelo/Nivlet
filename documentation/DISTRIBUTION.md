@@ -1,11 +1,13 @@
 # Nivlet for Mac 分发准备与验收
 
-## 当前工程基准（2026-10-21）
+## 当前工程基准（2026-10-28）
 
-当前发行版本为 1.0.7 / Build 53（arm64 / x86_64），包含底部统一错误、名称后未安装标签、应用状态与浏览器列表刷新及卸载后的浏览器改选。最终构建与回归见 [Build 53 验收](VALIDATION.md)，安装及发布状态以 [BASELINE.md](../BASELINE.md) 为准。旧构建记录仅作历史证据。
+1.0.8 / Build 54 修复 FinalShell 等无点号 Bundle ID 应用的规则保存校验。当前正式包位于本地忽略目录 `build/release-1.0.8-official/dist/`，提供双架构 ZIP、DMG 与 SHA-256；本轮已复核代码签名、公证票据及双架构更新签名。历史构建方式仅适用于其标注版本，不推定 Build 54 复用了 Build 49 原生程序。
+
+当前发行版本为 1.0.8 / Build 54（arm64 / x86_64），包含底部统一错误、名称后未安装标签、应用状态与浏览器列表刷新及卸载后的浏览器改选。最终构建与回归见 [Build 54 验收](VALIDATION.md)，安装及发布状态以 [BASELINE.md](../BASELINE.md) 为准。旧构建记录仅作历史证据。
 
 - Runtime 固定来源；构建通过 `scripts/prepare-updater.sh` 准备固定 Sparkle 2.10.0，许可收集包含其原文。
-- Release 构建使用完整 Xcode：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=53 sh scripts/build-release.sh`。53 为本次 1.0.7 发行 Build；下一构建继续递增 Build；构建不自动安装。
+- Release 构建使用完整 Xcode：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=54 sh scripts/build-release.sh`。54 为本次 1.0.8 发行 Build；下一构建继续递增 Build；构建不自动安装。
 - 更新入口位于关于页，原生 Sparkle 桥接由 `patches/nivlet-updater.patch` 注入；有草稿先处理，默认手动检查、用户确认安装。
 - Feed 为 `docs/appcast.xml`，使用 `python3 scripts/generate-update-feed.py <arm64 ZIP> <x86_64 ZIP>` 生成、`tests/updates.py` 验证。Ed25519 私钥留 Keychain，不导出到源码、日志或安装包。
 - 发布顺序：新版本/Build → 构建和回归 → 打包/签名校验 → 上传新附件 → 发布 feed → 实测升级及最新检查 → 保留回滚备份。

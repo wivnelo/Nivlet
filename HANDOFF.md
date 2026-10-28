@@ -1,6 +1,17 @@
-# Nivlet 会话交接 · 2026-10-23
+# Nivlet 会话交接 · 2026-10-28
 
-## 独立任务恢复 · 2026-10-26
+## 当前状态 · 2026-10-28
+
+本节取代下方历史记录中的“当前”“等待确认”，旧记录保留原日期。
+
+- 正式版及本机安装元数据均为 **1.0.8 / Build 54**。GitHub Latest 于今日发布，六附件齐全；tag 指向 `0772475`，发布后的 main 为 `6568a6d`（更新 feed 和发行测试）。
+- Issue #1 已关闭。`6cfa035` 修复 FinalShell `st` 等无点号 Bundle ID 被拒绝的问题，统一规则保存、前端检查和应用刷新校验。不是尚待诊断的问题。
+- 同步前本地 main 与 GitHub main 一致；本地 codex/screenshot 为 main 祖先，落后 27 个提交且无独有提交。远端无该分支，保持原状。
+- 本轮重跑全部 Lua、四项相关 JS 和双架构更新测试；复核正式 App 代码签名、App/DMG 公证票据及六附件服务端 digest，全部通过。未将检查扩展为真实升级、回滚、Intel 真机或完整 UI 验收。
+- 知识库已迁移为 GitHub 标准 Markdown 工作流，不再依赖 Obsidian；仅更新 Nivlet 项目摘要，保留其他项目未提交修改。
+- 下一建议仍为 A15 导入摘要预览，未开始；V01、A19、V02 继续按 ROADMAP 收集证据。本轮不新增功能或替换应用，不改个人配置和系统权限。
+
+## 历史：独立任务恢复 · 2026-10-26
 
 - **项目与目标**：Nivlet 是独立的免费开源 macOS 菜单栏工具，集中提供剪贴板、窗口管理、应用快捷启动、输入法切换与浏览器分流等操作。仓库为 [wivnelo/Nivlet](https://github.com/wivnelo/Nivlet)，本地路径为 `本地 Nivlet 项目目录`；不与其他项目混用开发上下文。
 - **已完成**：本轮完成项目身份、路径、交接与远端状态盘点。GitHub Latest 仍为 [1.0.7 / Build 53](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.7)；本地 main 与远端最新提交均为 [`823ae44`](https://github.com/wivnelo/Nivlet/commit/823ae4488d0e27a2a980c767cb98bbf7a12e21fb)。本轮已只读核对本机安装版本元数据为 1.0.7 / 53。既有发行与测试证据沿用下文及 VALIDATION，不视为本轮复测。

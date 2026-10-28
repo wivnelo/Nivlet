@@ -1,8 +1,8 @@
-> Current release: 1.0.7 / Build 53.
+> Current release: 1.0.8 / Build 54.
 
 # Nivlet User Guide
 
-The baseline is 1.0.7 / Build 53. Apps and DMGs for both architectures are signed with Apple Developer ID, notarized by Apple, and stapled. Signing and notarization do not grant Accessibility access. See the [installation guide](INSTALLATION.en.md).
+The baseline is 1.0.8 / Build 54. Apps and DMGs for both architectures are signed with Apple Developer ID, notarized by Apple, and stapled. Signing and notarization do not grant Accessibility access. See the [installation guide](INSTALLATION.en.md).
 
 [Back to README](../README.md) · [简体中文](USAGE.md)
 

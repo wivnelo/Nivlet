@@ -1,14 +1,14 @@
 # Installation, updates and removal
 
-Current release: **v1.0.7 / Build 53**, macOS 13.0+, Apple Silicon (arm64) or Intel (x86_64). [简体中文](INSTALLATION.md)
+Current release: **v1.0.8 / Build 54**, macOS 13.0+, Apple Silicon (arm64) or Intel (x86_64). [简体中文](INSTALLATION.md)
 
 ## Signing status
 
-**Nivlet 1.0.7 is signed with Apple Developer ID and notarized by Apple.** Both architectures have stapled tickets on their apps and DMGs. Sparkle update signatures independently protect archive integrity. Notarization does not grant Accessibility permission or mean App Store distribution.
+**Nivlet 1.0.8 is signed with Apple Developer ID and notarized by Apple.** Both architectures have stapled tickets on their apps and DMGs. Sparkle update signatures independently protect archive integrity. Notarization does not grant Accessibility permission or mean App Store distribution.
 
 ## Install
 
-1. Download either the DMG or ZIP from [this project's release](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.7).
+1. Download either the DMG or ZIP from [this project's release](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8).
 2. Open the DMG and drag `Nivlet.app` to Applications, or extract the ZIP and move the app to Applications. Eject the DMG; use only the installed copy.
 3. Launch `/Applications/Nivlet.app`. A normal downloaded-app confirmation may appear.
 4. Open Settings from the N menu bar icon. Enable the tools you need, configure rules and click Save Settings. No separate Hammerspoon installation is needed.
@@ -28,7 +28,7 @@ For browser routing, save rules first, then choose Nivlet as the system default 
 Place the DMG, ZIP and `.sha256` file together, then run:
 
 ```sh
-shasum -a 256 -c Nivlet-1.0.7-build53-arm64-developer-id.sha256
+shasum -a 256 -c Nivlet-1.0.8-build54-arm64.sha256
 ```
 
 Both archives should report OK. If you downloaded only one, the missing archive reports a missing-file error; inspect the result for the archive you have. Checksums do not replace Apple signing or notarization.

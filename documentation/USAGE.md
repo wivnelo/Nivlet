@@ -1,8 +1,8 @@
-> 当前正式版：1.0.7 / Build 53。浏览器内部测试区已移除，四类应用图标可拖动排序，新添加应用置顶，名称统一读取 macOS 显示名称。
+> 当前正式版：1.0.8 / Build 54。浏览器内部测试区已移除，四类应用图标可拖动排序，新添加应用置顶，名称统一读取 macOS 显示名称。
 
 # Nivlet 使用指南
 
-当前以 1.0.7 / Build 53 为基准，双架构 App 和 DMG 已使用 Apple Developer ID 正式签名，通过 Apple 公证并附加票据。签名与公证不代替辅助功能授权；安装和升级说明见[安装指南](INSTALLATION.md)。
+当前以 1.0.8 / Build 54 为基准，双架构 App 和 DMG 已使用 Apple Developer ID 正式签名，通过 Apple 公证并附加票据。签名与公证不代替辅助功能授权；安装和升级说明见[安装指南](INSTALLATION.md)。
 
 [返回首页](../README.zh-CN.md) · [English](USAGE.en.md)
 
