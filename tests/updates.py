@@ -18,13 +18,13 @@ assert versions[0] == versions[1], 'Architecture versions must match'
 for arm in (True, False):
     eligible = [item for item in items if arm or item.find('s:hardwareRequirements', ns) is None]
     selected = eligible[0].find('enclosure').attrib['url']
-    assert ('-arm64-' if arm else '-x86_64-') in selected
+    assert ('-arm64.zip' if arm else '-x86_64.zip') in selected
 for item, architecture in zip(items, ('arm64', 'x86_64')):
     entry = item.find('enclosure')
     version = item.find('s:shortVersionString', ns).text
     assert entry.attrib['url'].startswith(f'https://github.com/wivnelo/Nivlet/releases/download/v{version}/')
-    assert f'-{architecture}-' in entry.attrib['url']
-    archive = root / 'build/packages' / entry.attrib['url'].rsplit('/', 1)[1]
+    assert entry.attrib['url'].endswith(f'-{architecture}.zip')
+    archive = root / 'build/release-1.0.8-official/dist' / entry.attrib['url'].rsplit('/', 1)[1]
     assert archive.stat().st_size == int(entry.attrib['length'])
     with zipfile.ZipFile(archive) as package:
         assert package.testzip() is None

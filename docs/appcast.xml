@@ -4,23 +4,23 @@
     <title>Nivlet for Mac Updates</title>
     <link>https://wivnelo.github.io/Nivlet/</link>
     <item>
-      <title>Nivlet 1.0.7 · Build 53</title>
-      <sparkle:version>53</sparkle:version>
-      <sparkle:shortVersionString>1.0.7</sparkle:shortVersionString>
+      <title>Nivlet 1.0.8 · Build 54</title>
+      <sparkle:version>54</sparkle:version>
+      <sparkle:shortVersionString>1.0.8</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
       <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.7</link>
-      <description>Nivlet 1.0.7: Developer ID signed and Apple notarized for Apple Silicon / Intel, with corrected Accessibility status detection. 正式开发者签名与 Apple 公证，修复辅助功能权限误报，提供 ARM / Intel 更新。</description>
-      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.7/Nivlet-1.0.7-build53-arm64-developer-id.zip" length="11500023" type="application/octet-stream" sparkle:edSignature="zEvK/hPxHQtYDCpyIVM1OOJXWU+WZQ5ubs8nbNaQJ1IpFZtDh8tSObohpJzxfP3Nw1vVvj2BDTiLl9fgmOxjBw==" />
+      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8</link>
+      <description>Nivlet 1.0.8: Developer ID signed and Apple notarized for Apple Silicon and Intel. Fixed app rules failing to save for bundle IDs without dots, including FinalShell. 已通过 Apple 开发者签名与公证，支持 Apple Silicon 和 Intel。修复 FinalShell 等应用因 Bundle ID 不含点号而无法保存规则的问题。</description>
+      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.8/Nivlet-1.0.8-build54-arm64.zip" length="11307680" type="application/octet-stream" sparkle:edSignature="jD9B1OJGjbyJ7pZPqZ4At0N7Mm9VArVP+lYCCHz4XMv2BPZ938EgRnLZ4EiSlZ0FCmw0IxY6bPQ6/aC6IITBAw==" />
     </item>
     <item>
-      <title>Nivlet 1.0.7 · Build 53</title>
-      <sparkle:version>53</sparkle:version>
-      <sparkle:shortVersionString>1.0.7</sparkle:shortVersionString>
+      <title>Nivlet 1.0.8 · Build 54</title>
+      <sparkle:version>54</sparkle:version>
+      <sparkle:shortVersionString>1.0.8</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.7</link>
-      <description>Nivlet 1.0.7: Developer ID signed and Apple notarized for Apple Silicon / Intel, with corrected Accessibility status detection. 正式开发者签名与 Apple 公证，修复辅助功能权限误报，提供 ARM / Intel 更新。</description>
-      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.7/Nivlet-1.0.7-build53-x86_64-developer-id.zip" length="11735688" type="application/octet-stream" sparkle:edSignature="nXxP8ImRrrenlg6i2BSQ9OLsiH2dZeJjE9OyiYpLb7GQ6YW67RzJvaEvTcuvbhHz1xJL7yNDDD4nhAh/OpLFDQ==" />
+      <link>https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8</link>
+      <description>Nivlet 1.0.8: Developer ID signed and Apple notarized for Apple Silicon and Intel. Fixed app rules failing to save for bundle IDs without dots, including FinalShell. 已通过 Apple 开发者签名与公证，支持 Apple Silicon 和 Intel。修复 FinalShell 等应用因 Bundle ID 不含点号而无法保存规则的问题。</description>
+      <enclosure url="https://github.com/wivnelo/Nivlet/releases/download/v1.0.8/Nivlet-1.0.8-build54-x86_64.zip" length="11539503" type="application/octet-stream" sparkle:edSignature="DI/Cw40s+zpYdCjxA2eKYQk5RpZGSzgvjJLd6yyJ30YRZiS4AiD33d51DYi8ddpj9tZkhMZ/Q/7bJypnhW7mAg==" />
     </item>
   </channel>
 </rss>
