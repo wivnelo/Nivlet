@@ -4,6 +4,7 @@ assert(not hs.configdir:find(".hammerspoon", 1, true), "Personal configuration d
 local root = hs.processInfo.bundlePath .. "/Contents/Resources/Toolkit/"
 package.path = root .. "?.lua;" .. package.path
 local i18n = require("modules.i18n")
+local bundleIDs = require("modules.bundle_id")
 local preferences = require("modules.preferences")
 local windows = require("modules.windows")
 local input = require("modules.input_method")
@@ -330,7 +331,7 @@ function app.openSettings(section, focus)
         if body.action=="refreshApplications" then
             requestedApps={}
             if type(body.bundleIDs)=="table" then for _,id in ipairs(body.bundleIDs) do
-                if #requestedApps<500 and type(id)=="string" and #id<256 and id:match("^[%w_%-]+%.[%w_.%-]+$") then table.insert(requestedApps,id) end
+                if #requestedApps<500 and bundleIDs.valid(id) then table.insert(requestedApps,id) end
             end end
             reply(true,"",body.action);return
         end

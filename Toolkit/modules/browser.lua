@@ -1,4 +1,5 @@
 local i18n = require("modules.i18n")
+local bundleIDs = require("modules.bundle_id")
 local M={}
 local settingsKey="desktoptoolkit.browser.v1"
 M.browsers={{id="com.apple.Safari",name="Safari"},{id="com.google.Chrome",name="Chrome"},{id="org.mozilla.firefox",name="Firefox"},{id="com.microsoft.edgemac",name="Edge"},{id="com.brave.Browser",name="Brave"}}
@@ -30,7 +31,7 @@ function M.validate(value)
     end
     config.appRules={};seen={}
     for _,rule in ipairs(appRules) do
-        if type(rule)~="table" or type(rule.bundleID)~="string" or not rule.bundleID:match("^[%w_%-]+%.[%w_.%-]+$") or type(rule.name)~="string" or #rule.name>256 or not known(rule.browser) or seen[rule.bundleID:lower()] then return nil,i18n.t("来源应用规则无效或重复") end
+        if type(rule)~="table" or not bundleIDs.valid(rule.bundleID) or type(rule.name)~="string" or #rule.name>256 or not known(rule.browser) or seen[rule.bundleID:lower()] then return nil,i18n.t("来源应用规则无效或重复") end
         seen[rule.bundleID:lower()]=true;table.insert(config.appRules,{bundleID=rule.bundleID,name=rule.name,browser=rule.browser})
     end
     return config

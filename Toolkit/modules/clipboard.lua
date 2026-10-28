@@ -1,4 +1,5 @@
 local i18n = require("modules.i18n")
+local bundleIDs = require("modules.bundle_id")
 local M = {entries={},paused=false,nextID=0}
 local settingsKey = "desktoptoolkit.clipboard.v1"
 function M.defaults()
@@ -9,7 +10,7 @@ function M.validate(value)
     if value.images~=nil and type(value.images)~="boolean" or value.persistent~=nil and type(value.persistent)~="boolean" then return nil,i18n.t("图片和缓存设置格式无效") end
     local config,seen={enabled=value.enabled,limit=value.limit,minutes=value.minutes,images=value.images~=false,persistent=value.persistent==true,excluded={}},{}
     for _,id in ipairs(value.excluded) do
-        if type(id)~="string" or not id:match("^[%w_%-]+%.[%w_.%-]+$") then return nil,i18n.t("排除应用须填写有效 Bundle ID") end
+        if not bundleIDs.valid(id) then return nil,i18n.t("排除应用须填写有效 Bundle ID") end
         if not seen[id] then table.insert(config.excluded,id);seen[id]=true end
     end
     return config

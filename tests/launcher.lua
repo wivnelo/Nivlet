@@ -26,7 +26,10 @@ fail=true;assert(not m.save(config('8','com.example.replacement')));assert(bindi
 assert(stored['desktoptoolkit.launcher.v1'].rules[1].shortcut.key=='K')
 local duplicate=config('J');duplicate.rules[2]={bundleID='com.example.other',shortcut={key='j',mods={'ctrl','cmd'}}};assert(not m.save(duplicate))
 duplicate.rules[2].shortcut.key='L';duplicate.rules[2].bundleID='com.example.probe';assert(not m.save(duplicate))
-assert(not m.save({enabled=true,rules={{bundleID='invalid',shortcut={key='K',mods={'ctrl'}}}}}))
+assert(not m.save({enabled=true,rules={{bundleID='not a bundle id',shortcut={key='K',mods={'ctrl'}}}}}))
+-- FinalShell 等应用的 Bundle ID 没有点号，必须能保存。
+assert(m.save(config('K','st')) and bindings['ctrl+cmd+K'])
+assert(m.config.rules[1].bundleID=='st')
 assert(m.save(config('','com.example.probe')) and next(bindings)==nil)
 assert(m.save(config('J','com.example.probe',false)) and next(bindings)==nil)
 assert(m.save(config('K','com.example.probe')))

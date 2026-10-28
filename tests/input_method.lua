@@ -26,6 +26,14 @@ m.configure({enabled=false,rules={}})
 print("Input rules validation, activation matching, no-op, lifecycle and persistence passed")
 
 assert(not m.validate({enabled=false,rules={rule,{bundleID='ORG.TEST.EDITOR',sourceID='source.a'}}}))
+-- FinalShell 的 Bundle ID 是 "st"，没有点号；校验不能因此拒绝保存。
+assert(m.save({enabled=true,rules={{bundleID='st',sourceID='source.b',name='FinalShell'}}}))
+assert(m.config.rules[1].bundleID=='st')
+callback(nil,5,{bundleID=function() return 'st' end});assert(current=='source.b')
+assert(not m.validate({enabled=false,rules={{bundleID='not a bundle id',sourceID='source.b'}}}))
+assert(not m.validate({enabled=false,rules={{bundleID='',sourceID='source.b'}}}))
+m.configure({enabled=false,rules={}})
+print('Dotless bundle ID accepted, malformed and empty bundle ID rejected')
 local i18n=require('modules.i18n')
 hs.keycodes.layouts=function(ids)return ids and {'com.apple.keylayout.ABC'} or {'ABC'}end
 hs.keycodes.methods=function(ids)return ids and {'com.apple.inputmethod.SCIM.ITABC','third.party.input'} or {'Pinyin – Simplified','Third Party'}end

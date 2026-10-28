@@ -34,6 +34,13 @@ print('Startup URLs drain only after HTTP callback is installed')
 
 local caseDuplicate=b.defaults();caseDuplicate.appRules={{bundleID='com.example.app',name='App',browser='com.apple.Safari'},{bundleID='COM.EXAMPLE.APP',name='App',browser='com.apple.Safari'}};assert(not b.validate(caseDuplicate))
 
+-- FinalShell 等应用的 Bundle ID 没有点号，来源应用规则必须接受。
+local dotless=b.defaults();dotless.appRules={{bundleID='st',name='FinalShell',browser='com.apple.Safari'}}
+assert(b.validate(dotless).appRules[1].bundleID=='st')
+dotless.appRules[1].bundleID='not a bundle id';assert(not b.validate(dotless))
+dotless.appRules[1].bundleID='';assert(not b.validate(dotless))
+print('Browser app rules accept dotless bundle IDs and reject malformed ones')
+
 assert(b.resolve('https://other.test','COM.APPLE.MAIL')=='com.microsoft.edgemac')
 hs.urlevent.getDefaultHandler=function() return 'org.hammerspoon.Hammerspoon' end
 assert(not b.status().active)

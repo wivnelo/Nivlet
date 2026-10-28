@@ -277,6 +277,8 @@ function translateUI(){
 window.showSection=function(id){if(!document.getElementById(id))id='windowSection';for(const panel of document.querySelectorAll('.panel'))panel.hidden=panel.id!==id;for(const tab of document.querySelectorAll('[role=tab]')){const selected=tab.getAttribute('aria-controls')===id;tab.setAttribute('aria-selected',String(selected));tab.tabIndex=selected?0:-1}document.querySelector('main').scrollTop=0;if(['browserSection','inputSection','launcherSection','clipSection'].includes(id))refreshApplications();if(id==='systemSection')send({action:'refreshSystemValues'});if(id==='generalSection')send({action:'refreshPermissions',silent:true})};
 const tabs=[...document.querySelectorAll('[role=tab]')];for(const tab of tabs){tab.onclick=()=>{if(tab.dataset.suppressClick){delete tab.dataset.suppressClick;return;}window.showSection(tab.getAttribute('aria-controls'))};tab.onkeydown=e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const tabs=[...document.querySelectorAll('[role=tab]')];let i=tabs.indexOf(tab);i=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;delete tabs[i].dataset.suppressClick;tabs[i].click();tabs[i].focus()}}}
 
+// CFBundleIdentifier 不强制反向域名，FinalShell 等应用的 Bundle ID 没有点号。
+function validBundleID(id){return typeof id==='string'&&id.length<=255&&/^[\w-][\w.-]*$/.test(id)}
 function refreshApplications(){send({action:'refreshApplications',bundleIDs:[...new Set([...document.querySelectorAll('[data-bundle]')].map(row=>row.dataset.bundle))]})}
 let applicationStates={};
 function updateApplicationState(row){
@@ -330,7 +332,7 @@ function renderExcludedApps(){
     if(!ids.length){const empty=document.createElement('p');empty.className='help-text';empty.textContent=t('暂无排除应用');host.append(empty)}
 }
 window.addExcludedApp=function(app){
-    if(!app||typeof app.bundleID!=='string'||!app.bundleID.match(/^[\w-]+\.[\w.-]+$/))return;
+    if(!app||!validBundleID(app.bundleID))return;
     const field=document.getElementById('clipExcluded'),ids=field.value.split(/\n/).filter(Boolean);
     excludedAppNames[app.bundleID]=app.name||app.bundleID;
     if(app.icon)appIcons[app.bundleID]=app.icon;
@@ -432,7 +434,7 @@ window.addLauncherRule=function(rule){if(existingApp('launcherRules',rule))retur
 window.replaceLauncherApp=function(rule,originalBundleID){
     const host=document.getElementById('launcherRules');
     const row=[...host.children].find(row=>row.dataset.bundle?.toLowerCase()===originalBundleID?.toLowerCase());
-    if(!row||!rule||typeof rule.bundleID!=='string'||!rule.bundleID.match(/^[\w-]+\.[\w.-]+$/)||typeof rule.name!=='string')return;
+    if(!row||!rule||!validBundleID(rule.bundleID)||typeof rule.name!=='string')return;
     if(row.dataset.bundle.toLowerCase()===rule.bundleID.toLowerCase())return;
     if(existingApp('launcherRules',rule))return;
     row.dataset.bundle=rule.bundleID;row.dataset.name=rule.name;

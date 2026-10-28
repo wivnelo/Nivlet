@@ -1,6 +1,14 @@
 # Nivlet 会话交接 · 2026-10-23
 
-## 当前状态
+## 独立任务恢复 · 2026-10-26
+
+- **项目与目标**：Nivlet 是独立的免费开源 macOS 菜单栏工具，集中提供剪贴板、窗口管理、应用快捷启动、输入法切换与浏览器分流等操作。仓库为 [wivnelo/Nivlet](https://github.com/wivnelo/Nivlet)，本地路径为 `/Users/wmhou/Project/011_Codes/011_1_pub/Nivlet`；不与其他项目混用开发上下文。
+- **已完成**：本轮完成项目身份、路径、交接与远端状态盘点。GitHub Latest 仍为 [1.0.7 / Build 53](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.7)；本地 main 与远端最新提交均为 [`823ae44`](https://github.com/wivnelo/Nivlet/commit/823ae4488d0e27a2a980c767cb98bbf7a12e21fb)。本轮已只读核对本机安装版本元数据为 1.0.7 / 53。既有发行与测试证据沿用下文及 VALIDATION，不视为本轮复测。
+- **当前状态：等待确认**。尚未接到新的开发任务；没有正在执行的代码开发、修复或发布。外部 [Issue #1](https://github.com/wivnelo/Nivlet/issues/1) 仍开放，报告添加 FinalShell 输入法规则后无法保存；[评论](https://github.com/wivnelo/Nivlet/issues/1#issuecomment-6368291282) 提供 bundle ID 为 `st`、无点号的线索。此为外部报告，尚未复现或确认根因，也不代表用户已授权修复。
+- **下一步建议／待用户确认**：先选择优先级：诊断 Issue #1 的保存问题，或继续 ROADMAP 中未开始的 A15 配置导入摘要预览。功能或设计改动须先说明影响，再由用户决定；本轮不启动任一开发项。
+- **协作与保护边界**：主对话用于任务调度，具体工作留在 Nivlet 独立任务。按需整理交接，保留历史，不擅自停止运行中的工作。`website/` 仍是独立本地仓库，保持不动，线上官网来源仍为 `docs/`。本轮仅更新本交接摘要，不改代码、不操作前台 UI 或模拟器、不提交或推送发布；未运行测试。
+
+## 当前状态（2026-10-23 交接记录）
 
 - 当前正式版：**1.0.7 / Build 53**，macOS 13+，Apple Silicon / Intel，旧正式版 1.0.6 / Build 49 保留。
 - 双架构 App 已 Developer ID 签名、Apple 公证并附加票据；正式 DMG 也已公证、附加票据并通过 Gatekeeper。ZIP/DMG 内容、源码一致性、校验值、双架构更新签名和篡改拒绝均通过。六附件已公开重新下载，逐个 SHA-256 相同；官网与 appcast 和源码逐字节相同。

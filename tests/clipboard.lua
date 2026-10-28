@@ -21,6 +21,10 @@ for i=1,12 do copy('item'..i) end;assert(#m.entries==10 and m.entries[1].text=='
 now=now+60;assert(#m.snapshot().entries==0 and not m.copy(id))
 copy('<script>test</script>');assert(#m.entries==1)
 local bad=m.defaults();bad.limit=101;assert(not m.save(bad) and m.config.enabled)
+-- 排除列表同样要接受没有点号的 Bundle ID，例如 FinalShell 的 "st"。
+local dotless=m.defaults();dotless.excluded={'st'};assert(m.validate(dotless).excluded[1]=='st')
+dotless.excluded={'not a bundle id'};assert(not m.validate(dotless))
+dotless.excluded={''};assert(not m.validate(dotless))
 config.enabled=false;assert(m.save(config));assert(#m.entries==1 and not m.timer and stops>0);local disabledReads=reads;copy("disabled-copy");assert(reads==disabledReads and #m.entries==1);assert(m.copy(m.entries[1].id));assert(not m.pause())
 m.entries={};m.start();assert(not m.config.enabled and #m.entries==0)
 assert(saved.entries==nil)

@@ -1,4 +1,5 @@
 local i18n = require("modules.i18n")
+local bundleIDs = require("modules.bundle_id")
 local M = {config={enabled=false,rules={}}}
 local settingsKey = "desktoptoolkit.input.v1"
 function M.sources()
@@ -22,7 +23,7 @@ function M.validate(value, available)
     if type(value) ~= "table" or type(value.enabled) ~= "boolean" or type(value.rules) ~= "table" then return nil, i18n.t("输入法设置格式无效") end
     local result, used = {enabled=value.enabled,rules={}}, {}
     for _, rule in ipairs(value.rules) do
-        if type(rule) ~= "table" or type(rule.bundleID) ~= "string" or not rule.bundleID:match("^[%w_%-]+%.[%w_.%-]+$") or type(rule.sourceID) ~= "string" or rule.sourceID == "" then return nil, i18n.t("请选择应用和输入法") end
+        if type(rule) ~= "table" or not bundleIDs.valid(rule.bundleID) or type(rule.sourceID) ~= "string" or rule.sourceID == "" then return nil, i18n.t("请选择应用和输入法") end
         if used[rule.bundleID:lower()] then return nil, i18n.t("同一应用只能配置一条输入法规则") end
         if value.enabled and available and not available[rule.sourceID] then return nil, i18n.t("输入法不可用，请重新选择：") .. rule.sourceID end
         used[rule.bundleID:lower()] = true

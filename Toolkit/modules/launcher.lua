@@ -1,12 +1,13 @@
 local i18n=require('modules.i18n')
 local preferences=require('modules.preferences')
+local bundleIDs=require('modules.bundle_id')
 local M={config={enabled=false,rules={}},bindings={}}
 local settingsKey='desktoptoolkit.launcher.v1'
 function M.validate(value)
     if type(value)~='table' or type(value.enabled)~='boolean' or type(value.rules)~='table' then return nil,i18n.t('应用启动设置格式无效') end
     local result,apps,shortcuts={enabled=value.enabled,rules={}}, {}, {}
     for _,rule in ipairs(value.rules) do
-        if type(rule)~='table' or type(rule.bundleID)~='string' or not rule.bundleID:match('^[%w_%-]+%.[%w_.%-]+$') then return nil,i18n.t('请选择要启动的应用') end
+        if type(rule)~='table' or not bundleIDs.valid(rule.bundleID) then return nil,i18n.t('请选择要启动的应用') end
         if apps[rule.bundleID:lower()] then return nil,i18n.t('同一应用只能配置一个启动快捷键') end
         local config,message=preferences.validate({enabled=false,shortcuts={left=rule.shortcut}})
         if not config then return nil,message end
