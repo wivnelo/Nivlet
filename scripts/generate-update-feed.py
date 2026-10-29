@@ -1,12 +1,28 @@
 """Sign a release ZIP using the Nivlet Keychain key and write its Sparkle feed."""
 from pathlib import Path
 import plistlib
+import re
 import subprocess
 import sys
 import tempfile
 import xml.etree.ElementTree as ET
 import zipfile
 root = Path(__file__).resolve().parent.parent
+
+
+def read_description(version, build):
+    path = root / 'release-notes' / f'{version}-build{build}.md'
+    if not path.is_file():
+        raise SystemExit(f'Missing release notes: {path}')
+    notes = path.read_text(encoding='utf-8')
+    if 'DRAFT PLACEHOLDER' in notes:
+        raise SystemExit(f'Draft release notes must be replaced before release: {path}')
+    description = ' '.join(re.sub(r'<!--.*?-->', '', notes, flags=re.DOTALL).split())
+    if not description:
+        raise SystemExit(f'Empty release notes: {path}')
+    return description
+
+
 if len(sys.argv) != 3:
     raise SystemExit('Usage: generate-update-feed.py ARM64.zip X86_64.zip (both required)')
 archives = [Path(value).resolve() for value in sys.argv[1:]]
@@ -23,6 +39,7 @@ for archive, architecture in zip(archives, ('arm64', 'x86_64')):
     releases.append((info['CFBundleShortVersionString'], info['CFBundleVersion'], info['SUPublicEDKey']))
 if releases[0] != releases[1]:
     raise SystemExit('Both architectures must have the same version, build and update public key')
+description = read_description(*releases[0][:2])
 ns = 'http://www.andymatuschak.org/xml-namespaces/sparkle'
 ET.register_namespace('sparkle', ns)
 rss = ET.Element('rss', version='2.0')
@@ -52,14 +69,7 @@ for archive, architecture in zip(archives, ('arm64', 'x86_64')):
     if architecture == 'arm64':
         ET.SubElement(item, f'{{{ns}}}hardwareRequirements').text = 'arm64'
     ET.SubElement(item, 'link').text = f'https://github.com/wivnelo/Nivlet/releases/tag/v{version}'
-    ET.SubElement(item, 'description').text = (
-    f'Nivlet {version}: Developer ID signed and Apple notarized '
-    'for Apple Silicon and Intel. '
-    'Fixed app rules failing to save for bundle IDs without dots, '
-    'including FinalShell. '
-    '已通过 Apple 开发者签名与公证，支持 Apple Silicon 和 Intel。'
-    '修复 FinalShell 等应用因 Bundle ID 不含点号而无法保存规则的问题。'
-)
+    ET.SubElement(item, 'description').text = description
     ET.SubElement(item, 'enclosure', {
         'url': f'https://github.com/wivnelo/Nivlet/releases/download/v{version}/{archive.name}',
         'length': str(archive.stat().st_size),
