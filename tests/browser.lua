@@ -65,3 +65,38 @@ end
 local installed=b.installed()
 assert(#installed==1 and installed[1].id=='com.apple.Safari','Removed Chrome must not appear in installed browsers')
 print('Installed browser list excludes stale application paths')
+
+-- Localhost, single-label LAN names and IPv6 literals are real navigation targets.
+for _,url in ipairs({
+    'http://localhost:3000/',
+    'http://localhost./',
+    'http://wiki/page',
+    'http://wiki:8080/page',
+    'https://[::1]/',
+    'https://[::1]:8443/x',
+    'https://[0:0:0:0:0:0:0:1]/',
+    'https://[2001:db8::1]/',
+    'https://[::ffff:127.0.0.1]/',
+    'http://127.0.0.1:8080/x',
+}) do
+    assert(b.resolve(url)=='com.apple.Safari', url)
+end
+assert(b.resolve('https://example.com/a')=='com.google.Chrome')
+assert(b.resolve('https://example.com.evil.test')=='com.apple.Safari')
+for _,url in ipairs({
+    'file:///x','javascript:alert(1)','https://user@example.com','https://example.com:99999',
+    'https://example.com/a b','https://example.com\n','https://user@[::1]/','https://[::1]:99999/',
+    'https://[gggg::1]/','https://[::1::2]/','https://[:::1]/','http://[::1','http://-bad/','http://./',
+    'http://localhost:0/','https://[::ffff:999.1.1.1]/',
+}) do
+    assert(not b.resolve(url), url)
+end
+local previous=b.config
+local loopback=b.defaults(); loopback.enabled=true
+loopback.rules={{domain='127.0.0.1',browser='com.google.Chrome',subdomains=true}}
+b.config=assert(b.validate(loopback))
+assert(b.resolve('http://127.0.0.1:8080/x')=='com.google.Chrome')
+assert(b.resolve('https://[::ffff:127.0.0.1]/')=='com.apple.Safari')
+assert(b.resolve('http://localhost:3000/')=='com.apple.Safari')
+b.config=previous
+print('Localhost, single-label and IPv6 hosts resolve; malicious URLs stay rejected')
