@@ -106,4 +106,4 @@ Nivlet 是一款免费开源的 macOS 菜单栏工具，将常用操作放在一
 
 Nivlet 使用 [MIT License](LICENSE)。内置 Runtime 基于 [Hammerspoon](https://github.com/Hammerspoon/hammerspoon)；第三方组件保留各自许可证，见 [第三方声明](THIRD-PARTY-NOTICES.md)。
 
-1.0.8 修复 FinalShell 等无点号 Bundle ID 应用无法保存规则的问题，继续采用正式开发者签名与 Apple 公证。详见[版本说明](documentation/RELEASE-v1.0.8.md)。
+1.0.8 修复 FinalShell 等无点号 Bundle ID 应用无法保存规则的问题，继续采用正式开发者签名与 Apple 公证。Build 55 安全加固：快捷指令和 AppleScript 不再能在 Nivlet 中运行 Lua 代码；修复 localhost、单标签主机及 IPv6 地址链接无法打开的问题。详见[版本说明](documentation/RELEASE-v1.0.8.md)。

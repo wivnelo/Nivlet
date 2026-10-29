@@ -108,4 +108,4 @@ Report problems or suggestions through [GitHub Issues](https://github.com/wivnel
 
 Nivlet uses the [MIT License](LICENSE). Its embedded Runtime is based on [Hammerspoon](https://github.com/Hammerspoon/hammerspoon). Third-party components retain their own licenses; see [third-party notices](THIRD-PARTY-NOTICES.md).
 
-1.0.8 fixes rule saving for apps with dotless Bundle IDs, including FinalShell, and retains Developer ID signing and Apple notarization. See [release notes](documentation/RELEASE-v1.0.8.md).
+1.0.8 fixes rule saving for apps with dotless Bundle IDs, including FinalShell, and retains Developer ID signing and Apple notarization. Build 55 adds security hardening: Shortcuts and AppleScript can no longer run Lua code in Nivlet. It also fixes links to localhost, single-label hosts and IPv6 addresses failing to open. See [release notes](documentation/RELEASE-v1.0.8.md).
