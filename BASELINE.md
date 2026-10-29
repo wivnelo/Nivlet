@@ -6,7 +6,7 @@
 
 本次禁止 Shortcuts 和 AppleScript 在 Nivlet 中执行 Lua（安全加固），修复 localhost、单标签主机名和 IPv6 链接无法打开的问题；主 App 使用仓库 `Native/Nivlet.entitlements`。既有 v1.0.8 Release 新增六个 Build 55 附件，Build 54 附件保留，tag 未移动。正式包位于本地忽略目录 `build/release-1.0.8-build55/dist/`，构建使用 `NIVLET_BUILD_NUMBER=55`。
 
-本次文档同步基于 origin/main `b17dce4`（含 Build 55 README 与版本说明）；远端只有 main 及本文档同步分支。
+本次文档同步基于 origin/main `b17dce4`（含 Build 55 README 与版本说明）。
 
 Build 55 双架构签名、公证、附加票据与 Gatekeeper 检查通过；feed 已发布。单台 Apple Silicon Mac 通过本地测试 feed 完成正式 Build 54 → 55 Sparkle 升级，EdDSA 与安装后 CDHash 核对通过；Intel 未运行，仅完成包级检查。辅助功能曾需重授，推测与此前 ad-hoc 开发版有关；两个 Developer ID 正式版之间的权限延续尚未验证。详见 [VALIDATION](documentation/VALIDATION.md)。
 
