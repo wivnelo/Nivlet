@@ -26,7 +26,7 @@
 ## 正式签名与公证流程（1.0.7 起）
 
 1. 版本号与 Build 递增；相同 Bundle ID、Developer ID Team 与兼容 designated requirement 保持稳定。
-2. 原生依赖及主 App 使用 Developer ID 签名、Hardened Runtime 和安全时间戳；只保留必要 entitlements。检查所有嵌套签名。
+2. 原生依赖及主 App 使用 Developer ID 签名、Hardened Runtime 和安全时间戳；只保留必要 entitlements。主 App 使用仓库 `Native/Nivlet.entitlements`，与 1.0.8 正式签名一致，仅 `com.apple.security.automation.apple-events`。`scripts/fetch-runtime.sh` 与 Release 构建将该文件覆盖到 Runtime 的 `Hammerspoon/Hammerspoon.entitlements`（Release xcconfig 的 `CODE_SIGN_ENTITLEMENTS`），Release 签名也传入同一文件。检查所有嵌套签名。
 3. 用本机 Keychain 中的 `Nivlet-notary` 配置提交 App ZIP，等待 Accepted，附加 App 票据并验证 Gatekeeper。
 4. 将附加票据后的 App 放入正式 ZIP/DMG；DMG 单独签名、公证、附加票据。之后才计算最终 SHA-256，签名 Sparkle ZIP 并生成 feed。
 5. 校验 ZIP 内容、DMG 挂载与严格签名、公证票据、源码资源一致性和下载回核。先上传 Release 附件，再部署引用它们的 feed。
