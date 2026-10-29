@@ -25,6 +25,10 @@
 
 ## 正式签名与公证流程（1.0.7 起）
 
+使用 `scripts/sign-notarize.py`（版本读取仓库 `VERSION`），例如：
+`NIVLET_SIGN_IDENTITY=签名身份 NIVLET_TEAM_ID=团队标识 NIVLET_NOTARY_PROFILE=钥匙串配置 NIVLET_BUILD_NUMBER=55 NIVLET_RELEASE_DIR=build/release-1.0.8-build55 python3 scripts/sign-notarize.py`。
+默认处理 arm64、x86_64，可用位置参数选择架构；`--dry-run` 预览流程，已有输出拒绝覆盖。
+
 1. 版本号与 Build 递增；相同 Bundle ID、Developer ID Team 与兼容 designated requirement 保持稳定。
 2. 原生依赖及主 App 使用 Developer ID 签名、Hardened Runtime 和安全时间戳；只保留必要 entitlements。主 App 使用仓库 `Native/Nivlet.entitlements`，与 1.0.8 正式签名一致，仅 `com.apple.security.automation.apple-events`。`scripts/fetch-runtime.sh` 与 Release 构建将该文件覆盖到 Runtime 的 `Hammerspoon/Hammerspoon.entitlements`（Release xcconfig 的 `CODE_SIGN_ENTITLEMENTS`），Release 签名也传入同一文件。检查所有嵌套签名。
 3. 用本机 Keychain 中的 `Nivlet-notary` 配置提交 App ZIP，等待 Accepted，附加 App 票据并验证 Gatekeeper。
