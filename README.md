@@ -80,7 +80,7 @@ Features are opt-in, and shortcuts are yours to configure. Window management and
 
 ## Signed and notarized for macOS
 
-**v1.0.8 / Build 54 uses Apple Developer ID signing and has passed Apple notarization.** Both Apple Silicon (arm64) and Intel (x86_64) apps and DMGs include stapled notarization tickets. macOS 13.0+ is required.
+**v1.0.8 / Build 55 uses Apple Developer ID signing and has passed Apple notarization.** Both Apple Silicon (arm64) and Intel (x86_64) apps and DMGs include stapled notarization tickets. macOS 13.0+ is required.
 
 Download the matching DMG or ZIP from [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8), move `Nivlet.app` to Applications and launch that copy. No separate Hammerspoon installation is needed.
 
