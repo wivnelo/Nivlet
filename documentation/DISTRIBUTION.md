@@ -9,7 +9,7 @@
 - Runtime 固定来源；构建通过 `scripts/prepare-updater.sh` 准备固定 Sparkle 2.10.0，许可收集包含其原文。
 - Release 构建使用完整 Xcode：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=54 sh scripts/build-release.sh`。54 为本次 1.0.8 发行 Build；下一构建继续递增 Build；构建不自动安装。
 - 更新入口位于关于页，原生 Sparkle 桥接由 `patches/nivlet-updater.patch` 注入；有草稿先处理，默认手动检查、用户确认安装。
-- Feed 为 `docs/appcast.xml`，发行说明来自 `release-notes/<version>-build<N>.md`，使用 `python3 scripts/generate-update-feed.py <arm64 ZIP> <x86_64 ZIP>` 生成、`tests/updates.py` 验证。Ed25519 私钥留 Keychain，不导出到源码、日志或安装包。
+- Feed 为 `docs/appcast.xml`，发行说明来自 `release-notes/<version>-build<N>.md`，使用 `python3 scripts/generate-update-feed.py <arm64 ZIP> <x86_64 ZIP>` 生成、`NIVLET_BUILD_NUMBER=55 python3 tests/updates.py` 验证。Ed25519 私钥留 Keychain，不导出到源码、日志或安装包。
 - 发布顺序：新版本/Build → 构建和回归 → 打包/签名校验 → 上传新附件 → 发布 feed → 实测升级及最新检查 → 保留回滚备份。
 
 
