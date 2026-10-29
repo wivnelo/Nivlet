@@ -201,3 +201,14 @@ Build 53 最终包验证：每架构 101 个 Mach-O 均为正确的单架构；�
 - 双架构正式 App `codesign --verify --deep --strict` 通过，App 和 DMG 的 `stapler validate` 均通过。六附件本地 SHA-256 与 GitHub API 返回的服务端 digest 逐个相同；不是重新公开下载全部附件的回核。
 - 只读安装版 Info.plist 为 1.0.8 / Build 54。本轮不替换应用、不更改配置或权限，不读取个人历史。未新增真实 UI、Intel 真机、实际 Sparkle 安装/回滚或历史保留验收；1.0.7 的旧证据保留原范围。
 - 同步 README、当前基准、交接、路线图、配置/安装/使用/分发/开发说明、官网及知识库摘要。正式 feed 的 URL、版本和签名不改动，历史版本说明保持不变。
+
+
+## 1.0.8 / Build 55 · 发布与升级验证 · 2026-10-29
+
+- 2026-10-29（Asia/Manila）在既有 GitHub Release v1.0.8 新增六附件：`Nivlet-1.0.8-build55-{arm64,x86_64}.{zip,dmg,sha256}`。Build 54 附件保留；tag v1.0.8 仍解引用至 `0772475`，未移动。正式包位于本地忽略目录 `build/release-1.0.8-build55/dist/`，构建使用 `NIVLET_BUILD_NUMBER=55`。
+- 相较 Build 54，禁止 Shortcuts 和 AppleScript 在 Nivlet 中执行 Lua（安全加固），修复 localhost、单标签主机名和 IPv6 链接无法打开的问题；主 App 使用仓库 `Native/Nivlet.entitlements`。
+- arm64/x86_64 均已 Developer ID 签名、Apple 公证并附加票据，`CFBundleVersion` 为 55；`spctl` 返回 accepted、Notarized Developer ID。双架构签名、公证、lipo、spctl、stapler 检查通过。
+- `docs/appcast.xml` 已由 `338adfb` 发布；线上 `https://wivnelo.github.io/Nivlet/appcast.xml` 的 SHA-256 匹配 `a9920efa...b1e5`，enclosure 下载返回 200 且长度正确。`NIVLET_BUILD_NUMBER=55 python3 tests/updates.py` 通过。
+- 单台 Apple Silicon Mac 使用本地测试 feed 完成正式 Build 54 → Build 55 Sparkle 升级：EdDSA 校验通过，安装后 CDHash 与发行产物一致。Intel（x86_64）未运行，无 Rosetta/Intel 硬件；仅完成上述包级检查，不扩展为 Intel 真机升级验收。
+- 正式 54 与 55 的 designated requirement 相同（标识 `dev.local.DesktopToolkit`、同一 Team ID）。测试机升级后辅助功能需重授；推测原因是此前安装过采用 cdhash requirement 的 ad-hoc 开发版。此为观察与推断，尚未验证两个 Developer ID 正式版之间的权限延续。
+- 后续 PR 观察项：`NSAllowsArbitraryLoads=true`，考虑 `NSAllowsLocalNetworking`；请求麦克风但缺少 `com.apple.security.device.audio-input` entitlement，Build 54 同样存在，不是本次回归。

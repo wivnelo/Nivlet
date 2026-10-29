@@ -84,7 +84,7 @@ Nivlet 是一款免费开源的 macOS 菜单栏工具，将常用操作放在一
 
 从 [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 下载对应芯片的 DMG 或 ZIP，将 `Nivlet.app` 放入应用程序后打开，无需另装 Hammerspoon。
 
-签名与公证不代替**辅助功能授权**。从旧 ad-hoc 版首次迁移可能需要重新授权；此后同一开发者身份的正常更新通常可沿用授权，具体仍取决于 macOS。授权后回通用页自动检测，或点击“重新检测”。无需关闭 Gatekeeper；若出现恶意软件、应用损坏或校验不符提示，请停止安装并反馈。
+签名与公证不代替**辅助功能授权**。从旧 ad-hoc 版首次迁移可能需要重新授权；两个 Developer ID 正式版之间的权限延续尚未验证。授权后回通用页自动检测，或点击“重新检测”。无需关闭 Gatekeeper；若出现恶意软件、应用损坏或校验不符提示，请停止安装并反馈。
 
 详见[安装、升级和卸载指南](documentation/INSTALLATION.md)。关于页保留手动“检查更新…”，确认后安装。
 

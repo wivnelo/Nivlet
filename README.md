@@ -84,7 +84,7 @@ Features are opt-in, and shortcuts are yours to configure. Window management and
 
 Download the matching DMG or ZIP from [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8), move `Nivlet.app` to Applications and launch that copy. No separate Hammerspoon installation is needed.
 
-Signing and notarization do not replace **Accessibility permission**. Moving from an older ad-hoc build may require reauthorization; subsequent updates with the same developer identity generally retain it, subject to macOS behavior. Return to General or click **Recheck** after granting access. Do not disable Gatekeeper. If macOS reports malware, damage or a checksum mismatch, stop and report the exact message.
+Signing and notarization do not replace **Accessibility permission**. Moving from an older ad-hoc build may require reauthorization; permission carryover between two Developer ID releases has not yet been verified. Return to General or click **Recheck** after granting access. Do not disable Gatekeeper. If macOS reports malware, damage or a checksum mismatch, stop and report the exact message.
 
 See the [installation, upgrade and removal guide](documentation/INSTALLATION.en.md). About → Check for Updates remains manual; confirm before installation.
 

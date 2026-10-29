@@ -1,15 +1,15 @@
-> 当前正式发行：1.0.8 / Build 54；下方 Intel Build 33 为历史构建示例。正式构建请使用新的隔离目录及 NIVLET_BUILD_NUMBER=54。
+> 当前正式发行：1.0.8 / Build 55；下方 Intel Build 33 为历史构建示例。正式构建请使用新的隔离目录及 NIVLET_BUILD_NUMBER=55。
 
 # 开发与构建
 
-## 当前工程基准（2026-10-28）
+## 当前工程基准（2026-10-29）
 
-1.0.8 / Build 54 修复 FinalShell 等无点号 Bundle ID 应用的规则保存校验。当前正式包位于本地忽略目录 `build/release-1.0.8-official/dist/`，提供双架构 ZIP、DMG 与 SHA-256；本轮已复核代码签名、公证票据及双架构更新签名。历史构建方式仅适用于其标注版本，不推定 Build 54 复用了 Build 49 原生程序。
+1.0.8 / Build 55 于 2026-10-29 发布：禁止 Shortcuts 和 AppleScript 在 Nivlet 中执行 Lua，修复 localhost、单标签主机名和 IPv6 链接无法打开的问题；主 App 使用仓库 `Native/Nivlet.entitlements`。当前正式包位于本地忽略目录 `build/release-1.0.8-build55/dist/`，提供双架构 ZIP、DMG 与 SHA-256；签名、公证及升级验证边界见 VALIDATION。历史构建方式仅适用于其标注版本。
 
-当前发行版本为 1.0.8 / Build 54（arm64 / x86_64），包含应用状态刷新、底部统一错误和双架构更新源。最终构建与回归见 [Build 54 验收](VALIDATION.md)，安装及发布状态以 [BASELINE.md](../BASELINE.md) 为准。
+当前发行版本为 1.0.8 / Build 55（arm64 / x86_64），包含应用状态刷新、底部统一错误和双架构更新源。最终构建与回归见 [Build 55 验收](VALIDATION.md)，安装及发布状态以 [BASELINE.md](../BASELINE.md) 为准。
 
 - Runtime 固定来源；构建通过 `scripts/prepare-updater.sh` 准备固定 Sparkle 2.10.0，许可收集包含其原文。
-- Release 构建使用完整 Xcode：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=54 sh scripts/build-release.sh`。54 为本次 1.0.8 发行 Build；下一构建继续递增 Build；构建不自动安装。
+- Release 构建使用完整 Xcode：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=55 sh scripts/build-release.sh`。55 为本次 1.0.8 发行 Build；下一构建继续递增 Build；构建不自动安装。
 - 更新入口位于关于页，原生 Sparkle 桥接由 `patches/nivlet-updater.patch` 注入；有草稿先处理，默认手动检查、用户确认安装。
 - Feed 为 `docs/appcast.xml`，使用 `scripts/generate-update-feed.py <ARM64.zip> <X86_64.zip>` 生成、`tests/updates.py` 验证。Ed25519 私钥留 Keychain，不导出到源码、日志或安装包。
 - 发布顺序：新版本/Build → 构建和回归 → 打包/签名校验 → 上传新附件 → 发布 feed → 实测升级及最新检查 → 保留回滚备份。
@@ -22,11 +22,11 @@ Release 入口现在先检查当前仓库和 Git 提交身份，再把固定源�
 ```sh
 python3 tests/privacy.py
 python3 scripts/check-privacy.py --repo .
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=54 sh scripts/build-release.sh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=55 sh scripts/build-release.sh
 NIVLET_BUILD_CONFIGURATION=Release sh scripts/package-local.sh
 ```
 
-Build 32 为历史隐私修正版构建；以上命令采用当前 Build 54，后续新构建继续递增。构建和打包使用相同 `NIVLET_DERIVED_DATA_PATH`；打包可用 `NIVLET_PACKAGE_OUTPUT` 指定独立目录。打包检查仓库、App、ZIP；feed 生成前再次检查仓库与 ZIP，发现个人 home 路径、常见凭据或敏感文件即停止，日志只输出文件和问题类型。仅精确放行 Runtime 两个文档资源内已核对的示例路径，不放行可执行文件里的用户目录。此规则不替代截图人工审查、完整历史审计或未知凭据识别。
+Build 32 为历史隐私修正版构建；以上命令采用当前 Build 55，后续新构建继续递增。构建和打包使用相同 `NIVLET_DERIVED_DATA_PATH`；打包可用 `NIVLET_PACKAGE_OUTPUT` 指定独立目录。打包检查仓库、App、ZIP；feed 生成前再次检查仓库与 ZIP，发现个人 home 路径、常见凭据或敏感文件即停止，日志只输出文件和问题类型。仅精确放行 Runtime 两个文档资源内已核对的示例路径，不放行可执行文件里的用户目录。此规则不替代截图人工审查、完整历史审计或未知凭据识别。
 
 
 ## 常用检查

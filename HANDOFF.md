@@ -1,4 +1,15 @@
-# Nivlet 会话交接 · 2026-10-28
+# Nivlet 会话交接 · 2026-10-29
+
+## 当前状态 · 2026-10-29
+
+本节取代下方历史记录中的“当前”，旧记录保留原日期。
+
+- 当前发行与开发基准为 **1.0.8 / Build 55**，于 2026-10-29（Asia/Manila）在既有 GitHub Release v1.0.8 新增六附件；Build 54 附件保留，tag 仍解引用至 `0772475`。
+- Shortcuts 和 AppleScript 不再能执行 Lua；localhost、单标签主机名和 IPv6 链接可打开。主 App 使用 `Native/Nivlet.entitlements`。
+- 双架构 Developer ID 签名、Apple 公证、附加票据及 Gatekeeper 检查通过。feed 发布于 `338adfb`；`NIVLET_BUILD_NUMBER=55` 更新测试通过。
+- 单台 Apple Silicon Mac 经本地测试 feed 完成正式 54 → 55 Sparkle 升级，EdDSA 与安装后 CDHash 核对通过。Intel 无运行环境，仅完成签名、公证、lipo、spctl、stapler 检查。
+- 测试机辅助功能需重授，推测与此前 ad-hoc 开发版的 cdhash requirement 有关；正式 54/55 的 designated requirement 相同，但两次 Developer ID 正式发行间的权限延续尚未验证。
+- 正式包：`build/release-1.0.8-build55/dist/`；构建使用 `NIVLET_BUILD_NUMBER=55`。后续 PR 观察项：`NSAllowsArbitraryLoads=true`（考虑 `NSAllowsLocalNetworking`）及麦克风请求缺少 audio-input entitlement（54 已存在）。详见 VALIDATION；A15 仍未开始。
 
 ## 当前状态 · 2026-10-28
 
