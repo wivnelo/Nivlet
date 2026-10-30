@@ -1,8 +1,8 @@
-> 2026-10-28：当前发行与开发基准 1.0.8 / Build 54。Issue #1 无点号 Bundle ID 规则保存问题已修复并发布；继续使用正式签名与 Apple 公证，见 VALIDATION。
+> 2026-10-29：当前发行与开发基准 1.0.8 / Build 55（安全加固：禁止 Shortcuts/AppleScript 执行 Lua；修复 localhost、单标签主机名、IPv6 链接）。Issue #1 无点号 Bundle ID 修复已于 Build 54 发布；继续使用正式签名与 Apple 公证，见 VALIDATION。
 
 # Nivlet 开发计划
 
-当前开发与验收基准：1.0.8 / Build 54。Apple Developer ID 正式签名与 Apple 公证已完成并纳入正式发行流程，不再列为待办。窗口、应用、输入法、浏览器、剪贴板、系统信息及界面优化已完成；键盘排序已取消。每次只完成一个优化项。
+当前开发与验收基准：1.0.8 / Build 55。Apple Developer ID 正式签名与 Apple 公证已完成并纳入正式发行流程，不再列为待办。窗口、应用、输入法、浏览器、剪贴板、系统信息及界面优化已完成；键盘排序已取消。每次只完成一个优化项。
 
 ## 待办 P0：阻塞问题
 

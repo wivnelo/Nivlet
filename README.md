@@ -91,11 +91,11 @@ Features are opt-in, and shortcuts are yours to configure. Window management and
 
 ## Signed and notarized for macOS
 
-**v1.0.8 / Build 54 uses Apple Developer ID signing and has passed Apple notarization.** Both Apple Silicon (arm64) and Intel (x86_64) apps and DMGs include stapled notarization tickets. macOS 13.0+ is required.
+**v1.0.8 / Build 55 uses Apple Developer ID signing and has passed Apple notarization.** Both Apple Silicon (arm64) and Intel (x86_64) apps and DMGs include stapled notarization tickets. macOS 13.0+ is required.
 
 Download the matching DMG or ZIP from [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8), move `Nivlet.app` to Applications and launch that copy. No separate Hammerspoon installation is needed.
 
-Signing and notarization do not replace **Accessibility permission**. Moving from an older ad-hoc build may require reauthorization; subsequent updates with the same developer identity generally retain it, subject to macOS behavior. Return to General or click **Recheck** after granting access. Do not disable Gatekeeper. If macOS reports malware, damage or a checksum mismatch, stop and report the exact message.
+Signing and notarization do not replace **Accessibility permission**. Moving from an older ad-hoc build may require reauthorization; permission carryover between two Developer ID releases has not yet been verified. Return to General or click **Recheck** after granting access. Do not disable Gatekeeper. If macOS reports malware, damage or a checksum mismatch, stop and report the exact message.
 
 See the [installation, upgrade and removal guide](documentation/INSTALLATION.en.md). About → Check for Updates remains manual; confirm before installation.
 
@@ -119,4 +119,4 @@ Report problems or suggestions through [GitHub Issues](https://github.com/wivnel
 
 Nivlet uses the [MIT License](LICENSE). Its embedded Runtime is based on [Hammerspoon](https://github.com/Hammerspoon/hammerspoon). Third-party components retain their own licenses; see [third-party notices](THIRD-PARTY-NOTICES.md).
 
-1.0.8 fixes rule saving for apps with dotless Bundle IDs, including FinalShell, and retains Developer ID signing and Apple notarization. See [release notes](documentation/RELEASE-v1.0.8.md).
+1.0.8 fixes rule saving for apps with dotless Bundle IDs, including FinalShell, and retains Developer ID signing and Apple notarization. Build 55 adds security hardening: Shortcuts and AppleScript can no longer run Lua code in Nivlet. It also fixes links to localhost, single-label hosts and IPv6 addresses failing to open. See [release notes](documentation/RELEASE-v1.0.8.md).

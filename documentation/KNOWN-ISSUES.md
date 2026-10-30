@@ -1,6 +1,6 @@
 # 已知问题与观察项
 
-更新：2026-10-28。当前发行版本 1.0.8 / Build 54。
+更新：2026-10-29。当前发行版本 1.0.8 / Build 55。
 
 ## Issue #1 · FinalShell 规则无法保存（1.0.8 已修复）
 
@@ -12,7 +12,7 @@ FinalShell 的 Bundle ID 为 `st`，旧校验错误要求包含点号。1.0.8 �
 
 已在未退出的原进程验证修正后显示已开启，点击重新检测成功。Build 52 安装后权限显示与按钮正常，未操作系统授权。回归涵盖权限撤销/失败、空窗口列表、中英文页面及草稿保护。本轮未重复最新 Intel 包真机运行、再一轮系统开关切换和 Option 粘贴，不能保证任意 macOS 权限异常均可免重开恢复。
 
-从旧 ad-hoc 版迁移到正式 Developer ID 可能需要重新授权一次。之后同 Bundle ID、同开发者身份与兼容 designated requirement 的正常升级通常沿用授权；公证本身不授予或保留系统权限。不自动修改 TCC 或删除授权条目。
+从旧 ad-hoc 版迁移到正式 Developer ID 可能需要重新授权一次。正式 54 与 55 的 designated requirement 相同（`dev.local.DesktopToolkit`、同一 Team ID）。Build 55 测试机升级后需重授辅助功能，推测与此前采用 cdhash requirement 的 ad-hoc 开发版有关；两个 Developer ID 正式版之间的权限延续尚未验证。公证本身不授予或保留系统权限。不自动修改 TCC 或删除授权条目。
 
 以下为历史证据，历史的 ad-hoc 状态不适用于 1.0.7。
 

@@ -1,6 +1,6 @@
 # Installation, updates and removal
 
-Current release: **v1.0.8 / Build 54**, macOS 13.0+, Apple Silicon (arm64) or Intel (x86_64). [简体中文](INSTALLATION.md)
+Current release: **v1.0.8 / Build 55**, macOS 13.0+, Apple Silicon (arm64) or Intel (x86_64). [简体中文](INSTALLATION.md)
 
 ## Signing status
 
@@ -28,7 +28,7 @@ For browser routing, save rules first, then choose Nivlet as the system default 
 Place the DMG, ZIP and `.sha256` file together, then run:
 
 ```sh
-shasum -a 256 -c Nivlet-1.0.8-build54-arm64.sha256
+shasum -a 256 -c Nivlet-1.0.8-build55-arm64.sha256
 ```
 
 Both archives should report OK. If you downloaded only one, the missing archive reports a missing-file error; inspect the result for the archive you have. Checksums do not replace Apple signing or notarization.
@@ -37,7 +37,7 @@ Both archives should report OK. If you downloaded only one, the missing archive 
 
 Save or discard drafts and export saved configuration in General. Use About → Check for Updates and confirm installation, or quit Nivlet and replace the app in Applications manually. Updates are not installed silently. Keep the previous package for recovery; do not remove the user data directory.
 
-Configuration and persisted history stay local. Nonpersistent clipboard history is cleared on exit; persisted entries remain subject to retention limits. Migrating from an older ad-hoc build may require reauthorization once. Routine updates with the same developer identity generally retain permission, subject to macOS behavior. Return to General or click Recheck; live cross-app checks handle stale system trust values. If an old permission entry genuinely no longer works, remove the old Nivlet entry from the permissions list, add `/Applications/Nivlet.app` again with the + button, enable it, and click Check Again in Nivlet. This removes only the old permission entry, not the app or user data. Configuration exports do not contain clipboard history, system permissions, login items or the system default browser.
+Configuration and persisted history stay local. Nonpersistent clipboard history is cleared on exit; persisted entries remain subject to retention limits. Migrating from an older ad-hoc build may require reauthorization once. Permission carryover between two Developer ID releases has not yet been verified. Return to General or click Recheck; live cross-app checks handle stale system trust values. If an old permission entry genuinely no longer works, remove the old Nivlet entry from the permissions list, add `/Applications/Nivlet.app` again with the + button, enable it, and click Check Again in Nivlet. This removes only the old permission entry, not the app or user data. Configuration exports do not contain clipboard history, system permissions, login items or the system default browser.
 
 The app lives in `/Applications/Nivlet.app`; user data lives in `~/Library/Application Support/dev.local.DesktopToolkit`, with preferences in the `dev.local.DesktopToolkit` domain. Personal Hammerspoon data is separate. Do not assume older versions support a future configuration format when downgrading.
 
