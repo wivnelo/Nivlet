@@ -24,38 +24,49 @@
 
 Nivlet is a free, open-source macOS menu bar utility that brings everyday desktop actions together. Enable the tools you need and choose your own shortcuts. No coding or separate Hammerspoon installation required.
 
+## See it in action
+
+<p align="center">
+  <a href="docs/assets/demos/overview-en.gif"><img src="docs/assets/demos/overview-en.gif" alt="Nivlet demo: window layouts, clipboard search, browser routing and app shortcuts" width="720"></a>
+</p>
+
+<p align="center">
+  <sub>16-second UI demo · Synthetic data · No sound</sub><br>
+  <a href="docs/assets/demos/overview-en.gif">View full size</a> · <a href="#screenshots">Still screenshots</a>
+</p>
+
 ## Screenshots
 
-Interface reference: Browser uses 1.0.1 / Build 41; other pages retain 1.0.0 / Build 32. Chinese interface. Clipboard text, network addresses, app names/icons, rules and shortcuts are synthetic examples, not default settings. Click an image to enlarge it.
+<details>
+<summary>View all 8 screenshots</summary>
+
+English interface, rendered from the settings UI with synthetic demonstration data. Clipboard text, network addresses, app rules, shortcuts and permission states are examples, not default settings or live system readings. Click an image to enlarge it.
 
 <table>
 <tr>
-<td width="50%" valign="top"><strong>Window management</strong><br><a href="docs/assets/screenshots/windows.jpg"><img src="docs/assets/screenshots/windows.jpg" alt="Window management — synthetic demonstration" width="480"></a></td>
-<td width="50%" valign="top"><strong>Clipboard history</strong><br><a href="docs/assets/screenshots/clipboard.jpg"><img src="docs/assets/screenshots/clipboard.jpg" alt="Clipboard history — synthetic demonstration" width="480"></a></td>
+<td width="50%" valign="top"><strong>Window management</strong><br><a href="docs/assets/screenshots/en/windows.jpg"><img src="docs/assets/screenshots/en/windows.jpg" alt="Window management — synthetic demonstration" width="480"></a></td>
+<td width="50%" valign="top"><strong>Clipboard history</strong><br><a href="docs/assets/screenshots/en/clipboard.jpg"><img src="docs/assets/screenshots/en/clipboard.jpg" alt="Clipboard history — synthetic demonstration" width="480"></a></td>
 </tr>
 </table>
 
-<details>
-<summary>View the other six pages</summary>
-
 <table>
 <tr>
-<td width="50%" valign="top"><strong>General settings</strong><br><a href="docs/assets/screenshots/general.jpg"><img src="docs/assets/screenshots/general.jpg" alt="General settings — synthetic demonstration" width="480"></a></td>
-<td width="50%" valign="top"><strong>Input sources</strong><br><a href="docs/assets/screenshots/input.jpg"><img src="docs/assets/screenshots/input.jpg" alt="Input sources — synthetic demonstration" width="480"></a></td>
+<td width="50%" valign="top"><strong>General settings</strong><br><a href="docs/assets/screenshots/en/general.jpg"><img src="docs/assets/screenshots/en/general.jpg" alt="General settings — synthetic demonstration" width="480"></a></td>
+<td width="50%" valign="top"><strong>Input sources</strong><br><a href="docs/assets/screenshots/en/input.jpg"><img src="docs/assets/screenshots/en/input.jpg" alt="Input sources — synthetic demonstration" width="480"></a></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><strong>Browser routing</strong><br><a href="docs/assets/screenshots/browser.jpg"><img src="docs/assets/screenshots/browser.jpg" alt="Browser routing — synthetic demonstration" width="480"></a></td>
-<td width="50%" valign="top"><strong>App shortcuts</strong><br><a href="docs/assets/screenshots/launcher.jpg"><img src="docs/assets/screenshots/launcher.jpg" alt="App shortcuts — synthetic demonstration" width="480"></a></td>
+<td width="50%" valign="top"><strong>Browser routing</strong><br><a href="docs/assets/screenshots/en/browser.jpg"><img src="docs/assets/screenshots/en/browser.jpg" alt="Browser routing — synthetic demonstration" width="480"></a></td>
+<td width="50%" valign="top"><strong>App shortcuts</strong><br><a href="docs/assets/screenshots/en/launcher.jpg"><img src="docs/assets/screenshots/en/launcher.jpg" alt="App shortcuts — synthetic demonstration" width="480"></a></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><strong>System information</strong><br><a href="docs/assets/screenshots/system.jpg"><img src="docs/assets/screenshots/system.jpg" alt="System information — synthetic demonstration" width="480"></a></td>
-<td width="50%" valign="top"><strong>About & updates</strong><br><a href="docs/assets/screenshots/about.jpg"><img src="docs/assets/screenshots/about.jpg" alt="About & updates — synthetic demonstration" width="480"></a></td>
+<td width="50%" valign="top"><strong>System information</strong><br><a href="docs/assets/screenshots/en/system.jpg"><img src="docs/assets/screenshots/en/system.jpg" alt="System information — synthetic demonstration" width="480"></a></td>
+<td width="50%" valign="top"><strong>About & updates</strong><br><a href="docs/assets/screenshots/en/about.jpg"><img src="docs/assets/screenshots/en/about.jpg" alt="About & updates — synthetic demonstration" width="480"></a></td>
 </tr>
 </table>
 
 </details>
 
-[Browse the full screenshot gallery](https://wivnelo.github.io/Nivlet/screenshots.html)
+[Browse all English screenshots](docs/assets/screenshots/en/)
 
 ## What you can do
 

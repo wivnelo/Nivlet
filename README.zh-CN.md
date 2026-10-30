@@ -24,32 +24,43 @@
 
 Nivlet 是一款免费开源的 macOS 菜单栏工具，将常用操作放在一处。按需启用功能、配置自己的快捷键，无需编写代码，也无需另外安装 Hammerspoon。
 
+## 动态演示
+
+<p align="center">
+  <a href="docs/assets/demos/overview-zh.gif"><img src="docs/assets/demos/overview-zh.gif" alt="Nivlet 动态演示：窗口布局、剪贴板搜索、浏览器分流与应用快捷键" width="720"></a>
+</p>
+
+<p align="center">
+  <sub>16 秒界面演示 · 虚构演示数据 · 无声循环</sub><br>
+  <a href="docs/assets/demos/overview-zh.gif">查看原尺寸</a> · <a href="#界面预览">静态截图</a>
+</p>
+
 ## 界面预览
+
+<details>
+<summary>展开查看全部 8 张截图</summary>
 
 界面参考：浏览器页为 1.0.1 / Build 41，其余页面沿用 1.0.0 / Build 32；中文界面。所有剪贴板文字、网络地址、软件名称/图标、规则及快捷键均为演示数据，不代表默认配置。点击图片可查看大图。
 
 <table>
 <tr>
-<td width="50%" valign="top"><strong>窗口管理</strong><br><a href="docs/assets/screenshots/windows.jpg"><img src="docs/assets/screenshots/windows.jpg" alt="窗口管理 — synthetic demonstration" width="480"></a></td>
-<td width="50%" valign="top"><strong>剪贴板历史</strong><br><a href="docs/assets/screenshots/clipboard.jpg"><img src="docs/assets/screenshots/clipboard.jpg" alt="剪贴板历史 — synthetic demonstration" width="480"></a></td>
+<td width="50%" valign="top"><strong>窗口管理</strong><br><a href="docs/assets/screenshots/windows.jpg"><img src="docs/assets/screenshots/windows.jpg" alt="窗口管理 — 演示数据" width="480"></a></td>
+<td width="50%" valign="top"><strong>剪贴板历史</strong><br><a href="docs/assets/screenshots/clipboard.jpg"><img src="docs/assets/screenshots/clipboard.jpg" alt="剪贴板历史 — 演示数据" width="480"></a></td>
 </tr>
 </table>
 
-<details>
-<summary>查看其他六个页面</summary>
-
 <table>
 <tr>
-<td width="50%" valign="top"><strong>通用设置</strong><br><a href="docs/assets/screenshots/general.jpg"><img src="docs/assets/screenshots/general.jpg" alt="通用设置 — synthetic demonstration" width="480"></a></td>
-<td width="50%" valign="top"><strong>输入法切换</strong><br><a href="docs/assets/screenshots/input.jpg"><img src="docs/assets/screenshots/input.jpg" alt="输入法切换 — synthetic demonstration" width="480"></a></td>
+<td width="50%" valign="top"><strong>通用设置</strong><br><a href="docs/assets/screenshots/general.jpg"><img src="docs/assets/screenshots/general.jpg" alt="通用设置 — 演示数据" width="480"></a></td>
+<td width="50%" valign="top"><strong>输入法切换</strong><br><a href="docs/assets/screenshots/input.jpg"><img src="docs/assets/screenshots/input.jpg" alt="输入法切换 — 演示数据" width="480"></a></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><strong>浏览器分流</strong><br><a href="docs/assets/screenshots/browser.jpg"><img src="docs/assets/screenshots/browser.jpg" alt="浏览器分流 — synthetic demonstration" width="480"></a></td>
-<td width="50%" valign="top"><strong>应用快捷启动</strong><br><a href="docs/assets/screenshots/launcher.jpg"><img src="docs/assets/screenshots/launcher.jpg" alt="应用快捷启动 — synthetic demonstration" width="480"></a></td>
+<td width="50%" valign="top"><strong>浏览器分流</strong><br><a href="docs/assets/screenshots/browser.jpg"><img src="docs/assets/screenshots/browser.jpg" alt="浏览器分流 — 演示数据" width="480"></a></td>
+<td width="50%" valign="top"><strong>应用快捷启动</strong><br><a href="docs/assets/screenshots/launcher.jpg"><img src="docs/assets/screenshots/launcher.jpg" alt="应用快捷启动 — 演示数据" width="480"></a></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><strong>系统信息</strong><br><a href="docs/assets/screenshots/system.jpg"><img src="docs/assets/screenshots/system.jpg" alt="系统信息 — synthetic demonstration" width="480"></a></td>
-<td width="50%" valign="top"><strong>关于与更新</strong><br><a href="docs/assets/screenshots/about.jpg"><img src="docs/assets/screenshots/about.jpg" alt="关于与更新 — synthetic demonstration" width="480"></a></td>
+<td width="50%" valign="top"><strong>系统信息</strong><br><a href="docs/assets/screenshots/system.jpg"><img src="docs/assets/screenshots/system.jpg" alt="系统信息 — 演示数据" width="480"></a></td>
+<td width="50%" valign="top"><strong>关于与更新</strong><br><a href="docs/assets/screenshots/about.jpg"><img src="docs/assets/screenshots/about.jpg" alt="关于与更新 — 演示数据" width="480"></a></td>
 </tr>
 </table>
 
