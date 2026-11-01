@@ -1,5 +1,6 @@
 local i18n = require("modules.i18n")
 local bundleIDs = require("modules.bundle_id")
+local localHTML = require("modules.local_html")
 local M={}
 local settingsKey="desktoptoolkit.browser.v1"
 M.browsers={{id="com.apple.Safari",name="Safari"},{id="com.google.Chrome",name="Chrome"},{id="org.mozilla.firefox",name="Firefox"},{id="com.microsoft.edgemac",name="Edge"},{id="com.brave.Browser",name="Brave"}}
@@ -104,6 +105,12 @@ function M.installed()
     return result
 end
 function M.resolve(url,sourceBundle)
+    local incomingScheme=type(url)=="string" and url:match("^([%a]+):")
+    if incomingScheme and incomingScheme:lower()=="file" then
+        local normalized,message=localHTML.normalize(url)
+        if not normalized then return nil,message end
+        return M.config.defaultBrowser,nil,normalized
+    end
     if type(url)~="string" or #url>16384 or url:find("[%s%c]") then return nil,i18n.t("请输入有效的 HTTP / HTTPS 链接") end
     local scheme,authority=url:match("^([%a]+)://([^/?#]+)")
     if not scheme or scheme:lower()~="http" and scheme:lower()~="https" or authority:find("@",1,true) then return nil,i18n.t("仅支持不含登录信息的 HTTP / HTTPS 链接") end
@@ -129,9 +136,11 @@ function M.resolve(url,sourceBundle)
     return M.config.defaultBrowser
 end
 function M.open(url,sourceBundle)
-    local browser,message=M.resolve(url,sourceBundle);if not browser then return false,message end
-    if not hs.application.pathForBundleID(browser) then return false,i18n.t("目标浏览器未安装，请调整规则") end
-    if not hs.urlevent.openURLWithBundle(url,browser) then return false,i18n.t("无法打开目标浏览器") end
+    local browser,message,normalized=M.resolve(url,sourceBundle);if not browser then return false,message end
+    if not known(browser) then return false,i18n.t("目标浏览器无效，请调整规则") end
+    local browserPath=hs.application.pathForBundleID(browser)
+    if not browserPath or normalized and hs.fs.attributes(browserPath,"mode")~="directory" then return false,i18n.t("目标浏览器未安装，请调整规则") end
+    if not hs.urlevent.openURLWithBundle(normalized or url,browser) then return false,i18n.t("无法打开目标浏览器") end
     return true,i18n.t("链接已交给指定浏览器")
 end
 function M.save(value)

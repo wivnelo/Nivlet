@@ -13,21 +13,19 @@ window.runLeaveGuardUIRegression=function(data){
   document.getElementById('leaveCancel').click();check(!dialog.open&&dirtyPages().length===2&&!requests.length,'Return lost drafts or approved close');
   window.requestLeave('quit');dialog.dispatchEvent(new Event('cancel',{cancelable:true}));check(!dialog.open&&dirtyPages().length===2,'Esc cancel lost drafts');
   window.requestLeave('close');document.getElementById('leaveSave').click();
-  check(requests.length===1&&requests[0].action==='saveGeneral','Save all did not wait for first page');
+  check(requests.length===1&&requests[0].action==='saveAllSettings','Save all did not submit a coordinated batch');
   check(['leaveSave','leaveDiscard','leaveCancel'].every(id=>document.getElementById(id).disabled),'Pending save allows duplicate action');
-  const savedGeneral=requests[0].config;
-  window.receive({...data,general:savedGeneral,ok:true,action:'saveGeneral',message:''});
-  check(requests.length===2&&requests[1].action==='saveSystem','Second page saved before first response or not saved');
-  window.receive({...data,general:savedGeneral,ok:false,action:'saveSystem',message:'Synthetic save failure'});
+  const first=requests[0],savedGeneral=first.pages.generalSection.config;
+  window.receive({...data,general:savedGeneral,ok:false,action:'saveAllSettings',requestID:first.requestID,message:'',saveBatch:{ok:false,failedPage:'systemSection',message:'Synthetic save failure',results:[{page:'generalSection',status:'saved'},{page:'systemSection',status:'failed'}]}});
   check(!dialog.open&&dirtyPages().join(',')==='systemSection'&&system.checked!==data.system.cpu,'Failed save erased draft');
   check(!requests.some(value=>value.action==='confirmLeave'),'Failed save approved exit');
   window.requestLeave('quit');document.getElementById('leaveSave').click();
-  const savedSystem=requests.at(-1).config;
-  check(requests.at(-1).action==='saveSystem','Retry saved an already saved page');
-  window.receive({...data,general:savedGeneral,system:savedSystem,ok:true,action:'saveSystem',message:''});
+  const retry=requests.at(-1),savedSystem=retry.pages.systemSection.config;
+  check(retry.action==='saveAllSettings'&&Object.keys(retry.pages).join(',')==='systemSection','Retry saved an already saved page');
+  window.receive({...data,general:savedGeneral,system:savedSystem,ok:true,action:'saveAllSettings',requestID:retry.requestID,message:'',saveBatch:{ok:true,results:[{page:'systemSection',status:'saved'}]}});
   check(requests.at(-1).action==='confirmLeave'&&requests.at(-1).intent==='quit'&&!dirtyPages().length,'Successful retry did not approve quit');
   reset();draft();window.requestLeave('close');document.getElementById('leaveDiscard').click();
   check(!dialog.open&&!dirtyPages().length&&requests.at(-1).action==='confirmLeave','Discard did not restore saved pages');
-  return 'Real dialog focus/cancel, ordered saves, pending controls, failure drafts, retry and discard passed';
+  return 'Real dialog focus/cancel, coordinated saves, pending controls, failure drafts, retry and discard passed';
  }finally{leaveGuard.cancel();send=original;window.receive({...data,ok:true,action:'load',message:''})}
 };

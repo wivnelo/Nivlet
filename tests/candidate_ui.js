@@ -9,9 +9,14 @@ window.runCandidateRegression=function(data){
    check(!button.hidden&&button.closest('footer'),'Save is missing from footer: '+id);
    check(document.getElementById(pageSaves[id]).getBoundingClientRect().width===0,'Old inline Save visible: '+id);
   }
-  window.showSection('aboutSection');check(document.getElementById('saveSettings').hidden,'About has a redundant Save');
-  window.showSection('clipSection');const clipEnabled=document.getElementById('clipEnabled');clipEnabled.checked=!clipEnabled.checked;updateSaveState();document.getElementById('saveSettings').click();
-  check(captured.action==='saveClipboard'&&captured.popupShortcut&&captured.config,'Clipboard settings and hotkey are not saved together');
+  window.showSection('aboutSection');check(!document.getElementById('saveSettings').hidden&&document.getElementById('saveSettings').disabled,'About must expose a disabled global Save when clean');
+  window.showSection('clipSection');const clipEnabled=document.getElementById('clipEnabled');clipEnabled.checked=!clipEnabled.checked;updateSaveState();window.showSection('aboutSection');
+  check(!document.getElementById('saveSettings').disabled&&document.getElementById('cancelSettings').hidden,'About cannot save another page draft');document.getElementById('saveSettings').click();
+  const batch=captured,clipboard=batch.pages?.clipSection;
+  check(batch.action==='saveAllSettings'&&Object.keys(batch.pages).join(',')==='clipSection'&&clipboard.popupShortcut&&clipboard.config,'Clipboard settings and hotkey are not saved together');
+  check(clipboard.config.enabled===clipEnabled.checked,'Clipboard draft missing from global Save');
+  window.receive({...data,ok:true,action:'saveAllSettings',requestID:batch.requestID,clipboard:{...data.clipboard,config:clipboard.config},popupShortcut:clipboard.popupShortcut,saveBatch:{ok:true,results:[{page:'clipSection',status:'saved'}]}});
+  check(!saveAllCoordinator.saving&&!document.querySelector('main').inert,'Save acknowledgement did not unlock settings');window.showSection('clipSection');
   const search=document.getElementById('clipSearch'),query=search.value;search.value='NIVLET-SEARCH-PROBE';search.dispatchEvent(new Event('input',{bubbles:true}));
   window.receive({...data,action:'refreshPermissionsSilent'});check(search.value==='NIVLET-SEARCH-PROBE','Permission refresh erased search');search.value=query;search.dispatchEvent(new Event('input',{bubbles:true}));
   window.showSection('generalSection');sleep.checked=!before;updateSaveState();check(document.getElementById('draftHint').dataset.dirty==='true','Dirty state missing');

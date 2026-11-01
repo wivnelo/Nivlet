@@ -1,0 +1,27 @@
+--- a/extensions/urlevent/liburlevent.m
++++ b/extensions/urlevent/liburlevent.m
+@@ -112,8 +112,9 @@
+     }
+ 
+     if ([openUrl hasPrefix:@"/"]) {
+-        openUrl = [NSString stringWithFormat:@"file://%@", openUrl];
+-        openUrl = [openUrl stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
++        // A document path is not a URL: preserve literal #, ?, %, spaces and Unicode.
++        // The Lua browser router decides which local documents may be forwarded.
++        openUrl = [[NSURL fileURLWithPath:openUrl isDirectory:NO] absoluteString];
+     }
+ 
+     // Split the URL into its components
+--- a/Hammerspoon/MJAppDelegate.m
++++ b/Hammerspoon/MJAppDelegate.m
+@@ -102,6 +102,10 @@
+     }
+ 
+     NSString *fileExtension = [fileAndPath pathExtension];
++    // HTML documents should reach the URL router regardless of extension case.
++    if ([@[@"html", @"htm"] containsObject:fileExtension.lowercaseString]) {
++        fileExtension = fileExtension.lowercaseString;
++    }
+     NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
+     NSArray *supportedExtensions = [infoDict valueForKeyPath:@"CFBundleDocumentTypes.CFBundleTypeExtensions"];
+     NSArray *flatSupportedExtensions = [supportedExtensions valueForKeyPath:@"@unionOfArrays.self"];

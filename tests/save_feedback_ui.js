@@ -8,12 +8,12 @@ window.runSaveFeedbackRegression=function(data){
   window.setTimeout=(fn,ms)=>{const id=++serial;timers.set(id,{fn,ms});return id};window.clearTimeout=id=>timers.delete(id);
   window.receive({...data,ok:true,action:'load',message:''});window.showSection('generalSection');
   const field=document.getElementById('showMenu');field.checked=!field.checked;updateSaveState();
-  document.getElementById('saveSettings').click();check(requests.at(-1).action==='saveGeneral','Footer no longer submits');
-  const general=requests.at(-1).config;
-  window.receive({...data,ok:true,action:'saveGeneral',general,message:'Synthetic success'});
-  check(status.textContent==='Synthetic success'&&status.dataset.result==='success','Success missing');
+  document.getElementById('saveSettings').click();const batch=requests.at(-1);check(batch.action==='saveAllSettings'&&Object.keys(batch.pages).join(',')==='generalSection','Footer no longer submits the dirty settings batch');
+  const general=batch.pages.generalSection.config;
+  window.receive({...data,ok:true,action:'saveAllSettings',requestID:batch.requestID,general,autoLaunch:batch.pages.generalSection.autoLaunch,saveBatch:{ok:true,results:[{page:'generalSection',status:'saved'}]}});
+  check(status.textContent===t('所有修改已保存')&&status.dataset.result==='success'&&!saveAllCoordinator.saving,'Batch success missing or still pending');
   const timer=[...timers.values()].find(timer=>timer.ms===3000);check(timer,'Success does not expire after 3 seconds');
-  window.receive({...data,ok:true,action:'refreshPermissionsSilent',message:''});check(status.textContent==='Synthetic success','Silent refresh cleared feedback');
+  window.receive({...data,ok:true,action:'refreshPermissionsSilent',message:''});check(status.textContent===t('所有修改已保存'),'Silent refresh cleared feedback');
   timer.fn();check(!status.textContent,'Success did not expire');
   window.receive({...data,ok:true,action:'saveGeneral',general,message:'Synthetic success'});window.showSection('systemSection');
   check(!status.textContent&&![...timers.values()].some(timer=>timer.ms===3000),'Navigation retained success/timer');

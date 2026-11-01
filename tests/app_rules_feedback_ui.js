@@ -1,6 +1,6 @@
 window.runAppRulesFeedbackRegression=async function(data){
  const check=(ok,message)=>{if(!ok)throw new Error(message)},oldSend=send;let request;
- const drag=(first,target)=>{const box=first.getBoundingClientRect(),to=target.getBoundingClientRect();first.querySelector('.rule-drag').dispatchEvent(new PointerEvent('pointerdown',{button:0,clientX:box.left+15,clientY:box.top+box.height/2,bubbles:true}));document.dispatchEvent(new PointerEvent('pointermove',{clientX:to.left+15,clientY:to.top+1,bubbles:true}));document.dispatchEvent(new PointerEvent('pointerup',{bubbles:true}))};
+ const drag=(first,target)=>{first.scrollIntoView({block:'nearest'});const box=first.getBoundingClientRect(),to=target.getBoundingClientRect();first.querySelector('.rule-drag').dispatchEvent(new PointerEvent('pointerdown',{button:0,clientX:box.left+15,clientY:box.top+box.height/2,bubbles:true}));document.dispatchEvent(new PointerEvent('pointermove',{clientX:to.left+15,clientY:to.top+1,bubbles:true}));document.dispatchEvent(new PointerEvent('pointerup',{bubbles:true}))};
  try{
   send=value=>request=value;const fixture=structuredClone(data);fixture.ok=true;fixture.action='load';
   const rules=[{bundleID:'com.example.first',name:'First'},{bundleID:'com.example.second',name:'Second'}];

@@ -209,9 +209,58 @@ label:has(>input[type=checkbox]){display:inline-flex;align-items:center;gap:6px}
 #browserDataMenu button span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #browserDataMenu button:hover,#browserDataMenu button:focus-visible{background:var(--page)}
 .application-state{color:var(--error);font:inherit}
-</style><body><header><nav role="tablist" aria-label="设置模块"><button role="tab" id="tab-generalSection" aria-controls="generalSection" aria-selected="false" tabindex="-1">通用</button><button role="tab" id="tab-windowSection" aria-controls="windowSection" aria-selected="true">窗口管理</button><button role="tab" id="tab-inputSection" aria-controls="inputSection" aria-selected="false" tabindex="-1">输入法</button><button role="tab" id="tab-clipSection" aria-controls="clipSection" aria-selected="false" tabindex="-1">剪贴板</button><button role="tab" id="tab-systemSection" aria-controls="systemSection" aria-selected="false" tabindex="-1">系统信息</button><button role="tab" id="tab-browserSection" aria-controls="browserSection" aria-selected="false" tabindex="-1">浏览器</button><button role="tab" id="tab-launcherSection" aria-controls="launcherSection" aria-selected="false" tabindex="-1">应用启动</button><button role="tab" id="tab-aboutSection" aria-controls="aboutSection" aria-selected="false" tabindex="-1">关于</button></nav></header><main><section id="generalSection" class="panel" role="tabpanel" hidden><h2>通用</h2><h3 class="group-title">启动与行为</h3><p><label><input id="autoLaunch" type="checkbox">登录 Mac 时自动启动 Nivlet</label> <button id="openLoginSettings" hidden>打开登录项设置…</button></p><p><label><input id="sleepShortcut" type="checkbox">启用 ⌘ + L 睡眠</label></p><div class="permission-card"><h3>运行权限</h3><div class="permission-summary"><p class="permission-state" role="status"></p><button class="open-accessibility" hidden>打开辅助功能设置</button><button class="refresh-permissions state-refresh">重新检测</button></div><div class="permission-details" hidden><p>窗口管理和 Option 直接粘贴需要辅助功能权限。剪贴板记录、系统信息和应用启动不需要此权限。</p></div></div><h3 class="group-title">菜单栏与外观</h3><label><input id="showMenu" type="checkbox">在菜单栏显示 Nivlet 主图标</label><p>隐藏后可重新打开 Nivlet 进入设置；其他菜单栏图标不受影响。</p><p><label>外观 <select id="appearance"><option value="system">跟随系统</option><option value="light">浅色</option><option value="dark">深色</option></select></label></p><p><label>语言 <select id="language"><option value="system">跟随系统</option><option value="zh-Hans">简体中文</option><option value="en">English</option></select></label></p><button id="saveGeneral">保存通用设置</button><h3>配置备份与迁移</h3><p class="help-text">备份已保存的设置，不包含剪贴板历史或系统权限。</p><button id="exportConfiguration">导出配置…</button> <button id="exportDefaults">导出默认示例…</button> <button id="chooseConfiguration">导入配置…</button><div id="configurationPreview" hidden><h3>将替换的配置</h3><p>导入会替换文件中包含的模块及其未保存输入，其他模块保持不变。</p><pre id="configurationJSON" style="max-height:260px;overflow:auto;white-space:pre-wrap"></pre><button id="applyConfiguration">确认导入</button> <button id="cancelConfiguration">取消</button></div></section><section id="windowSection" class="panel" role="tabpanel"><h2>窗口管理</h2><label><input id="enabled" type="checkbox">启用窗口管理</label><p>默认关闭。快捷键留空表示不绑定。</p><p><label>布局分组 <select id="windowGroup"><option value="basic">基本布局</option><option value="corners">四角与居中</option><option value="thirds">三分区</option><option value="grid">九宫格</option><option value="adjust">大小与屏幕</option></select></label></p><p>所有分组一起保存。竖屏三分区为上、中、下；九宫格按左上到右下编号。窗口最小尺寸可能限制布局。</p><table id="rows"></table><button id="save">保存窗口设置</button></section><section id="inputSection" class="panel" role="tabpanel" hidden><h2>按应用切换输入法</h2><label><input id="inputEnabled" type="checkbox">启用输入法切换</label><p>保存后，规则在应用下次激活时生效。未配置的应用保持当前输入法。</p><div id="inputRows"></div><button id="chooseApp">添加应用…</button> <button id="saveInput">保存输入法规则</button></section><section id="clipSection" class="panel" role="tabpanel" hidden><h2>剪贴板</h2><div class="clip-layout"><div class="clip-config"><div class="clip-recording"><p id="clipRecordingState" role="status"></p><button id="pauseClip">暂停记录</button></div><h3 class="group-title">记录设置</h3><label><input id="clipEnabled" type="checkbox">启用剪贴板历史</label><p class="help-text">关闭仅停止记录，已有历史仍按保留策略清理。</p><label><input id="clipImages" type="checkbox">记录图片（最多 10 张）</label><h3 class="group-title">保留策略</h3><label><input id="clipPersistent" type="checkbox">跨重启保留历史（本地明文缓存）</label><p>未开启跨重启保留时，退出后历史不再保留。暂停仅本次运行有效；敏感内容复制前请暂停记录。</p><div class="clip-limits"><label>最多文本条数 <select id="clipLimit"></select></label><label>保留时间 <select id="clipMinutes"></select></label></div><details><summary>可选：菜单快捷键</summary><p>快捷键独立于记录开关。留空并保存可解除绑定；不能与其他模块重复。</p><div id="popupShortcut"></div><button id="savePopup">保存菜单快捷键</button></details><details><summary class="exclusion-heading"><span>隐私与应用排除</span><button id="chooseExcludedApp" type="button">添加应用…</button></summary><p class="help-text">应用排除不能覆盖所有敏感内容。</p><input id="clipExcluded" type="hidden"><div id="clipExcludedRows"></div></details><details class="usage-help"><summary>如何使用剪贴板菜单</summary><div class="clipboard-usage"><p><span class="clip-menu-icon" aria-hidden="true"></span><span>点击菜单栏图标：查看历史</span></p><p><span class="usage-key" aria-hidden="true">↖</span><span>点击历史项：复制</span></p><p><span class="usage-key">⌥</span><span>按住 ⌥ 点击历史项：粘贴到有焦点的输入框</span></p></div></details><button id="saveClip">保存剪贴板设置</button></div><div class="clip-history"><div class="clip-history-toolbar"><div class="clip-history-heading"><h3>历史记录</h3></div><p><input id="clipSearch" type="search" placeholder="搜索历史" aria-label="搜索剪贴板历史"> <button id="refreshClip">刷新历史</button> <button id="clearClip" disabled>清空历史…</button> </p></div><div id="clipHistory"></div></div></div></section>
-<section id="systemSection" class="panel" role="tabpanel" hidden><h2>系统信息</h2><p>选择菜单栏网速和菜单信息。关闭网速显示后，信息菜单仍可使用。</p><div id="systemFields"></div><p class="system-caption">数值自动刷新，开关仅控制菜单显示。</p><p><button id="saveSystem">保存系统信息设置</button></p></section><section id="browserSection" class="panel" role="tabpanel" hidden><div class="browser-heading"><h2>浏览器</h2><div class="browser-data-action"><button id="openBrowserData" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="browserDataMenu">清除浏览数据…</button><div id="browserDataMenu" role="menu" aria-label="清理浏览数据的浏览器" hidden></div></div></div><div class="routing-card"><div class="permission-summary"><p id="browserRoutingStatus" class="routing-state" role="status"></p><button id="refreshBrowserStatus" class="state-refresh">重新检测</button></div><div class="routing-actions"><button id="setDefaultBrowser">设为默认浏览器…</button> <button id="openDefaultBrowserSettings">打开默认浏览器设置…</button></div></div><label><input id="browserEnabled" type="checkbox">启用浏览器分流规则</label><p>匹配顺序：域名 → 来源应用 → 默认浏览器。</p><label>未匹配时使用 <select id="browserDefault" aria-label="未匹配时使用的浏览器"></select></label><div class="browser-rule-nav"><button type="button" data-rule-jump="browserAppGroup">应用规则</button><button type="button" data-rule-jump="browserDomainGroup">域名规则</button></div><div id="browserAppGroup" class="browser-rule-group"><h3>来源应用规则</h3><div id="browserAppRules"></div><p><button id="chooseBrowserApp">添加应用…</button></p></div><div id="browserDomainGroup" class="browser-rule-group"><h3>域名规则</h3><p class="help-text">从上到下匹配，优先规则放在前面。</p><div id="browserRules"></div><p><button id="addBrowserRule">添加域名规则</button> <button id="saveBrowser">保存浏览器设置</button></p></div><details class="usage-help"><summary>如何接管系统链接</summary><p>保存规则后，设为默认浏览器并完成系统确认，再从其他应用点击链接验证。取消接管时，在系统设置中改回原浏览器。</p></details></section><section id="launcherSection" class="panel" role="tabpanel" hidden><h2>应用快捷启动</h2><label><input id="launcherEnabled" type="checkbox">启用应用快捷启动</label><p>选择应用并设置快捷键；已打开的应用会切到前台。留空表示不绑定；不能与其他模块或系统快捷键重复。</p><div id="launcherRules"></div><p><button id="chooseLauncherApp">添加应用…</button> <button id="saveLauncher">保存应用启动设置</button></p></section><section id="aboutSection" class="panel" role="tabpanel" hidden><div class="about-brand"><img id="aboutIcon" alt="Nivlet" width="80" height="80"><div><h2>Nivlet for Mac</h2><p>让常用桌面操作更顺手。</p><div class="about-version"><p id="aboutVersion"></p><button id="checkUpdates">检查更新…</button></div></div></div><div class="about-links"><a href="https://wivnelo.github.io/Nivlet/">官网</a><a href="https://github.com/wivnelo/Nivlet">GitHub 项目</a><a href="https://github.com/wivnelo/Nivlet/issues">问题反馈</a><a href="https://github.com/wivnelo/Nivlet/releases">版本记录</a><a href="https://github.com/wivnelo/Nivlet/blob/main/LICENSE">MIT License</a></div><div class="privacy-card"><h3>本地与隐私</h3><p>配置、剪贴板内容与系统信息在本机处理，不上传到服务器。无需账号，核心工具可离线使用。</p><p>打开网页和项目链接会使用网络。</p></div><details><summary>开源许可与第三方声明</summary><pre id="licenseText"></pre><pre id="noticesText"></pre></details><p class="about-copyright">© 2026 Nivlet contributors</p></section></main><footer><span id="draftHint"></span><p id="status" role="status"></p><button id="cancelSettings">取消修改</button><button id="saveSettings">保存设置</button></footer><dialog id="imageDialog"><button id="closeImage">关闭预览</button><p><img id="fullImage" alt="剪贴板图片完整预览"></p></dialog><dialog id="leaveDialog" aria-labelledby="leaveTitle"><h3 id="leaveTitle">有未保存的修改</h3><p>保存所有页面的修改？保存失败会保留草稿。</p><div class="leave-actions"><button id="leaveDiscard">放弃修改</button><button id="leaveCancel" autofocus>返回设置</button><button id="leaveSave">保存全部</button></div></dialog><script>
-// Sequential saves: never approve leaving until every dirty page is acknowledged.
+
+/* System Settings layout: shared sidebar, grouped content, and a persistent save bar. */
+:root{--sidebar:#e9e9ed;--selection:#d2e3fa;--selection-text:#124e9d;--icon:#5c718e;--sidebar-width:204px;--content-gutter:28px}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--sidebar:#27272c;--selection:#354d70;--selection-text:#e0edff;--icon:#a7bad5}}
+:root[data-theme=dark]{--sidebar:#27272c;--selection:#354d70;--selection-text:#e0edff;--icon:#a7bad5}
+html,body{width:100%;min-width:0}
+body{display:grid;grid-template-columns:var(--sidebar-width) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;overflow:hidden}
+.settings-sidebar{grid-column:1;grid-row:1/3;padding:18px 12px;background:var(--sidebar);border:0;border-right:1px solid var(--line);overflow:auto;min-height:0}
+.settings-brand{display:flex;align-items:center;gap:10px;padding:2px 10px 22px;font-size:17px;line-height:1.4}
+.settings-brand img{width:32px;height:32px;border-radius:7px;flex:none}.settings-brand img:not([src]),.settings-brand img[src=""]{visibility:hidden}
+nav{display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;flex-wrap:nowrap;width:100%;max-width:none;gap:4px;padding:0;margin:0;border:0;border-radius:0;background:transparent}
+nav [role=tab]{display:flex;align-items:center;gap:10px;text-align:left;width:100%;min-height:38px;height:auto;padding:8px 22px 8px 10px;margin:0;white-space:normal;line-height:1.4;border:0;border-radius:7px;color:CanvasText;font-size:13px;box-shadow:none;background:transparent}
+nav [role=tab][aria-selected=true]{background:var(--selection);color:var(--selection-text);box-shadow:none;font-weight:600}
+.sidebar-icon{width:20px;height:20px;flex:none;fill:none;stroke:var(--icon);stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+nav [aria-selected=true] .sidebar-icon{stroke:currentColor}.sidebar-label{min-width:0;overflow-wrap:anywhere}
+nav [role=tab]::after{left:auto;right:9px;top:50%;bottom:auto;width:5px;height:5px;transform:translateY(-50%)}
+nav [role=tab][data-dirty=true]::after{background:#c69252}
+main{grid-column:2;grid-row:1;padding:28px var(--content-gutter);min-width:0;min-height:0;overflow:auto;scroll-padding-block:20px}
+.panel{max-width:1000px;margin:0 auto;padding:0;border:0;border-radius:0;background:transparent;overflow-wrap:anywhere;min-width:0}
+h2{font-size:25px;line-height:1.3;letter-spacing:-.4px;font-weight:600;margin:0 0 22px}h3,.group-title{font-size:13px;font-weight:600;margin:22px 2px 9px;line-height:1.5}
+.settings-group{border:1px solid var(--line);background:var(--card);border-radius:10px;min-width:0}
+.module-summary{padding:16px 18px;margin-bottom:20px}.module-summary>p{font-size:12px;margin:6px 0 0}.module-summary>label.toggle-row{display:flex;width:100%;justify-content:space-between;flex-direction:row-reverse;margin:0;gap:6px}
+.module-summary>label.value-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:15px 0 0;padding-top:13px;border-top:1px solid var(--line);width:100%}
+input[type=checkbox].switch-control{appearance:none;-webkit-appearance:none;position:relative;width:34px;height:20px;min-width:34px;min-height:20px;border:0;border-radius:12px;background:#b5b5bd;vertical-align:middle;flex:0 0 34px;cursor:pointer;transition:background .12s;box-shadow:inset 0 0 0 1px #00000008}
+input[type=checkbox].switch-control::before{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:white;box-shadow:0 1px 2px #0002;transition:transform .12s}
+input[type=checkbox].switch-control:checked{background:var(--accent)}input[type=checkbox].switch-control:checked::before{transform:translateX(14px)}input[type=checkbox].switch-control:disabled{opacity:.45;cursor:default}
+.settings-group-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:22px 1px 10px}.settings-group-heading h3{margin:0}.settings-group-heading label{display:flex;align-items:center;gap:12px;margin:0;color:var(--secondary)}
+.shortcut-group{overflow:hidden}.shortcut-column-head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--page);border-bottom:1px solid var(--line);font-size:12px;color:var(--secondary)}.shortcut-column-head>span:last-child{width:234px}
+#rows{margin:0;table-layout:auto}#rows td{padding:11px 12px;border-bottom:1px solid var(--line)}#rows tr:last-child td{border-bottom:0}#rows td:first-child{padding-left:16px}#rows td:last-child{padding-right:16px;width:70px}#rows td:nth-child(2){width:190px;white-space:nowrap}#rows .layout-preview{width:32px;height:23px;color:var(--icon)}#rows .layout-region{opacity:.42}#rows .window-action-label{gap:12px}#rows label+label{margin-left:6px}#rows label{gap:6px;min-width:34px}
+#rows input[data-shortcut-key]{width:54px}.shortcut-group+.help-text{margin:12px 2px 0;line-height:1.7}
+.general-behavior>p,.general-appearance>p,.general-appearance>label{padding:13px 16px;margin:0;border-bottom:1px solid var(--line);display:block}.general-behavior>p:last-child,.general-appearance>p:last-child{border:0}
+.general-behavior>p>label,.general-appearance>label{color:CanvasText;display:flex;flex-direction:row-reverse;align-items:center;justify-content:space-between;width:100%;margin:0;gap:6px}
+.general-behavior #openLoginSettings:not([hidden]){display:block;margin-top:8px;margin-left:auto}.general-appearance>p:has(select)>label{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;margin:0}.general-appearance>p:not(:has(select)){font-size:12px;color:var(--secondary);padding-top:0}
+.permission-card,.routing-card{margin:20px 0;padding:15px 18px;border:1px solid var(--line);border-radius:10px;background:var(--card)}#generalSection .permission-card{padding:15px 18px}#generalSection .permission-card h3{margin:0 0 9px}
+.permission-summary{align-items:center}.state-refresh,#refreshBrowserStatus,.permission-summary .refresh-permissions{color:var(--accent)}
+.configuration-group{padding:16px}.configuration-group>p{margin:0 0 12px}.configuration-group>button{margin:0 4px 8px 0}.configuration-group #configurationPreview{padding-top:12px}.configuration-group #configurationPreview h3{margin-top:8px}
+.rule-list{border:1px solid var(--line);border-radius:10px;background:var(--card);margin-top:14px;padding:0 12px;min-width:0}.rule-toolbar{padding:10px 0;gap:10px;border-bottom:1px solid var(--line);background:var(--card);top:0;border-radius:9px 9px 0 0}.rule-list .input-rule{padding:10px 0;margin:0;gap:10px}.rule-list .input-rule:last-child{border-bottom:0}.rule-empty{padding:4px 0}.rule-list .input-rule>span:first-of-type{min-width:80px}.rule-list .launcher-rule{gap:8px}.rule-list .launcher-rule label{gap:6px;min-width:32px}.rule-list .launcher-rule label+label{margin-left:0}.rule-list .launcher-rule input[data-shortcut-key]{width:52px}
+.browser-rule-group{border:0;margin-top:22px;padding-top:0}.browser-rule-group h3{margin:0 2px 9px}.browser-rule-group>.help-text{margin:0 2px 9px}.browser-rule-nav{margin:16px 0;gap:8px}.browser-heading{margin-bottom:20px}.browser-heading h2{font-size:25px}.browser-rule input[type=text]{min-width:140px}.browser-rule select{max-width:185px}.browser-app-rule select{max-width:210px}.browser-options{margin:0}.browser-options>p{margin-top:9px}.browser-rule-group .rule-list{margin-top:10px}
+#systemFields{display:block;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:0 16px;margin-top:20px}#systemFields p{min-height:50px;padding:11px 0;margin:0}#systemFields p:last-child{border-bottom:0}#systemFields label{color:CanvasText}#systemFields .system-value{font-size:12px}
+#clipSection:not([hidden]){max-width:none}.clip-config,.clip-history{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}.clip-layout{gap:18px}.clip-config{padding-right:16px}.clip-history{padding-left:16px}.clip-history-toolbar{background:var(--card)}.clip-history-toolbar>p{display:flex;flex-wrap:wrap;gap:8px}.clip-history-toolbar #clipSearch{flex:1 1 180px;width:auto;margin:0;min-width:0}.clip-history-toolbar button{font-size:12px}.clip-recording{gap:8px}.clip-config>label:has(.switch-control){display:flex;flex-direction:row-reverse;justify-content:space-between;gap:6px;margin:12px 0;align-items:center;width:100%}.clip-config .group-title{margin-top:20px}.clip-config .clip-limits{gap:10px}.clip-config details{margin-top:12px}.exclusion-heading{flex-wrap:wrap}.exclusion-heading button{margin-left:auto}.clip-card-actions{gap:6px}
+#aboutSection{max-width:820px}.about-brand{padding:12px 0 22px;border-bottom:1px solid var(--line);margin-bottom:22px}.about-brand h2{font-size:25px}.about-links{gap:4px 18px}.about-links a{margin:0}.privacy-card{border:1px solid var(--line);border-radius:10px;padding:18px!important;background:var(--card);margin:20px 0!important}#aboutSection .privacy-card{border-bottom:1px solid var(--line)}.privacy-card h3{margin-top:0}.about-copyright{margin-top:24px}
+footer{grid-column:2;grid-row:2;min-width:0;min-height:60px;padding:12px 22px;background:var(--card);border-top:1px solid var(--line);gap:10px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+footer #draftHint{flex:1 1 210px;font-size:12px;min-width:0}footer #status{font-size:12px;flex:1 1 100%;margin:0;order:3;min-height:0}footer #status:empty{display:none}#cancelSettings,#saveSettings{min-height:32px;white-space:normal;max-width:100%}#saveSettings{font-weight:500}footer #draftHint:empty{display:none}
+@media(min-width:1181px){:root{--sidebar-width:224px;--content-gutter:38px}main:has(#clipSection:not([hidden])){overflow:hidden}.clip-layout{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr)}.clip-config,.clip-history{overflow:auto;min-height:0}}
+@media(max-width:1180px){#clipSection:not([hidden]){height:auto;overflow:visible}main:has(#clipSection:not([hidden])){overflow:auto}.clip-layout{display:block}.clip-config,.clip-history{overflow:visible;padding:16px}.clip-history{margin-top:18px}.clip-history-toolbar,.clip-config .rule-toolbar{position:static}}
+@media(max-width:850px){:root{--sidebar-width:176px;--content-gutter:20px}.settings-sidebar{padding:16px 8px}.settings-brand{padding-left:9px;gap:8px}nav [role=tab]{padding-left:8px;gap:8px;font-size:12px}.sidebar-icon{width:18px;height:18px}main{padding-block:22px}h2,.browser-heading h2{font-size:23px}#rows td{padding:9px 7px}#rows td:first-child{padding-left:12px}#rows td:last-child{padding-right:12px}#rows td:nth-child(2){width:170px}#rows label{min-width:28px;gap:4px}#rows label+label{margin-left:3px}.window-action-label{gap:7px}.settings-group-heading{flex-wrap:wrap}.settings-group-heading label{margin-left:auto}.shortcut-column-head>span:last-child{width:224px}.browser-heading{align-items:flex-start;flex-wrap:wrap;gap:12px}footer{padding-inline:16px}.rule-list .launcher-rule>span:first-of-type{flex:1 1 160px}}
+@media(max-width:650px){:root{--sidebar-width:148px;--content-gutter:14px}.settings-sidebar{padding-inline:6px}.settings-brand{font-size:15px;padding-inline:6px}.settings-brand img{width:26px;height:26px}nav [role=tab]{padding:8px 16px 8px 7px;gap:6px;min-height:37px;font-size:12px}nav [role=tab]::after{right:6px}.sidebar-icon{width:16px;height:16px}#rows td:nth-child(2){width:auto;white-space:normal}#rows td:first-child{min-width:100px}#rows td{padding:10px 6px}#rows label{min-width:32px;margin-bottom:3px}#rows input[data-shortcut-key]{width:42px}.shortcut-column-head{display:none}.general-appearance select{min-width:120px!important;max-width:100%}.module-summary,.configuration-group{padding:13px}.module-summary>label.value-row{flex-wrap:wrap;gap:8px}.module-summary>label.value-row select{width:100%}.permission-summary{gap:8px}footer #draftHint{flex-basis:100%}footer{padding:10px 12px;gap:8px}.rule-list{padding-inline:10px}.rule-toolbar{gap:8px}.browser-rule select{max-width:100%}.clip-config,.clip-history{padding:13px}.clip-limits label{min-width:100px}.about-brand{gap:12px;align-items:flex-start}.about-brand img{width:58px;height:58px}.about-brand h2{font-size:20px}}
+@media(prefers-reduced-motion:reduce){input[type=checkbox].switch-control,input[type=checkbox].switch-control::before{transition:none}}
+
+</style><body><header class="settings-sidebar"><div class="settings-brand" aria-hidden="true"><img id="settingsBrandIcon" alt="" width="32" height="32"><strong>Nivlet</strong></div><nav role="tablist" aria-label="设置模块" aria-orientation="vertical"><button role="tab" id="tab-generalSection" aria-controls="generalSection" aria-selected="false" tabindex="-1"><svg class="sidebar-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10l2 2M5 19l2-2M17 7l2-2"/></svg><span class="sidebar-label">通用</span></button><button role="tab" id="tab-windowSection" aria-controls="windowSection" aria-selected="true"><svg class="sidebar-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M11 9v11"/></svg><span class="sidebar-label">窗口管理</span></button><button role="tab" id="tab-inputSection" aria-controls="inputSection" aria-selected="false" tabindex="-1"><svg class="sidebar-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M8 16l4-9 4 9M9 13h6"/></svg><span class="sidebar-label">输入法</span></button><button role="tab" id="tab-clipSection" aria-controls="clipSection" aria-selected="false" tabindex="-1"><svg class="sidebar-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="16" rx="2"/><rect x="9" y="2" width="6" height="5" rx="1"/><path d="M9 12h6m-6 4h6"/></svg><span class="sidebar-label">剪贴板</span></button><button role="tab" id="tab-systemSection" aria-controls="systemSection" aria-selected="false" tabindex="-1"><svg class="sidebar-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M3 16h3l3-9 4 13 3-9 2 5h3"/></svg><span class="sidebar-label">系统信息</span></button><button role="tab" id="tab-browserSection" aria-controls="browserSection" aria-selected="false" tabindex="-1"><svg class="sidebar-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18M12 3c-5 5-5 13 0 18"/></svg><span class="sidebar-label">浏览器</span></button><button role="tab" id="tab-launcherSection" aria-controls="launcherSection" aria-selected="false" tabindex="-1"><svg class="sidebar-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg><span class="sidebar-label">应用启动</span></button><button role="tab" id="tab-aboutSection" aria-controls="aboutSection" aria-selected="false" tabindex="-1"><svg class="sidebar-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.5"/></svg><span class="sidebar-label">关于</span></button></nav></header><main><section id="generalSection" class="panel" role="tabpanel" hidden><h2>通用</h2><h3 class="group-title">启动与行为</h3><div class="settings-group general-behavior"><p><label><input id="autoLaunch" class="switch-control" role="switch" type="checkbox">登录 Mac 时自动启动 Nivlet</label> <button id="openLoginSettings" hidden>打开登录项设置…</button></p><p><label><input id="sleepShortcut" class="switch-control" role="switch" type="checkbox">启用 ⌘ + L 睡眠</label></p></div><div class="permission-card"><h3>运行权限</h3><div class="permission-summary"><p class="permission-state" role="status"></p><button class="open-accessibility" hidden>打开辅助功能设置</button><button class="refresh-permissions state-refresh">重新检测</button></div><div class="permission-details" hidden><p>窗口管理和 Option 直接粘贴需要辅助功能权限。剪贴板记录、系统信息和应用启动不需要此权限。</p></div></div><h3 class="group-title">菜单栏与外观</h3><div class="settings-group general-appearance"><label><input id="showMenu" class="switch-control" role="switch" type="checkbox">在菜单栏显示 Nivlet 主图标</label><p>隐藏后可重新打开 Nivlet 进入设置；其他菜单栏图标不受影响。</p><p><label>外观 <select id="appearance"><option value="system">跟随系统</option><option value="light">浅色</option><option value="dark">深色</option></select></label></p><p><label>语言 <select id="language"><option value="system">跟随系统</option><option value="zh-Hans">简体中文</option><option value="en">English</option></select></label></p></div><button id="saveGeneral">保存通用设置</button><h3 class="group-title">配置备份与迁移</h3><div class="settings-group configuration-group"><p class="help-text">备份已保存的设置，不包含剪贴板历史或系统权限。</p><button id="exportConfiguration">导出配置…</button> <button id="exportDefaults">导出默认示例…</button> <button id="chooseConfiguration">导入配置…</button><div id="configurationPreview" hidden><h3>将替换的配置</h3><p>导入会替换文件中包含的模块及其未保存输入，其他模块保持不变。</p><pre id="configurationJSON" style="max-height:260px;overflow:auto;white-space:pre-wrap"></pre><button id="applyConfiguration">确认导入</button> <button id="cancelConfiguration">取消</button></div></div></section><section id="windowSection" class="panel" role="tabpanel"><h2>窗口管理</h2><div class="settings-group module-summary"><label class="toggle-row"><input id="enabled" class="switch-control" role="switch" type="checkbox">启用窗口管理</label><p>默认关闭。快捷键留空表示不绑定。</p></div><div class="settings-group-heading"><h3>布局快捷键</h3><label>布局分组 <select id="windowGroup"><option value="basic">基本布局</option><option value="corners">四角与居中</option><option value="thirds">三分区</option><option value="grid">九宫格</option><option value="adjust">大小与屏幕</option></select></label></div><div class="settings-group shortcut-group"><div class="shortcut-column-head" aria-hidden="true"><span>布局</span><span>修饰键 / 按键</span></div><table id="rows"></table></div><p class="help-text">所有分组一起保存。竖屏三分区为上、中、下；九宫格按左上到右下编号。窗口最小尺寸可能限制布局。</p><button id="save">保存窗口设置</button></section><section id="inputSection" class="panel" role="tabpanel" hidden><h2>按应用切换输入法</h2><div class="settings-group module-summary"><label class="toggle-row"><input id="inputEnabled" class="switch-control" role="switch" type="checkbox">启用输入法切换</label><p>保存后，规则在应用下次激活时生效。未配置的应用保持当前输入法。</p></div><div id="inputRows"></div><button id="chooseApp">添加应用…</button> <button id="saveInput">保存输入法规则</button></section><section id="clipSection" class="panel" role="tabpanel" hidden><h2>剪贴板</h2><div class="clip-layout"><div class="clip-config"><div class="clip-recording"><p id="clipRecordingState" role="status"></p><button id="pauseClip">暂停记录</button></div><h3 class="group-title">记录设置</h3><label><input id="clipEnabled" class="switch-control" role="switch" type="checkbox">启用剪贴板历史</label><p class="help-text">关闭仅停止记录，已有历史仍按保留策略清理。</p><label><input id="clipImages" class="switch-control" role="switch" type="checkbox">记录图片（最多 10 张）</label><h3 class="group-title">保留策略</h3><label><input id="clipPersistent" class="switch-control" role="switch" type="checkbox">跨重启保留历史（本地明文缓存）</label><p>未开启跨重启保留时，退出后历史不再保留。暂停仅本次运行有效；敏感内容复制前请暂停记录。</p><div class="clip-limits"><label>最多文本条数 <select id="clipLimit"></select></label><label>保留时间 <select id="clipMinutes"></select></label></div><details><summary>可选：菜单快捷键</summary><p>快捷键独立于记录开关。留空并保存可解除绑定；不能与其他模块重复。</p><div id="popupShortcut"></div><button id="savePopup">保存菜单快捷键</button></details><details><summary class="exclusion-heading"><span>隐私与应用排除</span><button id="chooseExcludedApp" type="button">添加应用…</button></summary><p class="help-text">应用排除不能覆盖所有敏感内容。</p><input id="clipExcluded" type="hidden"><div id="clipExcludedRows"></div></details><details class="usage-help"><summary>如何使用剪贴板菜单</summary><div class="clipboard-usage"><p><span class="clip-menu-icon" aria-hidden="true"></span><span>点击菜单栏图标：查看历史</span></p><p><span class="usage-key" aria-hidden="true">↖</span><span>点击历史项：复制</span></p><p><span class="usage-key">⌥</span><span>按住 ⌥ 点击历史项：粘贴到有焦点的输入框</span></p></div></details><button id="saveClip">保存剪贴板设置</button></div><div class="clip-history"><div class="clip-history-toolbar"><div class="clip-history-heading"><h3>历史记录</h3></div><p><input id="clipSearch" type="search" placeholder="搜索历史" aria-label="搜索剪贴板历史"> <button id="refreshClip">刷新历史</button> <button id="clearClip" disabled>清空历史…</button> </p></div><div id="clipHistory"></div></div></div></section>
+<section id="systemSection" class="panel" role="tabpanel" hidden><h2>系统信息</h2><p>选择菜单栏网速和菜单信息。关闭网速显示后，信息菜单仍可使用。</p><div id="systemFields"></div><p class="system-caption">数值自动刷新，开关仅控制菜单显示。</p><p><button id="saveSystem">保存系统信息设置</button></p></section><section id="browserSection" class="panel" role="tabpanel" hidden><div class="browser-heading"><h2>浏览器</h2><div class="browser-data-action"><button id="openBrowserData" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="browserDataMenu">清除浏览数据…</button><div id="browserDataMenu" role="menu" aria-label="清理浏览数据的浏览器" hidden></div></div></div><div class="routing-card"><div class="permission-summary"><p id="browserRoutingStatus" class="routing-state" role="status"></p><button id="refreshBrowserStatus" class="state-refresh">重新检测</button></div><div class="routing-actions"><button id="setDefaultBrowser">设为默认浏览器…</button> <button id="openDefaultBrowserSettings">打开默认浏览器设置…</button></div></div><div class="settings-group module-summary browser-options"><label class="toggle-row"><input id="browserEnabled" class="switch-control" role="switch" type="checkbox">启用浏览器分流规则</label><p>匹配顺序：域名 → 来源应用 → 默认浏览器。</p><label class="value-row">未匹配时使用 <select id="browserDefault" aria-label="未匹配时使用的浏览器"></select></label></div><div class="browser-rule-nav"><button type="button" data-rule-jump="browserAppGroup">应用规则</button><button type="button" data-rule-jump="browserDomainGroup">域名规则</button></div><div id="browserAppGroup" class="browser-rule-group"><h3>来源应用规则</h3><div id="browserAppRules"></div><p><button id="chooseBrowserApp">添加应用…</button></p></div><div id="browserDomainGroup" class="browser-rule-group"><h3>域名规则</h3><p class="help-text">从上到下匹配，优先规则放在前面。</p><div id="browserRules"></div><p><button id="addBrowserRule">添加域名规则</button> <button id="saveBrowser">保存浏览器设置</button></p></div><details class="usage-help"><summary>如何接管系统链接</summary><p>保存规则后，设为默认浏览器并完成系统确认，再从其他应用点击链接验证。取消接管时，在系统设置中改回原浏览器。</p><p>本地 .html / .htm 文件使用“未匹配时使用”的浏览器打开，不参与域名或来源应用匹配。</p></details></section><section id="launcherSection" class="panel" role="tabpanel" hidden><h2>应用快捷启动</h2><div class="settings-group module-summary"><label class="toggle-row"><input id="launcherEnabled" class="switch-control" role="switch" type="checkbox">启用应用快捷启动</label><p>选择应用并设置快捷键；已打开的应用会切到前台。留空表示不绑定；不能与其他模块或系统快捷键重复。</p></div><div id="launcherRules"></div><p><button id="chooseLauncherApp">添加应用…</button> <button id="saveLauncher">保存应用启动设置</button></p></section><section id="aboutSection" class="panel" role="tabpanel" hidden><div class="about-brand"><img id="aboutIcon" alt="Nivlet" width="80" height="80"><div><h2>Nivlet for Mac</h2><p>让常用桌面操作更顺手。</p><div class="about-version"><p id="aboutVersion"></p><button id="checkUpdates">检查更新…</button></div></div></div><div class="about-links"><a href="https://wivnelo.github.io/Nivlet/">官网</a><a href="https://github.com/wivnelo/Nivlet">GitHub 项目</a><a href="https://github.com/wivnelo/Nivlet/issues">问题反馈</a><a href="https://github.com/wivnelo/Nivlet/releases">版本记录</a><a href="https://github.com/wivnelo/Nivlet/blob/main/LICENSE">MIT License</a></div><div class="privacy-card"><h3>本地与隐私</h3><p>配置、剪贴板内容与系统信息在本机处理，不上传到服务器。无需账号，核心工具可离线使用。</p><p>打开网页和项目链接会使用网络。</p></div><details><summary>开源许可与第三方声明</summary><pre id="licenseText"></pre><pre id="noticesText"></pre></details><p class="about-copyright">© 2026 Nivlet contributors</p></section></main><footer><span id="draftHint"></span><p id="status" role="status"></p><button id="cancelSettings">取消当前页修改</button><button id="saveSettings">保存全部设置</button></footer><dialog id="imageDialog"><button id="closeImage">关闭预览</button><p><img id="fullImage" alt="剪贴板图片完整预览"></p></dialog><dialog id="leaveDialog" aria-labelledby="leaveTitle"><h3 id="leaveTitle">有未保存的修改</h3><p>保存所有页面的修改？保存失败会保留草稿。</p><div class="leave-actions"><button id="leaveDiscard">放弃修改</button><button id="leaveCancel" autofocus>返回设置</button><button id="leaveSave">保存全部</button></div></dialog><script>
+// Never approve leaving until every dirty page is acknowledged.
 function createLeaveGuard(io){
     let intent=null,waiting=null,queue=[];
     const reset=()=>{intent=null;waiting=null;queue=[];io.busy(false)};
@@ -234,14 +283,41 @@ function createLeaveGuard(io){
             if(!intent||waiting)return;
             queue=io.dirty();
             for(const page of queue)if(!io.validate(page)){reset();io.dismiss();io.focus(page);return}
-            io.busy(true);next();
+            io.busy(true);if(io.saveAll){waiting="batch";if(io.saveAll()===false){reset();io.dismiss()}}else next();
         },
         receive(page,ok){
             if(!waiting||page!==waiting)return;
             if(!ok){const failed=waiting;reset();io.dismiss();io.focus(failed);return}
             waiting=null;next();
         },
+        receiveBatch(ok){
+            if(waiting!=="batch")return;
+            if(!ok||io.dirty().length){reset();io.dismiss();return}
+            finish();
+        },
         get saving(){return waiting!==null}
+    };
+}
+
+// One request owns a frozen set of dirty pages until its matching backend reply.
+function createSaveAllCoordinator(io){
+    let pending=null,serial=0;
+    return {
+        start(){
+            if(pending)return false;
+            const pages=io.dirty();if(!pages.length)return false;
+            for(const page of pages)if(!io.validate(page)){io.focus(page);return false}
+            const values={};
+            for(const page of pages){const value=io.capture(page);if(!value){io.focus(page);return false}values[page]=value}
+            pending={requestID:'save-all-'+(++serial),pages:values};
+            io.busy(true);io.send({action:'saveAllSettings',...pending});return true;
+        },
+        receive(data){
+            if(!pending||data.action!=='saveAllSettings'||data.requestID!==pending.requestID)return false;
+            const submitted=pending;pending=null;
+            io.apply(data,submitted);io.busy(false);io.complete(data,submitted);return true;
+        },
+        get saving(){return pending!==null}
     };
 }
 
@@ -275,7 +351,7 @@ function translateUI(){
 }
 
 window.showSection=function(id){if(!document.getElementById(id))id='windowSection';for(const panel of document.querySelectorAll('.panel'))panel.hidden=panel.id!==id;for(const tab of document.querySelectorAll('[role=tab]')){const selected=tab.getAttribute('aria-controls')===id;tab.setAttribute('aria-selected',String(selected));tab.tabIndex=selected?0:-1}document.querySelector('main').scrollTop=0;if(['browserSection','inputSection','launcherSection','clipSection'].includes(id))refreshApplications();if(id==='systemSection')send({action:'refreshSystemValues'});if(id==='generalSection')send({action:'refreshPermissions',silent:true})};
-const tabs=[...document.querySelectorAll('[role=tab]')];for(const tab of tabs){tab.onclick=()=>{if(tab.dataset.suppressClick){delete tab.dataset.suppressClick;return;}window.showSection(tab.getAttribute('aria-controls'))};tab.onkeydown=e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const tabs=[...document.querySelectorAll('[role=tab]')];let i=tabs.indexOf(tab);i=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;delete tabs[i].dataset.suppressClick;tabs[i].click();tabs[i].focus()}}}
+const tabs=[...document.querySelectorAll('[role=tab]')];for(const tab of tabs){tab.onclick=()=>{if(tab.dataset.suppressClick){delete tab.dataset.suppressClick;return;}window.showSection(tab.getAttribute('aria-controls'))};tab.onkeydown=e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key)){e.preventDefault();const tabs=[...document.querySelectorAll('[role=tab]')];let i=tabs.indexOf(tab);i=e.key==='Home'?0:e.key==='End'?tabs.length-1:(i+(['ArrowRight','ArrowDown'].includes(e.key)?1:-1)+tabs.length)%tabs.length;delete tabs[i].dataset.suppressClick;tabs[i].click();tabs[i].focus()}}}
 
 // CFBundleIdentifier 不强制反向域名，FinalShell 等应用的 Bundle ID 没有点号。
 function validBundleID(id){return typeof id==='string'&&id.length<=255&&/^[\w-][\w.-]*$/.test(id)}
@@ -464,12 +540,12 @@ for(const tab of tabs){
     tab.onpointerdown=e=>{
         if(e.button!==0)return;
         delete tab.dataset.suppressClick;
-        const start=e.clientX,order=currentTabOrder();let moved=false;
+        const start=e.clientY,order=currentTabOrder();let moved=false;
         const move=event=>{
-            if(!moved&&Math.abs(event.clientX-start)<5)return;
+            if(!moved&&Math.abs(event.clientY-start)<5)return;
             moved=true;tab.classList.add('dragging');
             const others=[...tabNav.querySelectorAll('[role=tab]')].filter(other=>other!==tab&&!['generalSection','aboutSection'].includes(other.getAttribute('aria-controls')));
-            const before=others.find(other=>{const r=other.getBoundingClientRect();return event.clientX<r.left+r.width/2});
+            const before=others.find(other=>{const r=other.getBoundingClientRect();return event.clientY<r.top+r.height/2});
             tabNav.insertBefore(tab,before||document.getElementById('tab-aboutSection'));
         };
         const finish=event=>{
@@ -572,7 +648,7 @@ window.receive=function(data){
     document.querySelector('.permission-details').hidden=state==='granted';
     document.querySelector('.refresh-permissions').hidden=false;
     document.querySelector('.open-accessibility').hidden=state!=='denied';
-    if(data.about){document.getElementById('aboutVersion').textContent=t('版本')+' '+data.about.version+' · Build '+data.about.build;document.getElementById('licenseText').textContent=data.about.license||t('请在 GitHub 项目查看许可声明');document.getElementById('noticesText').textContent=data.about.notices||t('请在 GitHub 项目查看许可声明');if(data.about.icon)document.getElementById('aboutIcon').src=data.about.icon}
+    if(data.about){document.getElementById('aboutVersion').textContent=t('版本')+' '+data.about.version+' · Build '+data.about.build;document.getElementById('licenseText').textContent=data.about.license||t('请在 GitHub 项目查看许可声明');document.getElementById('noticesText').textContent=data.about.notices||t('请在 GitHub 项目查看许可声明');if(data.about.icon){document.getElementById('settingsBrandIcon').src=data.about.icon;document.getElementById('aboutIcon').src=data.about.icon}}
     translateUI();
 };
 window.previewConfiguration=function(value){
@@ -764,18 +840,15 @@ function updateSaveState(){
     refreshConflictHints();browserDomainConflicts();renderValidationStatus();
     const section=document.querySelector('[role=tab][aria-selected=true]').getAttribute('aria-controls');
     const button=document.getElementById('saveSettings'),hint=document.getElementById('draftHint');
-    button.hidden=!pageSaves[section];button.textContent=t('保存设置');
-    const cancel=document.getElementById('cancelSettings');cancel.hidden=button.hidden;cancel.textContent=t('取消修改');
+    button.hidden=false;button.textContent=t(saveAllCoordinator.saving?'正在保存…':'保存全部设置');
+    const cancel=document.getElementById('cancelSettings');cancel.hidden=!pageSaves[section];cancel.textContent=t('取消当前页修改');
     const dirty=[...savedPages].filter(([id,value])=>value!==pageSnapshot(id)).map(([id])=>id);
-    button.disabled=cancel.disabled=!dirty.includes(section);
+    button.disabled=!dirty.length||saveAllCoordinator.saving;cancel.disabled=!dirty.includes(section)||saveAllCoordinator.saving;
     for(const tab of document.querySelectorAll('[role=tab]')){const changed=dirty.includes(tab.getAttribute('aria-controls'));tab.dataset.dirty=String(changed);tab.setAttribute('aria-label',tab.textContent+(changed?' · '+t('有未保存的修改'):''));}
     hint.dataset.dirty=String(dirty.length>0);
     hint.textContent=dirty.length?t('有未保存的修改'):'';
 }
-document.getElementById('saveSettings').onclick=()=>{
-    const section=document.querySelector('[role=tab][aria-selected=true]').getAttribute('aria-controls');
-    document.getElementById(pageSaves[section])?.click();
-};
+document.getElementById('saveSettings').onclick=()=>saveAllCoordinator.start();
 const receiveSettings=window.receive;
 document.getElementById('cancelSettings').onclick=()=>{
     const section=document.querySelector('[role=tab][aria-selected=true]').getAttribute('aria-controls');
@@ -783,9 +856,11 @@ document.getElementById('cancelSettings').onclick=()=>{
     const theme=document.documentElement.dataset.theme;
     receiveSettings({...structuredClone(saved),action:pageSaves[section]==='saveClip'?'saveClipboard':pageSaves[section],message:''});
     document.documentElement.dataset.theme=theme;
+    savedPages.set(section,pageSnapshot(section));
     clearSaveError(section);setStatus(t('已取消当前页面的修改'),true,true);updateSaveState();
 };
 window.receive=data=>{
+    if(data.action==='saveAllSettings'){saveAllCoordinator.receive(data);return}
     receiveSettings(data);
     if(['copyClipboard','previewClipboard','pauseClipboard','clearClipboard','refreshClipboard'].includes(data.action))clipboardFeedback(t(data.action==='copyClipboard'&&data.ok?'已复制':data.message|| (data.action==='refreshClipboard'?'历史已刷新':'')),data.ok===true);
     const actions={saveGeneral:'generalSection',save:'windowSection',saveInput:'inputSection',saveClipboard:'clipSection',saveSystem:'systemSection',saveBrowser:'browserSection',saveLauncher:'launcherSection'};
@@ -821,6 +896,90 @@ for(const [name,hostID] of Object.entries({addInputRule:'inputRows',addBrowserAp
 for(const event of ['input','change'])document.addEventListener(event,e=>{const panel=e.target.closest('.panel');if(panel)clearSaveError(panel.id);clearStatus()});
 for(const event of ['input','change','click'])document.addEventListener(event,()=>queueMicrotask(updateSaveState));
 
+let saveReturnFocus=null,pendingBatchLeave=null;
+const saveActions={generalSection:'saveGeneral',windowSection:'save',inputSection:'saveInput',clipSection:'saveClipboard',systemSection:'saveSystem',browserSection:'saveBrowser',launcherSection:'saveLauncher'};
+function pageResponse(data,page,value){
+    const response={...data,ok:true,action:saveActions[page],message:''};
+    const keys={generalSection:'general',windowSection:'config',inputSection:'input',systemSection:'system',browserSection:'browser',launcherSection:'launcher'};
+    if(page==='clipSection'){response.clipboard={...data.clipboard,config:value.config};response.popupShortcut=value.popupShortcut}
+    else response[keys[page]]=value.config;
+    if(page==='generalSection')response.autoLaunch=value.autoLaunch;
+    return response;
+}
+function reconcileFailedPage(data,page,current,draft){
+    // The native module can fail after applying part of a change. Cancel must
+    // return to its reported current state, while the submitted draft stays here.
+    const fields=[...document.getElementById(page).querySelectorAll('input,select,textarea')].map(input=>({id:input.id,type:input.type,value:input.value,checked:input.checked}));
+    const actual=pageResponse(data,page,current);receiveSettings(actual);
+    const baseline=pageSnapshot(page);savedResponses.set(page,structuredClone(actual));
+    const theme=document.documentElement.dataset.theme;
+    receiveSettings(pageResponse(data,page,draft));
+    document.documentElement.dataset.theme=theme;
+    [...document.getElementById(page).querySelectorAll('input,select,textarea')].forEach((input,index)=>{
+        const value=fields[index];if(value&&value.id===input.id&&value.type===input.type){input.value=value.value;input.checked=value.checked}
+    });
+    // Even when the current configuration equals the draft, a failed runtime
+    // application still needs an explicit retry or a user-initiated cancel.
+    savedPages.set(page,baseline===pageSnapshot(page)?'save-not-confirmed':baseline);
+}
+function focusSavePage(section){
+    if(!pageSaves[section])return;
+    window.showSection(section);
+    document.querySelector('#'+section+' [aria-invalid=true],#'+section+' input,#'+section+' select')?.focus();
+}
+const saveAllCoordinator=createSaveAllCoordinator({
+    dirty:()=>dirtyPages(),
+    validate:section=>canSaveShortcuts(section)&&(section!=='browserSection'||!browserDomainConflicts()),
+    focus:focusSavePage,
+    capture:section=>{
+        // Existing page serializers remain the single source of truth. Capture
+        // synchronously so no individual save reaches the native bridge.
+        const previousSend=send;let value=null;
+        try{send=body=>{value=structuredClone(body)};document.getElementById(pageSaves[section]).click()}
+        finally{send=previousSend}
+        if(!value||value.action!==saveActions[section])return null;
+        delete value.action;return value;
+    },
+    send:body=>send(body),
+    busy:value=>{
+        if(value)saveReturnFocus=document.activeElement;
+        document.querySelector('main').inert=value;document.querySelector('nav').inert=value;
+        updateSaveState();
+    },
+    apply:(data,submitted)=>{
+        const result=data.saveBatch||{ok:false,results:[]};
+        for(const entry of result.results||[]){
+            if(!submitted.pages[entry.page]||!saveActions[entry.page])continue;
+            if(entry.status==='failed'&&entry.current){reconcileFailedPage(data,entry.page,entry.current,submitted.pages[entry.page]);continue}
+            if(entry.status!=='saved')continue;
+            const response={...data,ok:true,action:saveActions[entry.page],message:''};
+            receiveSettings(response);
+            savedPages.set(entry.page,pageSnapshot(entry.page));savedResponses.set(entry.page,structuredClone(response));clearSaveError(entry.page);
+        }
+        if(result.failedPage){
+            const message=result.message||data.message;
+            saveError(result.failedPage,{message});
+            if(result.failedPage==='generalSection')document.getElementById('openLoginSettings').hidden=!String(message||'').includes(t('无法修改启动设置，请在系统设置中检查登录项'));
+        }
+    },
+    complete:data=>{
+        const result=data.saveBatch||{ok:false,results:[]};
+        const success=result.ok===true&&data.ok===true&&!dirtyPages().length;
+        leaveGuard.receiveBatch(success);
+        if(result.failedPage)focusSavePage(result.failedPage);
+        else if(saveReturnFocus?.isConnected&&!saveReturnFocus.closest('[hidden]'))saveReturnFocus.focus();
+        const count=(result.results||[]).filter(entry=>entry.status==='saved').length;
+        let message=success?t('所有修改已保存'):count?t('部分设置已保存；其余修改仍保留。'):t('保存失败，修改仍保留。');
+        if(!success&&(result.message||data.message))message+=' '+(result.message||data.message);
+        if(result.recoveryAttempted)message+=' '+t('已尝试恢复保存失败的设置。');
+        if(result.recoveryAttempted&&(result.results||[]).some(entry=>entry.page==='clipSection'&&entry.attempted))message+=' '+t('已清理的剪贴板内容无法恢复。');
+        if(result.recoveryIncomplete)message+=' '+t('部分状态无法恢复，请检查设置。');
+        if(!success&&result.failedPage)saveError(result.failedPage,{message});
+        updateSaveState();setStatus(message,success,success);
+        const intent=pendingBatchLeave;pendingBatchLeave=null;
+        if(intent&&success)leaveGuard.request(intent);
+    }
+});
 const leaveDialog=document.getElementById('leaveDialog');
 let leaveReturnFocus=null;
 const dirtyPages=()=>[...savedPages].filter(([id,value])=>value!==pageSnapshot(id)).map(([id])=>id);
@@ -833,15 +992,18 @@ const leaveGuard=createLeaveGuard({
     focus:section=>{window.showSection(section);document.querySelector('#'+section+' [aria-invalid=true],#'+section+' input,#'+section+' select')?.focus()},
     validate:section=>canSaveShortcuts(section)&&(section!=='browserSection'||!browserDomainConflicts()),
     save:section=>document.getElementById(pageSaves[section]).click(),
+    saveAll:()=>saveAllCoordinator.start(),
     discard:()=>{
         for(const section of dirtyPages()){
             const saved=savedResponses.get(section);
             receiveSettings({...structuredClone(saved),action:section==='clipSection'?'saveClipboard':pageSaves[section],message:''});
+            savedPages.set(section,pageSnapshot(section));
         }
         updateSaveState();
     }
 });
 window.requestLeave=(intent,keyEvent)=>{
+    if(saveAllCoordinator.saving){if(leaveGuard.saving)leaveGuard.request(intent);else if(intent==='quit'||pendingBatchLeave!=='quit')pendingBatchLeave=intent;return}
     const input=document.activeElement;
     if(keyEvent?.metaKey&&input?.matches('[data-shortcut-key]')&&!document.querySelector('dialog[open]')&&keyEvent.key.toLowerCase()===(intent==='quit'?'q':'w')){
         input.dispatchEvent(new KeyboardEvent('keydown',{...keyEvent,bubbles:true,cancelable:true}));return;
@@ -853,9 +1015,10 @@ document.getElementById('leaveDiscard').onclick=()=>leaveGuard.discard();
 document.getElementById('leaveCancel').onclick=()=>leaveGuard.cancel();
 leaveDialog.addEventListener('cancel',event=>{event.preventDefault();leaveGuard.cancel()});
 
-// Command-S saves this page; a shortcut field gets first refusal.
+// Command-S saves all dirty pages; a shortcut field gets first refusal.
 document.addEventListener('keydown',event=>{
     if(event.defaultPrevented||event.isComposing)return;
+    if(saveAllCoordinator.saving){event.preventDefault();return}
     if(event.key==='Tab'&&!event.metaKey&&!event.ctrlKey&&!event.altKey){
         const scope=document.querySelector('dialog[open]')||document;
         const controls=[...scope.querySelectorAll('button,input,select,textarea,summary,a[href],[tabindex]')].filter(control=>!control.disabled&&control.tabIndex>=0&&control.getClientRects().length);

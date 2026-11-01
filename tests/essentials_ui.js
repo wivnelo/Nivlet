@@ -23,8 +23,10 @@ window.runEssentialsRegression=function(data){
   window.receive({...data,action:'refreshPermissions',autoLaunch:before.launch});
   check(launch.checked===!before.launch&&mainIcon.checked===!before.main,'Background refresh erased General drafts');
   window.showSection('generalSection');document.getElementById('saveSettings').click();
-  check(captured.action==='saveGeneral'&&captured.autoLaunch===!before.launch&&captured.config.showMenu===!before.main,'General footer Save missing draft values');
-  window.receive({...data,ok:false,action:'saveGeneral'});check(launch.checked===!before.launch,'Failed save erased draft');
+  const batch=captured;
+  check(batch.action==='saveAllSettings'&&Object.keys(batch.pages).join(',')==='generalSection,systemSection'&&batch.pages.generalSection.autoLaunch===!before.launch&&batch.pages.generalSection.config.showMenu===!before.main&&batch.pages.systemSection.config.cpu===!draft,'Global footer Save missing General or System draft values');
+  window.receive({...data,ok:false,action:'saveAllSettings',requestID:batch.requestID,saveBatch:{ok:false,failedPage:'generalSection',message:'Synthetic save failure',results:[{page:'generalSection',status:'failed'},{page:'systemSection',status:'skipped'}]}});
+  check(!saveAllCoordinator.saving&&launch.checked===!before.launch&&mainIcon.checked===!before.main&&flag.checked===!draft,'Failed save erased drafts or left settings locked');
   launch.checked=before.launch;mainIcon.checked=before.main;
   document.querySelector('.open-accessibility').click();check(captured.action==='openAccessibility','Settings link missing');
   const shortcut=document.getElementById('left-key'),priorKey=shortcut.value;shortcut.value='q';shortcut.dispatchEvent(new Event('input',{bubbles:true}));check(shortcut.value==='Q','Pasted shortcut letter not uppercase');shortcut.value=priorKey;

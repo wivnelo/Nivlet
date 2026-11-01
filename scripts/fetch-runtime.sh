@@ -41,5 +41,8 @@ git -C "$upstream_dir" apply "$project_dir/patches/keyboard-focus.patch"
 # Request browser protocols without changing document associations.
 git -C "$upstream_dir" apply "$project_dir/patches/browser-url-only.patch"
 
+# Preserve local document paths when forwarding native file-open events.
+git -C "$upstream_dir" apply "$project_dir/patches/browser-file-url.patch"
+
 # Release xcconfig signs Hammerspoon/Hammerspoon.entitlements. Use the audited file.
 cp "$project_dir/Native/Nivlet.entitlements" "$upstream_dir/Hammerspoon/Hammerspoon.entitlements"

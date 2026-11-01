@@ -11,7 +11,9 @@ window.runKeyboardFocusRegression=async function(data){
   check(input.value==='Q'&&!leaveDialog.open&&!requests.length,'Native Command-Q quit while recording');
   document.getElementById('cancelSettings').click();await Promise.resolve();
   window.showSection('generalSection');const field=document.getElementById('showMenu');field.checked=!field.checked;updateSaveState();field.focus();requests=[];
-  await key(field,'s',{metaKey:true});check(requests.length===1&&requests[0].action==='saveGeneral','Command-S does not use page save');
+  await key(field,'s',{metaKey:true});check(requests.length===1&&requests[0].action==='saveAllSettings'&&Object.keys(requests[0].pages).join(',')==='generalSection'&&requests[0].pages.generalSection.config.showMenu===field.checked,'Command-S does not submit the dirty settings batch');
+  const batch=requests[0];window.receive({...data,ok:false,action:'saveAllSettings',requestID:batch.requestID,saveBatch:{ok:false,failedPage:'generalSection',message:'Synthetic save failure',results:[{page:'generalSection',status:'failed'}]}});
+  check(!saveAllCoordinator.saving&&dirtyPages().includes('generalSection'),'Save failure lost the draft or remained pending');field.focus();
   requests=[];window.requestLeave('close');check(leaveDialog.open&&document.activeElement.id==='leaveCancel','Safe dialog focus missing');
   await key(document.activeElement,'Tab');check(document.activeElement.id==='leaveSave','Dialog Tab order wrong');
   await key(document.activeElement,'Tab');check(document.activeElement.id==='leaveDiscard','Dialog Tab escapes');

@@ -1,0 +1,62 @@
+// Run in an isolated settings document with synthetic state and an inert bridge.
+window.runGlobalSaveUIRegression=function(data){
+ const check=(ok,message)=>{if(!ok)throw new Error(message)},original=send;
+ let requests=[];
+ const save=document.getElementById('saveSettings'),cancel=document.getElementById('cancelSettings');
+ const general=document.getElementById('showMenu'),cpu=document.getElementById('system-cpu');
+ const saves=()=>requests.filter(value=>value.action==='saveAllSettings');
+ const reset=()=>{window.receive({...data,ok:true,action:'load',message:''});requests=[]};
+ const draft=()=>{general.checked=!general.checked;cpu.checked=!cpu.checked;updateSaveState()};
+ const reply=(request,results,ok,extra={})=>window.receive({...data,...extra,action:'saveAllSettings',requestID:request.requestID,ok,message:'',saveBatch:{ok,results,...(!ok?{failedPage:'systemSection',message:'Synthetic save failure'}:{}),...(extra.saveBatch||{})}});
+ try{
+  send=value=>requests.push(value);reset();
+  window.showSection('aboutSection');check(!save.hidden&&save.disabled,'Global save must be visible but disabled when clean on About');
+  draft();check(!save.disabled&&cancel.hidden,'Other-page changes must enable Save All on About');
+  save.click();const first=saves()[0];
+  check(first&&Object.keys(first.pages).join(',')==='generalSection,systemSection','Save All must contain only dirty pages');
+  check(saves().length===1&&!requests.some(v=>v.action==='saveGeneral'||v.action==='saveSystem'),'Captured serializers must not send individual saves');
+  check(document.querySelector('main').inert&&document.querySelector('nav').inert&&save.disabled,'Edits/navigation/save must be blocked while a frozen batch is pending');
+  saveAllCoordinator.start();check(saves().length===1,'Duplicate batch submitted');
+  reply({...first,requestID:'stale'},[],true);check(saveAllCoordinator.saving,'Stale response completed the batch');
+  reply(first,[{page:'generalSection',status:'saved'},{page:'systemSection',status:'failed'}],false,{general:first.pages.generalSection.config});
+  check(!saveAllCoordinator.saving&&!document.querySelector('main').inert,'Failure left the settings locked');
+  check(dirtyPages().join(',')==='systemSection'&&cpu.checked!==data.system.cpu,'Partial failure lost drafts or kept a confirmed save dirty');
+  check(!document.getElementById('systemSection').hidden&&document.getElementById('status').textContent.includes('Synthetic save failure'),'Failure must locate its page and display the reason');
+  updateSaveState();check(document.getElementById('status').textContent.includes(t('部分设置已保存；其余修改仍保留。')),'Partial save status must remain visible after queued validation refreshes');
+  window.showSection('aboutSection');save.click();const retry=saves().at(-1);
+  check(Object.keys(retry.pages).join(',')==='systemSection','Retry must not overwrite a clean page');
+  reply(retry,[{page:'systemSection',status:'saved'}],true,{general:first.pages.generalSection.config,system:retry.pages.systemSection.config});
+  check(!dirtyPages().length&&save.disabled,'Successful retry did not clear the remaining draft');
+  reset();draft();window.showSection('windowSection');requests=[];
+  save.focus();save.dispatchEvent(new KeyboardEvent('keydown',{key:'s',metaKey:true,bubbles:true,cancelable:true}));
+  check(saves().length===1,'Command-S on a clean page must save all dirty pages');
+  const keyboard=saves()[0];window.requestLeave('quit');check(!requests.some(v=>v.action==='confirmLeave'),'Quit was approved before save acknowledgement');
+  reply(keyboard,[{page:'generalSection',status:'saved'},{page:'systemSection',status:'saved'}],true,{general:keyboard.pages.generalSection.config,system:keyboard.pages.systemSection.config});
+  check(requests.at(-1).action==='confirmLeave'&&requests.at(-1).intent==='quit','Pending quit should only proceed after all saves succeed');
+  reset();draft();window.requestLeave('close');document.getElementById('leaveSave').click();
+  const closing=saves()[0];window.requestLeave('quit');window.requestLeave('close');
+  reply(closing,[{page:'generalSection',status:'saved'},{page:'systemSection',status:'saved'}],true,{general:closing.pages.generalSection.config,system:closing.pages.systemSection.config});
+  const approvals=requests.filter(value=>value.action==='confirmLeave');
+  check(approvals.length===1&&approvals[0].intent==='quit','Close upgraded to quit must produce exactly one prioritized approval');
+  reset();document.getElementById('autoLaunch').checked=!data.autoLaunch;document.getElementById('appearance').value=data.general.appearance==='dark'?'light':'dark';updateSaveState();save.click();
+  const login=saves()[0],loginDraft=document.getElementById('autoLaunch').checked;
+  reply(login,[{page:'generalSection',status:'failed',attempted:true,current:{config:data.general,autoLaunch:data.autoLaunch}}],false,{saveBatch:{failedPage:'generalSection',message:t('无法修改启动设置，请在系统设置中检查登录项'),recoveryAttempted:true}});
+  check(!document.getElementById('openLoginSettings').hidden,'Login save failure lost the system-settings recovery link');
+  check(document.getElementById('autoLaunch').checked===loginDraft&&dirtyPages().includes('generalSection'),'Login failure overwrote its draft');
+  check(document.documentElement.dataset.theme===data.general.appearance&&document.getElementById('appearance').value===login.pages.generalSection.config.appearance,'Failed General save must preserve appearance draft without applying its unsaved theme');
+  reset();cpu.checked=!cpu.checked;updateSaveState();save.click();const uncertain=saves()[0];
+  reply(uncertain,[{page:'systemSection',status:'failed',attempted:true,current:uncertain.pages.systemSection}],false,{system:uncertain.pages.systemSection.config,saveBatch:{recoveryAttempted:true,recoveryIncomplete:true}});
+  check(cpu.checked===uncertain.pages.systemSection.config.cpu&&dirtyPages().includes('systemSection')&&!save.disabled,'Unconfirmed runtime state matching the draft must remain retryable');
+  cancel.click();
+  check(cpu.checked===uncertain.pages.systemSection.config.cpu&&!dirtyPages().length,'Cancel after incomplete recovery must use the reported current baseline, not the stale saved value');
+  reset();general.checked=!general.checked;document.getElementById('enabled').checked=true;
+  document.getElementById('left-key').value='INVALID';document.getElementById('left-ctrl').checked=true;updateSaveState();window.showSection('aboutSection');requests=[];
+  const invalidDrafts=Object.fromEntries(dirtyPages().map(page=>[page,pageSnapshot(page)]));
+  save.click();check(!saves().length&&!document.getElementById('windowSection').hidden&&dirtyPages().length,'Invalid hidden page must prevent all writes and receive focus');
+  for(const [page,snapshot] of Object.entries(invalidDrafts))check(pageSnapshot(page)===snapshot,'Preflight changed a draft on '+page);
+  return 'Global save across clean/About pages, only dirty payloads, UI lock, stale/duplicate suppression, partial failure/retry, current-state baseline, login recovery, Command-S, single deferred quit and preflight passed';
+ }finally{
+  const pending=saves().at(-1);if(saveAllCoordinator.saving&&pending)reply(pending,[],false);
+  leaveGuard.cancel();send=original;window.receive({...data,ok:true,action:'load',message:''});
+ }
+};
