@@ -1,0 +1,65 @@
+// Synthetic settings only. Exercise the same dirty/global-save/cancel path as the real switch.
+window.runPopupToggleRegression=async function(data){
+ const check=(ok,message)=>{if(!ok)throw new Error(message)},oldSend=send;
+ const fixed={key:'V',mods:['cmd','shift']},custom={key:'K',mods:['ctrl']};
+ const tick=()=>new Promise(resolve=>setTimeout(resolve,0));
+ let request;
+ const load=shortcut=>{window.receive({...data,ok:true,action:'load',message:'',popupShortcut:shortcut,popupShortcutDefault:fixed});window.showSection('clipSection')};
+ try{
+  send=body=>request=body;load(fixed);
+  const control=document.getElementById('popupEnabled'),readOnly=document.getElementById('popupShortcutValue');
+  check(control.checked&&control.getAttribute('role')==='switch','Fixed shortcut is not an enabled switch');
+  check(document.querySelectorAll('#popupShortcut input:not([type=hidden])').length===1&&!document.querySelector('#popupShortcut [data-shortcut-key],#popupShortcut select'),'Shortcut remains editable');
+  check(readOnly.textContent==='⌘⇧V'&&document.getElementById('popupLegacyHint').hidden,'Default combination presentation wrong');
+  if(window.capturePopupState)await window.capturePopupState('enabled');
+  control.click();control.click();await tick();
+  check(!dirtyPages().length&&document.getElementById('popupShortcutChanged').value==='false','Normal off/on return created a false draft');
+  control.click();await tick();
+  check(!control.checked&&collectPopupShortcut()===false&&dirtyPages().length,'Off is not a dirty explicit false');
+  if(window.capturePopupState)await window.capturePopupState('disabled');
+  window.showSection('aboutSection');request=null;document.getElementById('saveSettings').click();
+  check(request?.action==='saveAllSettings'&&request.pages.clipSection.popupShortcut===false&&request.pages.clipSection.popupShortcutChanged===true,'Global save from another page did not capture off');
+  window.receive({...data,ok:false,action:'saveAllSettings',requestID:request.requestID,popupShortcut:fixed,popupShortcutDefault:fixed,message:t('保存失败，修改仍保留。'),saveBatch:{ok:false,results:[{page:'clipSection',status:'failed'}]}});
+  check(!control.checked&&dirtyPages().length,'Failed save lost the off draft');
+  window.showSection('clipSection');document.getElementById('cancelSettings').click();await tick();
+  check(control.checked&&JSON.stringify(collectPopupShortcut())===JSON.stringify(fixed),'Cancel did not restore fixed shortcut');
+  load(custom);
+  check(control.checked&&readOnly.textContent==='⌃K'&&!document.getElementById('popupLegacyHint').hidden,'Existing custom combination hidden or misrepresented');
+  if(window.capturePopupState)await window.capturePopupState('legacy');
+  document.getElementById('clipImages').click();await tick();window.showSection('aboutSection');document.getElementById('saveSettings').click();
+  check(JSON.stringify(request.pages.clipSection.popupShortcut)===JSON.stringify(custom)&&request.pages.clipSection.popupShortcutChanged===false,'Unrelated clipboard save migrated custom shortcut');
+  window.receive({...data,ok:true,action:'saveAllSettings',requestID:request.requestID,popupShortcut:custom,clipboard:{...data.clipboard,config:request.pages.clipSection.config},saveBatch:{ok:true,results:[{page:'clipSection',status:'saved'}]}});
+  load(custom);control.click();control.click();await tick();
+  check(control.checked&&readOnly.textContent==='⌘⇧V'&&document.getElementById('popupLegacyHint').hidden&&dirtyPages().length,'Off/on migration not captured when checked state returns to original');
+  document.getElementById('cancelSettings').click();await tick();
+  check(readOnly.textContent==='⌃K'&&!dirtyPages().length,'Cancel did not restore legacy snapshot');
+  const conflict={...data,config:{enabled:true,shortcuts:{left:fixed}},popupShortcut:false,popupShortcutDefault:fixed};
+  window.receive({...conflict,ok:true,action:'load',message:''});window.showSection('clipSection');control.click();await tick();
+  request=null;document.getElementById('saveSettings').click();
+  check(request?.action!=='saveAllSettings','Fixed-key conflict reached backend');check(control.getAttribute('aria-invalid')==='true'&&dirtyPages().length,'Fixed-key conflict marker or draft missing');
+  window.showSection('windowSection');const left=document.getElementById('left-key');left.value='';left.dispatchEvent(new Event('input',{bubbles:true}));await tick();
+  window.showSection('aboutSection');document.getElementById('saveSettings').click();
+  check(request?.action==='saveAllSettings'&&request.pages.windowSection&&JSON.stringify(request.pages.clipSection.popupShortcut)===JSON.stringify(fixed),'Cross-page conflict resolution not saved together');
+  window.receive({...data,ok:true,action:'saveAllSettings',requestID:request.requestID,config:request.pages.windowSection.config,popupShortcut:fixed,saveBatch:{ok:true,results:[{page:'windowSection',status:'saved'},{page:'clipSection',status:'saved'}]}});
+  check(!saveAllCoordinator.saving,'Successful cross-page save remained busy');
+  // A startup conflict is visible without pretending a binding was installed.
+  window.receive({...data,ok:true,action:'load',popupShortcut:false,popupShortcutDefault:fixed,popupShortcutError:t('剪贴板快捷键被系统占用或无法注册')});
+  check(!control.checked&&!document.getElementById('popupRuntimeError').hidden,'Startup conflict warning absent');
+  window.showSection('clipSection');if(window.capturePopupState)await window.capturePopupState('startup-error');
+  document.getElementById('clipImages').click();await tick();document.getElementById('saveSettings').click();
+  check(request.pages.clipSection.popupShortcut===false&&request.pages.clipSection.popupShortcutChanged===false,'Unrelated save converted an unavailable default into explicit off');
+  window.receive({...data,ok:true,action:'saveAllSettings',requestID:request.requestID,clipboard:{...data.clipboard,config:request.pages.clipSection.config},popupShortcut:false,popupShortcutError:t('剪贴板快捷键被系统占用或无法注册'),saveBatch:{ok:true,results:[{page:'clipSection',status:'saved'}]}});
+  check(!document.getElementById('popupRuntimeError').hidden&&!dirtyPages().length,'Unrelated save lost the default failure state or created a draft');
+  control.click();control.click();await tick();
+  check(!control.checked&&document.getElementById('popupShortcutChanged').value==='true'&&dirtyPages().length,'Explicit on/off intent from an unavailable default was lost');
+  document.getElementById('cancelSettings').click();await tick();
+  check(!control.checked&&document.getElementById('popupShortcutChanged').value==='false'&&!dirtyPages().length&&!document.getElementById('popupRuntimeError').hidden,'Cancel lost original unavailable default intent');
+  control.click();control.click();await tick();document.getElementById('saveSettings').click();
+  check(request.pages.clipSection.popupShortcut===false&&request.pages.clipSection.popupShortcutChanged===true,'Explicit off intent did not reach global save');
+  window.receive({...data,ok:false,action:'saveAllSettings',requestID:request.requestID,popupShortcut:false,popupShortcutError:t('剪贴板快捷键被系统占用或无法注册'),saveBatch:{ok:false,results:[{page:'clipSection',status:'failed',current:{config:data.clipboard.config,popupShortcut:false}}]}});
+  check(document.getElementById('popupShortcutChanged').value==='true'&&dirtyPages().length,'Failed global save erased explicit off intent');
+  document.getElementById('cancelSettings').click();await tick();
+  check(!document.getElementById('pauseClip')&&!document.getElementById('clipRecordingState')&&!document.querySelector('.clipboard-usage'),'Removed recording/help UI reappeared');
+  return 'Fixed/default/disabled/legacy shortcut, explicit migration, dirty/cancel, global-save failures, cross-page conflicts and startup feedback passed';
+ }finally{send=oldSend;window.receive({...data,ok:true,action:'load',message:'',popupShortcutError:''})}
+};

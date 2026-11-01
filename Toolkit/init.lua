@@ -15,6 +15,11 @@ local browser = require("modules.browser")
 local browserData=require("modules.browser_data")
 browser.start()
 clipboard.start()
+local previousShutdown=hs.shutdownCallback
+hs.shutdownCallback=function()
+    clipboard.stop()
+    if type(previousShutdown)=="function" then previousShutdown() end
+end
 local launcher=require("modules.launcher")
 local permissions=require("modules.permissions")
 local about=require("modules.about")
@@ -31,7 +36,7 @@ local function validateGeneral(value)
     end
     if value.sleepShortcut~=nil and type(value.sleepShortcut)~="boolean" then return nil,i18n.t("通用设置格式无效") end
     local language=value.language or "system"
-    if language~="system" and language~="zh-Hans" and language~="en" then return nil,i18n.t("语言设置无效") end
+    if language~="system" and language~="zh-Hans" and language~="en" and language~="zh-Hant" and language~="ja" then return nil,i18n.t("语言设置无效") end
     local order,seen={},{}
     if value.tabOrder~=nil then
         if type(value.tabOrder)~="table" then return nil,i18n.t("通用设置格式无效") end
@@ -85,6 +90,7 @@ _G.desktopToolkit = app
 local key = "desktoptoolkit.preferences.v1"
 app.config = preferences.validate(hs.settings.get(key)) or preferences.defaults()
 local popupKey = "desktoptoolkit.clipboard.shortcut.v1"
+local function defaultPopup() return {key="V",mods={"cmd","shift"}} end
 local function normalizePopup(value)
     local config, message = preferences.validate({enabled=false,shortcuts={left=value}})
     if not config then return nil, message end
@@ -114,7 +120,11 @@ local function popupConflicts(shortcut, config)
     end
     return false
 end
-app.popupShortcut = normalizePopup(hs.settings.get(popupKey))
+local storedPopup=hs.settings.get(popupKey)
+local usingDefaultPopup=storedPopup==nil
+local popupLoadError
+app.popupShortcut,popupLoadError=normalizePopup(usingDefaultPopup and defaultPopup() or storedPopup)
+if popupLoadError then app.popupShortcutError="快捷键格式无效" end
 local function installPopup(shortcut)
     if app.popupBinding then app.popupBinding:delete();app.popupBinding=nil end
     if not shortcut then return true end
@@ -141,8 +151,23 @@ function app.savePopup(value)
         end
     end
     app.popupShortcut=shortcut
-    if shortcut then hs.settings.set(popupKey,shortcut) else hs.settings.clear(popupKey) end
+    -- Missing means the enabled default; an explicit false remembers a user's off choice.
+    hs.settings.set(popupKey,shortcut or false)
+    app.popupShortcutError=nil
     return true, shortcut and i18n.t("剪贴板菜单快捷键已保存") or i18n.t("剪贴板菜单快捷键已解除")
+end
+local function capturePopupState()
+    return {shortcut=app.popupShortcut,value=hs.settings.get(popupKey),error=app.popupShortcutError}
+end
+local function restorePopupMetadata(saved)
+    if saved.value==nil then hs.settings.clear(popupKey) else hs.settings.set(popupKey,saved.value) end
+    app.popupShortcutError=saved.error
+end
+local function restorePopupState(saved)
+    local ran,ok,message=pcall(app.savePopup,saved.shortcut)
+    local persisted=pcall(restorePopupMetadata,saved)
+    if not ran or not persisted then return false,i18n.t("保存失败，请检查设置") end
+    return ok,message
 end
 function app.saveGeneralPage(value,autoLaunch)
     local config,message=validateGeneral(value)
@@ -155,16 +180,30 @@ function app.saveGeneralPage(value,autoLaunch)
     if not success and hs.autoLaunch()~=oldLogin and hs.autoLaunch(oldLogin)~=oldLogin then result=result..i18n.t("；登录项恢复失败，请检查系统设置") end
     return success,result
 end
-function app.saveClipboardPage(value,popupShortcut)
+function app.saveClipboardPage(value,popupShortcut,popupShortcutChanged)
     local config,message=clipboard.validate(value)
     if not config then return false,message end
-    local oldPopup=app.popupShortcut
-    local success,result=app.savePopup(popupShortcut)
-    if not success then return false,result end
-    success,result=clipboard.save(config)
+    if popupShortcutChanged~=nil and type(popupShortcutChanged)~="boolean" then return false,i18n.t("设置格式无效") end
+    local before=capturePopupState()
+    local popupApplied=false
+    local ran,success,result=pcall(function()
+        local installed,installMessage
+        if popupShortcutChanged==false then
+            -- A coordinated batch may have released the unchanged binding.
+            -- Restore only the runtime binding, without migrating its saved form.
+            installed=true
+            if app.popupShortcut and not app.popupBinding then installed,installMessage=installPopup(app.popupShortcut) end
+        else installed,installMessage=app.savePopup(popupShortcut) end
+        if not installed then return false,installMessage end
+        popupApplied=true
+        return clipboard.save(config)
+    end)
+    if not ran then success=false;result=i18n.t("保存失败，请检查设置") end
     if not success then
-        local restored,restoreMessage=app.savePopup(oldPopup)
-        if not restored then result=result.."; "..restoreMessage end
+        if popupApplied or not ran then
+            local restored,restoreMessage=restorePopupState(before)
+            if not restored then result=(result or i18n.t("保存失败，请检查设置")).."; "..restoreMessage end
+        end
     end
     return success,result
 end
@@ -211,7 +250,7 @@ local configuration=require("modules.configuration")
 local adapters={
     general={get=function() return app.general end,defaults=function() return {showMenu=true,appearance="system",language="system"} end,validate=validateGeneral,save=app.saveGeneral},
     windows={get=function() return app.config end,defaults=preferences.defaults,validate=preferences.validate,save=app.save},
-    popupShortcut={get=function() return app.popupShortcut or false end,defaults=function() return false end,validate=function(v) local item,message;if v~=false then item,message=normalizePopup(v) end;if message then return nil,message end;return item or false end,save=function(v) if v==false then return app.savePopup(nil) end;return app.savePopup(v) end},
+    popupShortcut={get=function() return app.popupShortcut or false end,defaults=defaultPopup,release=function() return app.savePopup(nil) end,validate=function(v) local item,message;if v~=false then item,message=normalizePopup(v) end;if message then return nil,message end;return item or false end,save=function(v) if v==false then return app.savePopup(nil) end;return app.savePopup(v) end},
 }
 for name,module in pairs({input=input,clipboard=clipboard,system=system,browser=browser,launcher=launcher}) do
     adapters[name]={get=function() return module.config end,defaults=module.defaults or function() return {enabled=false,rules={}} end,validate=module.validate,save=module.save}
@@ -221,8 +260,11 @@ app.configuration=configuration.new(adapters,{
     systemAssigned=function(item) return preferences.systemAssigned(item.mods,item.key) end,
     accessibility=permissions.isGranted,
     hasHistory=function() return #clipboard.entries>0 end,
-    capture=function() local result={};for name,k in pairs(configKeys) do result[name]={value=hs.settings.get(k)} end;return result end,
-    restore=function(saved) for name,k in pairs(configKeys) do if saved[name].value==nil then hs.settings.clear(k) else hs.settings.set(k,saved[name].value) end end end,
+    capture=function() local result={};for name,k in pairs(configKeys) do result[name]={value=hs.settings.get(k)} end;result.popupShortcut.error=app.popupShortcutError;return result end,
+    restore=function(saved) for name,k in pairs(configKeys) do if saved[name].value==nil then hs.settings.clear(k) else hs.settings.set(k,saved[name].value) end end;app.popupShortcutError=saved.popupShortcut.error end,
+    afterApply=function(selected,saved)
+        if not selected.popupShortcut and (selected.windows or selected.launcher) then restorePopupMetadata(saved.popupShortcut) end
+    end,
     available=function(config,selected)
         local function installed(id) return hs.application.pathForBundleID(id)~=nil end
         for _,name in ipairs({"launcher","input"}) do
@@ -256,19 +298,24 @@ pageAdapters.generalSection={get=function() return {config=app.general,autoLaunc
 pageAdapters.windowSection={get=function() return {config=app.config} end,
     validate=function(value) if type(value)~="table" then return nil,i18n.t("设置格式无效") end;local config,message=preferences.validate(value.config);if not config then return nil,message end;return {config=config} end,
     save=function(value) return app.save(value.config) end}
-pageAdapters.clipSection={get=function() return {config=clipboard.config,popupShortcut=app.popupShortcut or false} end,
+pageAdapters.clipSection={get=function() return {config=clipboard.config,popupShortcut=app.popupShortcut or false,popupShortcutChanged=false,_popupState=capturePopupState()} end,
     validate=function(value)
         if type(value)~="table" then return nil,i18n.t("设置格式无效") end
+        if value.popupShortcutChanged~=nil and type(value.popupShortcutChanged)~="boolean" then return nil,i18n.t("设置格式无效") end
         local config,message=clipboard.validate(value.config);if not config then return nil,message end
         local shortcut,errorMessage
-        if value.popupShortcut~=false then shortcut,errorMessage=normalizePopup(value.popupShortcut) end
+        if value.popupShortcutChanged==false then shortcut=app.popupShortcut
+        elseif value.popupShortcut~=false then shortcut,errorMessage=normalizePopup(value.popupShortcut) end
         if errorMessage then return nil,errorMessage end
-        return {config=config,popupShortcut=shortcut or false}
-    end,save=function(value) return app.saveClipboardPage(value.config,value.popupShortcut~=false and value.popupShortcut or nil) end,
+        return {config=config,popupShortcut=shortcut or false,popupShortcutChanged=value.popupShortcutChanged}
+    end,save=function(value) return app.saveClipboardPage(value.config,value.popupShortcut~=false and value.popupShortcut or nil,value.popupShortcutChanged) end,
     restore=function(value,attempted)
-        local popup=value.popupShortcut~=false and value.popupShortcut or nil
-        if not attempted then return app.savePopup(popup) end
-        return app.saveClipboardPage(value.config,popup)
+        local restored,message=restorePopupState(value._popupState)
+        if not attempted then return restored,message end
+        local ran,ok,result=pcall(clipboard.save,value.config)
+        if not restored then return false,message end
+        if not ran then return false,i18n.t("保存失败，请检查设置") end
+        return ok,result
     end}
 pageAdapters.inputSection=configPage(input,function(value)
     local available={};for _,source in ipairs(input.sources()) do available[source.id]=true end
@@ -370,7 +417,7 @@ end
 local function reply(ok, message, action, requestID, saveBatch)
     if action=="refreshApplications" or action=="refreshBrowserStatus" or action=="refreshPermissionsSilent" or action=="prepareBrowserData" or action==nil then appIcons.clear() end
     local permission=permissionState()
-    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.dictionary,general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),excludedAppNames=excludedAppNames(),appIcons=configuredAppIcons(),applicationStates=applicationStates(),popupShortcut=app.popupShortcut or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}) .. ")") end
+    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.translations(),general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),excludedAppNames=excludedAppNames(),appIcons=configuredAppIcons(),applicationStates=applicationStates(),popupShortcut=app.popupShortcut or false,popupShortcutDefault=defaultPopup(),popupShortcutError=app.popupShortcutError and i18n.t(app.popupShortcutError) or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}) .. ")") end
 end
 local function showSettingsWindow(view)
     hs.dockicon.show()
@@ -527,8 +574,7 @@ function app.openSettings(section, focus)
         if body.action == "saveBrowser" then local success, result = browser.save(body.config); reply(success, result, body.action) end
         if body.action == "saveSystem" then local success, result = system.save(body.config); reply(success, result, body.action) end
         if body.action == "saveInput" then local success, result = input.save(body.config); reply(success, result, body.action) end
-        if body.action == "saveClipboard" then local success,result=app.saveClipboardPage(body.config,body.popupShortcut);reply(success,result,body.action) end
-        if body.action == "pauseClipboard" then local success, result = clipboard.pause(); reply(success, result, body.action) end
+        if body.action == "saveClipboard" then local success,result=app.saveClipboardPage(body.config,body.popupShortcut,body.popupShortcutChanged);reply(success,result,body.action) end
         if body.action == "refreshClipboard" then reply(true, "", body.action) end
         if body.action == "previewClipboard" then
             local value, result = clipboard.preview(body.id)
@@ -580,11 +626,33 @@ clipboard.startMenu(function(mode)
     local id=mode=="settings" and "clipEnabled" or "clipSearch"
     app.openSettings("clipSection",id)
 end)
-if popupConflicts(app.popupShortcut, app.config) then
+-- A newly introduced default must not take a shortcut from an existing app rule.
+local defaultLauncherConflict=false
+if usingDefaultPopup and app.popupShortcut then
+    local savedLauncher=launcher.validate(hs.settings.get("desktoptoolkit.launcher.v1"))
+    for _,rule in ipairs(savedLauncher and savedLauncher.rules or {}) do
+        if sameShortcut(app.popupShortcut,rule.shortcut) then defaultLauncherConflict=true;break end
+    end
+end
+if defaultLauncherConflict then
+    app.popupShortcutError="快捷键与应用启动配置重复"
+    app.popupShortcut=nil
+    hs.alert.show(i18n.t(app.popupShortcutError))
+elseif popupConflicts(app.popupShortcut, app.config) then
+    if usingDefaultPopup then
+        app.popupShortcutError="剪贴板菜单快捷键与窗口配置冲突，未启用菜单绑定"
+        app.popupShortcut=nil
+    end
     hs.alert.show(i18n.t("剪贴板菜单快捷键与窗口配置冲突，未启用菜单绑定"))
 else
     local installed, errorMessage = installPopup(app.popupShortcut)
-    if not installed then hs.alert.show(errorMessage) end
+    if not installed then
+        if usingDefaultPopup then
+            app.popupShortcutError="剪贴板快捷键被系统占用或无法注册"
+            app.popupShortcut=nil
+        end
+        hs.alert.show(errorMessage)
+    elseif popupLoadError then hs.alert.show(i18n.t(app.popupShortcutError)) end
 end
 launcher.start(function(shortcut) if batchCandidates then return batchShortcutConflicts(shortcut,"launcherSection") end;return sleep.conflicts(shortcut) or sameShortcut(shortcut,app.popupShortcut) or (shortcut and popupConflicts(shortcut,app.config)) end)
 system.start(function() app.openSettings("systemSection") end)

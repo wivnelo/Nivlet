@@ -110,7 +110,9 @@ function M.new(adapters,environment)
             local general=copy(adapters.general.get())
             if general.sleepShortcut then general.sleepShortcut=false;local ok,result=adapters.general.save(general);if not ok then error(result) end end
             for _,name in ipairs({"launcher","windows","popupShortcut"}) do
-                local ok,result=adapters[name].save(adapters[name].defaults())
+                local ok,result
+                if adapters[name].release then ok,result=adapters[name].release()
+                else ok,result=adapters[name].save(adapters[name].defaults()) end
                 if not ok then error(result) end
             end
         end
@@ -121,6 +123,7 @@ function M.new(adapters,environment)
                     local ok,result=adapters[name].save(config[name]);if not ok then error(result) end
                 end
             end
+            if environment.afterApply then environment.afterApply(selected,stored) end
         end
         local ok,result=pcall(apply,plan.modules,plan.selected)
         if ok then return true,i18n.t("配置已导入"),plan.selected end

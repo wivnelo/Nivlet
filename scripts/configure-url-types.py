@@ -15,7 +15,7 @@ info['CFBundleShortVersionString'] = version
 info['CFBundleVersion'] = build
 # Frameworks such as Sparkle choose their localization from the host's
 # supported languages, even though our settings UI is localized in Lua/HTML.
-info['CFBundleLocalizations'] = ['en', 'zh-Hans']
+info['CFBundleLocalizations'] = ['en', 'zh-Hans', 'zh-Hant', 'ja']
 info['SUFeedURL'] = 'https://wivnelo.github.io/Nivlet/appcast.xml'
 info['SUPublicEDKey'] = 'BZOLe5gdPobi3DhB5l13XFopkGgkPP/V6I/kzY3YXKg='
 info['SUEnableAutomaticChecks'] = False

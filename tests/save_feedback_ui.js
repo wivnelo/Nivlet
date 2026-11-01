@@ -45,7 +45,7 @@ window.runSaveFeedbackRegression=function(data){
   check(document.querySelectorAll('#browserRules [aria-invalid=true]').length===2&&status.textContent===t('域名重复，请修改红框中的设置。'),'Domain conflict not in footer');
   window.showSection('clipSection');window.receive({...data,ok:false,action:'saveClipboard',message:t('排除应用须填写有效 Bundle ID')});
   check(status.textContent===t('排除应用须填写有效 Bundle ID')&&document.getElementById('clipExcluded').closest('details').open,'Clipboard error missing in footer');
-  window.receive({...data,ok:true,action:'refreshPermissionsSilent',language:'en'});window.showSection('browserSection');check(status.textContent==='Duplicate domain. Update the fields marked in red.','Footer translation missing');
+  window.receive({...data,ok:true,action:'refreshPermissionsSilent',language:'en',translations:data.testTranslations.en});window.showSection('browserSection');check(status.textContent==='Duplicate domain. Update the fields marked in red.','Footer translation missing');
   return 'Footer-only errors, four conflict red fields, modifiers, mixed errors, domain duplicates, save blocking, page-local backend errors, drafts and translations passed';
  }finally{clearStatus();window.setTimeout=oldTimeout;window.clearTimeout=oldClear;send=oldSend;window.receive({...data,ok:true,action:'load',message:''})}
 };

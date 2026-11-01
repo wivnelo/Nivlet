@@ -40,7 +40,7 @@ Nivlet is a free, open-source macOS menu bar utility that brings everyday deskto
 <details>
 <summary>View all 8 screenshots</summary>
 
-English interface, rendered from the settings UI with synthetic demonstration data. Clipboard text, network addresses, app rules, shortcuts and permission states are examples, not default settings or live system readings. Click an image to enlarge it.
+Historical interface screenshots, rendered from the settings UI with synthetic demonstration data; they do not show the new 1.0.9 sidebar. Clipboard text, network addresses, app rules, shortcuts and permission states are examples, not default settings or live system readings. Click an image to enlarge it.
 
 <table>
 <tr>
@@ -72,30 +72,32 @@ English interface, rendered from the settings UI with synthetic demonstration da
 
 | Feature | Highlights |
 | --- | --- |
-| **Clipboard history** | Keep text and images with search, thumbnails, larger previews and Option-click paste; pause recording, exclude apps and choose retention limits |
+| **Clipboard history** | Keep text and images with search, thumbnails, larger previews and Option-click paste; turn recording on or off, exclude apps and choose retention limits |
 | **Window management** | 29 actions for halves, quarters, thirds, a 3×3 grid, centering, resizing, display moves and restore |
 | **App shortcuts** | Launch apps or bring them forward; replace apps, drag to reorder and check shortcut conflicts |
 | **Browser routing** | Choose the browser for a link based on its domain or source app |
 | **Input sources** | Assign an input source to an app and switch automatically when you activate it |
 | **System information** | See network speed in the menu bar and choose CPU, memory, disk, network addresses and dates to display |
-| **Personalization & migration** | Chinese and English, light and dark appearances, tab ordering and JSON configuration import/export |
+| **Personalization & migration** | Simplified/Traditional Chinese, English and Japanese in 1.0.9; light and dark appearances, sidebar ordering and JSON configuration import/export |
 
 ## Get started
 
 1. Download **either the DMG or ZIP** from [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/latest).
 2. Move `Nivlet.app` to Applications and open it.
 3. Click the menu bar **N icon → Settings…**, enable your tools and configure their rules.
-4. Click **Save Settings** in the bottom-right corner. Switching tabs keeps drafts; a small orange dot below a tab marks unsaved pages.
+4. In 1.0.9, click **Save All Settings** in the bottom-right corner to save every changed page. Switching sidebar sections keeps drafts; an orange dot marks each unsaved page. **Cancel Page Changes** affects only the current page.
 
 Features are opt-in, and shortcuts are yours to configure. Window management and Option-click paste require **Accessibility permission**. Browser routing requires choosing **Nivlet as your default browser**.
 
-## Signed and notarized for macOS
+## Release and architecture support
 
-**v1.0.8 / Build 55 uses Apple Developer ID signing and has passed Apple notarization.** Both Apple Silicon (arm64) and Intel (x86_64) apps and DMGs include stapled notarization tickets. macOS 13.0+ is required.
+**1.0.9 / Build 56 is being prepared for Apple Silicon (arm64), macOS 13.0+.** Its final build, signing, notarization and acceptance checks must pass before publication. See the [candidate release notes](documentation/RELEASE-v1.0.9.md).
 
-Download the matching DMG or ZIP from [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8), move `Nivlet.app` to Applications and launch that copy. No separate Hammerspoon installation is needed.
+**[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) is the final Intel (x86_64) release.** Its existing signed and notarized downloads remain available. New releases will no longer build or support Intel; no Intel hardware validation is claimed for 1.0.9. Until the candidate is published, v1.0.8 remains the latest official release.
 
-Signing and notarization do not replace **Accessibility permission**. Moving from an older ad-hoc build may require reauthorization; permission carryover between two Developer ID releases has not yet been verified. Return to General or click **Recheck** after granting access. Do not disable Gatekeeper. If macOS reports malware, damage or a checksum mismatch, stop and report the exact message.
+Download a published DMG or ZIP from [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/latest), move `Nivlet.app` to Applications and launch that copy. No separate Hammerspoon installation is needed.
+
+Signing and notarization do not replace **Accessibility permission**. Moving from an older ad-hoc build may require reauthorization; permission carryover depends on the tested release and system. Return to General or click **Recheck** after granting access. Do not disable Gatekeeper. If macOS reports malware, damage or a checksum mismatch, stop and report the exact message.
 
 See the [installation, upgrade and removal guide](documentation/INSTALLATION.en.md). About → Check for Updates remains manual; confirm before installation.
 
@@ -103,7 +105,7 @@ See the [installation, upgrade and removal guide](documentation/INSTALLATION.en.
 
 No account required. Settings, clipboard contents and system information are processed locally without being uploaded to a server. Core desktop tools work offline; opening websites and external links uses the network.
 
-Clipboard history is cleared on exit by default. Optional persistence uses a **local plaintext cache**; pause recording before copying sensitive content. Clearing history also clears the current system clipboard, with a confirmation prompt.
+Clipboard history is cleared on exit by default. Optional persistence uses a **local plaintext cache**; turn off recording and save before copying sensitive content. Turning recording off keeps existing history subject to its original retention limits. Clearing history also clears the current system clipboard, with a confirmation prompt.
 
 Check for signed updates in About, then confirm to download, install and restart. Checking for updates uses the network.
 
@@ -119,4 +121,4 @@ Report problems or suggestions through [GitHub Issues](https://github.com/wivnel
 
 Nivlet uses the [MIT License](LICENSE). Its embedded Runtime is based on [Hammerspoon](https://github.com/Hammerspoon/hammerspoon). Third-party components retain their own licenses; see [third-party notices](THIRD-PARTY-NOTICES.md).
 
-1.0.8 fixes rule saving for apps with dotless Bundle IDs, including FinalShell, and retains Developer ID signing and Apple notarization. Build 55 adds security hardening: Shortcuts and AppleScript can no longer run Lua code in Nivlet. It also fixes links to localhost, single-label hosts and IPv6 addresses failing to open. See [release notes](documentation/RELEASE-v1.0.8.md).
+The 1.0.9 candidate unifies all eight settings pages with a sidebar, adds local `.html`/`.htm` routing and saves drafts across pages together. Clipboard recording uses one enable switch; its menu shortcut uses an enable switch for ⌘⇧V, while existing custom shortcuts are preserved until that switch is changed and saved. Image previews close when clicking outside the image or pressing Escape. Existing HTTP/HTTPS routing remains in scope; see [detailed changes, migration rules and validation gates](documentation/RELEASE-v1.0.9.md).

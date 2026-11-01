@@ -1,6 +1,6 @@
 package.path='Toolkit/?.lua;'..package.path
 local canvases,deleted={},0
-hs={settings={get=function() end},timer={secondsSinceEpoch=function() return 1000 end},application={frontmostApplication=function() return nil end},
+hs={settings={get=function() end},timer={secondsSinceEpoch=function() return 1000 end,doAfter=function() return {stop=function() end} end},application={frontmostApplication=function() return nil end},
  drawing={getTextDrawingSize=function(text,style) assert(style.size==14);return {w=utf8.len(text)*14} end},
  canvas={new=function(frame)
   assert(frame.w>0 and frame.w<=360 and frame.h>0 and frame.h<=260)

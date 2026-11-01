@@ -12,6 +12,17 @@
      }
  
      // Split the URL into its components
+@@ -136,6 +137,10 @@
+         NSString *key = [[bits objectAtIndex:0] stringByRemovingPercentEncoding];
+         NSString *value = [[bits objectAtIndex:1] stringByRemovingPercentEncoding];
+ 
++        // Invalid UTF-8 escapes can decode to nil. Keep the full URL intact and
++        // omit only the undecodable entry from this auxiliary query dictionary.
++        if (!key || !value) { continue; }
++
+         [pairs setObject:value forKey:key];
+     }
+ 
 --- a/Hammerspoon/MJAppDelegate.m
 +++ b/Hammerspoon/MJAppDelegate.m
 @@ -102,6 +102,10 @@

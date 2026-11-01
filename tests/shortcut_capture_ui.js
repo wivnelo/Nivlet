@@ -15,9 +15,9 @@ window.runShortcutCaptureRegression=async function(data){
   await press(other,'Delete');check(other.value===''&&!input.hasAttribute('aria-invalid'),'Clear did not immediately remove conflict');
   document.getElementById('cancelSettings').click();await Promise.resolve();
   check(document.getElementById('tab-windowSection').dataset.dirty==='false','Cancel did not restore draft');
-  window.showSection('clipSection');const popup=document.getElementById('popup-key');await press(popup,'ArrowLeft',{metaKey:true,shiftKey:true});
-  check(popup.title==='⌘ ⇧ ←','Special key combination display missing');
-  check(!document.getElementById('saveSettings').disabled,'Popup capture did not mark draft');
+  window.showSection('clipSection');const popup=document.getElementById('popupEnabled');popup.click();await Promise.resolve();
+  check(!popup.checked&&!document.getElementById('popup-key')&&document.getElementById('popupShortcutValue').textContent==='⌘⇧V','Popup must be a fixed shortcut toggle');
+  check(!document.getElementById('saveSettings').disabled,'Popup toggle did not mark draft');
   document.getElementById('cancelSettings').click();await Promise.resolve();
   window.showSection('launcherSection');addLauncherRule({bundleID:'com.example.a07',name:'A07 Synthetic App',shortcut:{key:'',mods:[]}});await Promise.resolve();
   const launcher=document.querySelector('#launcherRules .launcher-rule:last-child .launcher-key');await press(launcher,'Enter',{ctrlKey:true});

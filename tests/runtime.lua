@@ -1,7 +1,9 @@
 package.path = "Toolkit/?.lua;" .. package.path
 local stored, callbacks = {}, {}
+local inheritedShutdownCalls=0
 local function menu() return setmetatable({}, {__index=function() return function(self) return self end end}) end
 hs = {
+    shutdownCallback=function() inheritedShutdownCalls=inheritedShutdownCalls+1 end,
     image={imageFromName=function() return menu() end,imageFromPath=function() return menu() end},autoLaunch=function() return false end,
     processInfo={bundleID="dev.local.DesktopToolkit",bundlePath="."}, configdir="/isolated/toolkit",
     settings={bundleID="dev.local.DesktopToolkit",clear=function(k) stored[k]=nil end,get=function(k) return stored[k] end,set=function(k,v) stored[k]=v end},
@@ -175,3 +177,12 @@ assert(not desktopToolkit.saveClipboardPage({}, {key="W",mods={"ctrl"}}))
 assert(desktopToolkit.popupShortcut.key=="Q" and callbacks.Q and not callbacks.W)
 clip.save,clip.validate=oldSave,oldValidate
 print("Sleep cross-module and import conflicts, owner transfer, General login rollback and combined clipboard save rollback passed")
+
+local oldStop,stopCalls=clip.stop,0
+clip.stop=function() stopCalls=stopCalls+1;oldStop() end
+hs.shutdownCallback()
+assert(stopCalls==1 and inheritedShutdownCalls==1 and clip.stopped)
+assert(not clip.timer and not clip.expiryTimer)
+clip.stop=oldStop
+clip.configure(clip.config) -- Leave this shared fixture usable by downstream runtime regressions.
+print("Application shutdown stops clipboard timers and preserves the prior shutdown callback")

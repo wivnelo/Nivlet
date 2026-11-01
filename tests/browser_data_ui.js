@@ -21,8 +21,8 @@ window.runBrowserDataRegression=function(data){
  window.receive({...data,action:'openBrowserData',ok:false,message:'Failure'});check(pageSnapshot('browserSection')===draft&&!browserDataButton.disabled,'Failure erased draft');
  browserDataButton.click();window.receive({...data,action:'prepareBrowserData',requestID:requests.at(-1).requestID,ok:true});browserDataMenu.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));check(browserDataMenu.hidden,'Escape closes chooser');
  window.receive({...data,action:'refreshBrowserStatus',browsers:[]});check(browserDataButton.disabled&&browserDataMenu.hidden,'No supported browser');
- data.language='en';window.receive(data);check(browserDataButton.textContent==='Clear Browsing Data…','English action');
- data.language='zh-Hans';data.general.appearance='light';window.receive(data);check(browserDataButton.textContent==='清除浏览数据…','Chinese action');
+ data.language='en';data.translations=data.testTranslations.en;window.receive(data);check(browserDataButton.textContent==='Clear Browsing Data…','English action');
+ data.language='zh-Hans';data.translations=data.testTranslations['zh-Hans'];data.general.appearance='light';window.receive(data);check(browserDataButton.textContent==='清除浏览数据…','Chinese action');
  data.general.appearance='dark';window.receive(data);
  check(getComputedStyle(document.getElementById('refreshBrowserStatus')).borderTopColor==='rgba(0, 0, 0, 0)','Original refresh style');
  browserDataButton.click();window.receive({...data,action:'prepareBrowserData',requestID:requests.at(-1).requestID,ok:true,message:''});

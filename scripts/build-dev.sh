@@ -3,7 +3,7 @@ set -eu
 project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 configuration=${NIVLET_BUILD_CONFIGURATION:-Debug}
 architecture=${NIVLET_ARCH:-arm64}
-case "$architecture" in arm64|x86_64) ;; *) echo "Unsupported architecture: $architecture" >&2; exit 1 ;; esac
+case "$architecture" in arm64) ;; *) echo "New Nivlet builds require Apple Silicon (arm64); 1.0.8 Build 55 is the final Intel release." >&2; exit 1 ;; esac
 derived_data=${NIVLET_DERIVED_DATA_PATH:-"$project_dir/build/DerivedData"}
 case "$configuration" in Debug|Release) ;; *) echo "Unsupported build configuration: $configuration" >&2; exit 1 ;; esac
 sh "$project_dir/scripts/preflight.sh"
@@ -30,8 +30,12 @@ sh "$project_dir/scripts/prepare-updater.sh" "$app_path"
 python3 "$project_dir/scripts/collect-notices.py" "$app_path/Contents/Resources/Toolkit/THIRD-PARTY-NOTICES.md"
 xcrun clang -fobjc-arc -Wall -Wextra -Werror -arch "$architecture" -mmacosx-version-min=13.0 -framework Foundation "$project_dir/Native/system_probe.m" -o "$app_path/Contents/Resources/Toolkit/system-probe"
 python3 "$project_dir/scripts/optimize-app.py" "$app_path" "$configuration" "$architecture"
+if [ "$configuration" = Release ]; then
+    python3 "$project_dir/scripts/trim-distribution.py" "$app_path"
+fi
 # Ad-hoc signing is only for this local probe, not a distribution signature.
 python3 "$project_dir/scripts/configure-url-types.py" "$app_path/Contents/Info.plist"
+python3 "$project_dir/scripts/localize-native-menu.py" "$app_path"
 if [ "$configuration" = Release ]; then
     python3 "$project_dir/scripts/check-privacy.py" --app "$app_path"
 fi

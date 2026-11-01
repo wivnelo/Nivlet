@@ -10,7 +10,7 @@ hs={hash={SHA256=function(value) return value end},configdir=directory,settings=
  fs={mkdir=function(path) os.execute('mkdir -p '..path);return true end,symlinkAttributes=function(path) local f=io.open(path,'rb');if f then local size=f:seek('end');f:close();return {mode=path:match('%.png$') and 'file' or 'directory',size=size or 0} end end},
  image={imageFromPath=function() return imageMock end},accessibilityState=function() return true end,alert={show=function(m) error(m) end},
  application={frontmostApplication=function() return {bundleID=function() return 'org.test.app' end,isRunning=function() return true end} end},
- eventtap={keyStroke=function() keys=keys+1 end},timer={secondsSinceEpoch=function() return now end,doEvery=function() return {stop=function() end} end,doAfter=function(_,fn) fn() end},
+ eventtap={keyStroke=function() keys=keys+1 end},timer={secondsSinceEpoch=function() return now end,doEvery=function() return {stop=function() end} end,doAfter=function(delay,fn) if delay==0.15 then fn() end;return {stop=function() end} end},
  pasteboard={changeCount=function() return count end,contentTypes=function() return {'public.png'} end,readImage=function() return image end,getContents=function() return nil end,writeObjects=function(v) assert(v==imageMock);writes=writes+1;count=count+1;return true end}}
 hs.canvas={new=function() return {imageFromCanvas=function() return {} end,delete=function() end} end}
 local c=require('modules.clipboard');c.start();local cfg=c.defaults();cfg.enabled=true;cfg.persistent=true;assert(c.save(cfg))
@@ -31,6 +31,6 @@ image=imageMock;count=count+1;c.poll();local kept=c.entries[1].path
 cfg.enabled=false;assert(c.save(cfg));assert(#c.entries==1 and not c.timer and io.open(kept,'rb'))
 table.insert(c.entries,{id=999,time=now,kind='text',text='retained while disabled'});assert(c.persist())
 c.entries={};c.start();assert(not c.config.enabled and not c.timer and #c.entries==2 and c.preview(c.entries[1].id));assert(c.entries[2].text=='retained while disabled')
-assert(c.copy(c.entries[1].id));assert(not c.pause())
+assert(c.copy(c.entries[1].id));assert(c.pause==nil)
 c.clear();assert(#stored['desktoptoolkit.clipboard.history.v1']==0 and not io.open(kept,'rb'))
 print('Image cap, thumbnail snapshot, cache reload/expiry and Option paste permission guard passed')

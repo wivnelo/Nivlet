@@ -25,7 +25,7 @@ window.runWindowsRegression=function(data){
         check(Object.keys(captured.config.shortcuts).length===29,'Save omitted hidden groups');
         check(captured.config.shortcuts.left.key==='Z'&&captured.config.shortcuts.grid9.key==='↓','Draft lost across groups');
         check(captured.config.shortcuts.grid9.mods.join('+')==='ctrl+alt','Grid modifiers not captured');
-        window.receive({...data,ok:true,action:'refreshClipboard',language:'en'});
+        window.receive({...data,ok:true,action:'refreshClipboard',language:'en',translations:data.testTranslations.en});
         check(group.options[0].textContent==='Basic Layouts'&&group.options[3].textContent==='Nine-cell Grid','Group options not translated');
         check(grid.getAttribute('aria-label')==='Grid 9 key','Grid accessibility label not translated');
         check(left.value==='Z','Translation discarded window draft');

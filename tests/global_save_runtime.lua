@@ -210,7 +210,7 @@ resetLog()
 result=app.saveAllSettings({windowSection=page(window('M')),clipSection={config=copy(clip.config),popupShortcut=false}})
 assert(result.ok,result.message)
 assert(app.popupShortcut==nil and app.popupBinding==nil and occupied['ctrl+M']==app.bindings[1])
-assert(hs.settings.get(popupSettingsKey)==nil)
+assert(hs.settings.get(popupSettingsKey)==false)
 onlyWrites({[windowKey]=true,[clipSettingsKey]=true,[popupSettingsKey]=true,[historySettingsKey]=true})
 
 -- Exercise the real system module's write-before-menu-update path. The runtime

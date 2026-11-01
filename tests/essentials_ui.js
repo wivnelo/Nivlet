@@ -2,7 +2,7 @@ window.runEssentialsRegression=function(data){
  const oldSend=send,originalSection=document.querySelector('[role=tab][aria-selected=true]').getAttribute('aria-controls'),flag=document.getElementById('system-cpu'),draft=flag.checked;
  const check=(v,m)=>{if(!v)throw new Error(m)};
  try{
-  for(const input of document.querySelectorAll('label>input[type=checkbox]'))check(parseFloat(getComputedStyle(input.parentElement).gap)===6,'Checkbox label gap: '+(input.id||input.dataset.mod));
+  for(const input of document.querySelectorAll('label>input[type=checkbox]')){const expected=input.closest('#rows')&&matchMedia('(max-width:850px)').matches?4:6;check(parseFloat(getComputedStyle(input.parentElement).gap)===expected,'Checkbox label gap: '+(input.id||input.dataset.mod));}
   check(document.getElementById('chooseExcludedApp').closest('summary'),'Excluded application action belongs in heading');
   let captured;send=body=>captured=body;
   flag.checked=!draft;
@@ -35,7 +35,7 @@ window.runEssentialsRegression=function(data){
   firstLink.click();check(captured.action==='openProjectLink'&&captured.link==='website','Website link bypasses opener');
   document.querySelector('#aboutSection a[href="https://github.com/wivnelo/Nivlet"]').click();check(captured.action==='openProjectLink'&&captured.link==='project','External link bypasses opener');
   check(document.querySelectorAll('#tab-aboutSection').length===1,'About tab missing or duplicated');
-  window.receive({...data,language:'en',action:'refreshPermissions',permissions:{accessibility:'error'},about:{version:'1.2.3',build:'4',license:'<script>unsafe</script>',notices:'Fixture'}});
+  window.receive({...data,language:'en',translations:data.testTranslations.en,action:'refreshPermissions',permissions:{accessibility:'error'},about:{version:'1.2.3',build:'4',license:'<script>unsafe</script>',notices:'Fixture'}});
   check(document.getElementById('tab-aboutSection').textContent==='About','About English missing');
   check(document.querySelector('.privacy-card h3').textContent==='Local and Private','Privacy English missing');
   check(document.getElementById('aboutVersion').textContent.includes('1.2.3'),'Actual version missing');check(document.getElementById('checkUpdates').parentElement===document.getElementById('aboutVersion').parentElement,'Update action separated from version');check(!document.querySelector('.about-update'),'Empty update section remains');check(document.getElementById('licenseText').textContent==='<script>unsafe</script>'&&!document.querySelector('#licenseText script'),'Notices interpreted as HTML');

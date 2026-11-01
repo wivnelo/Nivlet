@@ -19,7 +19,7 @@ window.runConfigurationRegression=function(data){
         check(key.value==='Z','Partial import discarded unrelated draft');
         check(document.getElementById('appearance').value==='dark','Imported general settings not rendered');
         window.previewConfiguration(null);check(document.getElementById('configurationPreview').hidden,'Cancel left preview visible');
-        window.receive({...data,ok:true,language:'en',action:'refreshClipboard'});
+        window.receive({...data,ok:true,language:'en',translations:data.testTranslations.en,action:'refreshClipboard'});
         check(document.getElementById('exportConfiguration').textContent==='Export configuration…','Export label untranslated');
         return 'Configuration actions, safe JSON preview, cancel, selective refresh and English labels passed';
     }finally{

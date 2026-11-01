@@ -1,16 +1,16 @@
 # 安装、升级与卸载
 
-适用版本：v1.0.8 / Build 55，GitHub 正式发行版，已使用 Developer ID 签名并通过 Apple 公证。
+适用候选：**1.0.9 / Build 56，尚未发布**。最终构建、签名、公证与验收通过后才提供下载；当前正式版仍为 [1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8)。
 
 ## 系统要求
 
 - macOS 13.0 或更高版本。
-- **支持 Apple Silicon（arm64）与 Intel（x86_64），请按芯片下载对应安装包。** 可在“关于本机”查看芯片类型。
-- 当前正式版为 v1.0.8 / Build 55，分别提供 arm64 和 x86_64 安装包。
+- **1.0.9 起仅支持 Apple Silicon（arm64）**，可在“关于本机”查看芯片类型。
+- **1.0.8 / Build 55 是最后 Intel（x86_64）版本**，历史下载保留。后续不再构建、发布或支持 Intel；本次没有 Intel 真机验收。
 
 ## 首次安装
 
-1. 从 [GitHub Release](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 下载 DMG 或 ZIP，任选一种；不要运行多个副本。
+1. 从 [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/latest) 下载已发布的 DMG 或 ZIP；Intel 用户使用 [最后的 1.0.8 Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8)。不要运行多个副本。
 2. DMG 打开后将 Nivlet.app 拖入 Applications；ZIP 解压后将 App 放入 Applications。
 3. 从 Applications 打开，使用菜单栏 N 图标进入设置。无需另外安装 Hammerspoon。
 4. 先按需要配置并保存；窗口管理、Option 直接粘贴和打开浏览器清除窗口需要辅助功能权限。
@@ -18,7 +18,7 @@
 
 ### 签名、公证与系统提示
 
-当前 ARM / Intel App 与 DMG 均使用 Apple Developer ID 正式签名，通过 Apple 公证并附加票据。首次打开可能仍显示系统下载确认提示。公证不等于 App Store 上架，也不代替辅助功能授权。
+已发布的 1.0.8 ARM / Intel App 与 DMG 使用 Apple Developer ID 正式签名、Apple 公证与附加票据；1.0.9 arm64 候选仍须完成同样的最终门槛。首次打开可能仍显示系统下载确认提示。公证不等于 App Store 上架，也不代替辅助功能授权。
 
 无需全局关闭 Gatekeeper，也无需运行解除隔离命令。若出现“无法验证开发者”、应用损坏或恶意软件警告，请先核对版本、下载来源与 SHA-256，并通过 Issue 提供完整提示；不要按旧版未签名安装方法绕过。受管理设备还可能有组织限制。
 
@@ -26,16 +26,16 @@
 
 首次使用窗口管理、Option 直接粘贴或浏览器清除窗口时，在通用页点击“打开辅助功能设置”，允许 `/Applications/Nivlet.app`。回到 App 自动检测，也可以点击“重新检测”。检测会核实实际跨应用访问，处理系统返回值过期造成的误报。
 
-从旧 ad-hoc 版迁移到正式签名版时可能需要重新授权一次。若旧条目确实失效，可移除权限列表中的旧 Nivlet，再用“+”添加 `/Applications/Nivlet.app` 并开启。只移除权限条目，不删除 App 或用户数据。两个 Developer ID 正式版之间的权限延续尚未验证；不保证任何系统和手动权限操作均无需重新授权或重开。不要选择测试或备份副本。
+从旧 ad-hoc 版迁移到正式签名版时可能需要重新授权一次。若旧条目确实失效，可移除权限列表中的旧 Nivlet，再用“+”添加 `/Applications/Nivlet.app` 并开启。只移除权限条目，不删除 App 或用户数据。权限延续以对应版本的实际验收为准；不保证任何系统和手动权限操作均无需重新授权或重开。不要选择测试或备份副本。
 
 `/Applications` 的 App 可由多个 macOS 用户共享，而用户配置与历史各自独立。提示 App 完全一致时无需重复覆盖；同机新用户测试不代表新硬件兼容性通过。
 
 ## 校验下载
 
-把 ZIP、DMG 及同版本的 .sha256 文件放在同一文件夹，在该文件夹运行：
+正式发布后，把 ZIP、DMG 及同版本的 .sha256 文件放在同一文件夹，在该文件夹运行（候选尚未提供正式附件）：
 
 ```sh
-shasum -a 256 -c Nivlet-1.0.8-build55-arm64.sha256
+shasum -a 256 -c Nivlet-1.0.9-build56-arm64.sha256
 ```
 
 两个安装包都在时应各显示 OK；缺少其中一个会报该文件不存在，不代表另一个损坏。校验文件检测传输一致性，不替代 Apple 签名公证。
@@ -61,9 +61,9 @@ shasum -a 256 -c Nivlet-1.0.8-build55-arm64.sha256
 
 ## 已知限制与反馈
 
-- 当前正式包已完成 Developer ID 签名与 Apple 公证；签名、公证和辅助功能授权是不同机制。
+- 1.0.9 的签名、公证及本机测试状态见对应最终验收记录，不能引用旧包通过结果；签名、公证和辅助功能授权是不同机制。
 - 同机新用户配置使用已由用户反馈暂无明显重大问题；登录启动按反馈转观察，暂不继续排查。
-- 关于页已接入官网和手动更新通道；捐赠尚未接入。当前公开下载为 1.0.8 / Build 55，更新通道按架构提供 arm64 或 x86_64 包。
+- 关于页已接入官网和手动更新通道；捐赠尚未接入。当前公开下载仍为 1.0.8 / Build 55；1.0.9 起更新通道仅提供明确限制为 arm64 的新包，Intel 不再获得新版本。
 - 报告问题请提供应用版本/Build、macOS、芯片、操作步骤与提示；不要上传敏感剪贴板内容、完整私人配置或凭据。
 
 现有模块使用方式见 [README](../README.md)，当前验证状态见 [BASELINE](../BASELINE.md)，工程验收见 [DISTRIBUTION](DISTRIBUTION.md)。
@@ -71,4 +71,4 @@ shasum -a 256 -c Nivlet-1.0.8-build55-arm64.sha256
 ## 应用内更新
 
 
-关于页手动检查更新，按芯片提供对应包。更新包保留 Sparkle Ed25519 完整性校验，App 使用 Developer ID 签名并经过 Apple 公证；三者用途不同。确认后安装并重启，先处理未保存草稿；安装权限不足时按系统提示操作，无需关闭安全机制。
+关于页手动检查更新；1.0.9 起仅向 Apple Silicon 提供新包，Intel 保留最后的 1.0.8 Build 55。更新包保留 Sparkle Ed25519 完整性校验，App 使用 Developer ID 签名并经过 Apple 公证；三者用途不同。确认后安装并重启，先处理未保存草稿；安装权限不足时按系统提示操作，无需关闭安全机制。

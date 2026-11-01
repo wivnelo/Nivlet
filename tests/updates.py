@@ -2,6 +2,7 @@
 from pathlib import Path
 import argparse
 import hashlib
+import importlib.util
 import os
 import plistlib
 import subprocess
@@ -22,26 +23,32 @@ version = (root / 'VERSION').read_text().strip()
 dist = root / (args.dist or Path(f'build/release-{version}-build{args.build}/dist'))
 ns = {'s': 'http://www.andymatuschak.org/xml-namespaces/sparkle'}
 items = ET.parse(root / args.appcast).findall('./channel/item')
-assert len(items) == 2, 'Both architecture updates are required'
+assert len(items) == 1, 'Only the Apple Silicon update is supported'
 assert items[0].find('s:hardwareRequirements', ns).text == 'arm64'
-assert items[1].find('s:hardwareRequirements', ns) is None, 'Intel is the fallback, not an unsupported hardware token'
 versions = [(item.find('s:version', ns).text, item.find('s:shortVersionString', ns).text) for item in items]
-assert versions[0] == versions[1], 'Architecture versions must match'
 for build, short_version in versions:
     assert short_version == version, 'Feed shortVersionString must match VERSION'
     assert build == args.build, 'Feed sparkle:version must match the requested build'
-# Sparkle 2.10 filters ARM requirements, then keeps the first equal-version item.
+# New releases must never offer the arm64 archive to an Intel client.
 for arm in (True, False):
     eligible = [item for item in items if arm or item.find('s:hardwareRequirements', ns) is None]
-    selected = eligible[0].find('enclosure').attrib['url']
-    assert ('-arm64.zip' if arm else '-x86_64.zip') in selected
-for item, architecture in zip(items, ('arm64', 'x86_64')):
+    if arm:
+        assert len(eligible) == 1 and '-arm64.zip' in eligible[0].find('enclosure').attrib['url']
+    else:
+        assert not eligible, 'Intel clients must not receive a new incompatible update'
+spec = importlib.util.spec_from_file_location('feed_generator', root / 'scripts/generate-update-feed.py')
+generator = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(generator)
+for item in items:
+    architecture = 'arm64'
     entry = item.find('enclosure')
     version = item.find('s:shortVersionString', ns).text
     assert entry.attrib['url'].startswith(f'https://github.com/wivnelo/Nivlet/releases/download/v{version}/')
     assert entry.attrib['url'].endswith(f'-{architecture}.zip')
     archive = dist / entry.attrib['url'].rsplit('/', 1)[1]
     assert archive.stat().st_size == int(entry.attrib['length'])
+    _, macho_count = generator.inspect_archive(archive)
+    assert macho_count > 0, 'All embedded Mach-O files must be arm64'
     with zipfile.ZipFile(archive) as package:
         assert package.testzip() is None
         info = plistlib.loads(package.read('Nivlet.app/Contents/Info.plist'))

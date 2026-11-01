@@ -8,7 +8,9 @@ window.runCompactRulesRegression=function(data){
   check(!document.querySelector('.shortcut-display,.rule-count,#clipHistoryCount,#updateHint'),'Removed duplicate/count/help still rendered');
   window.showSection('launcherSection');const row=document.querySelector('#launcherRules .launcher-rule'),input=row.querySelector('.launcher-key');
   check(input.value==='K'&&row.querySelector('[data-mod=alt]').checked&&input.title==='⌥ K','Compact shortcut lost configuration');
-  check(row.offsetHeight<=80,'Launcher row is not compact');
+  const maxRowHeight=matchMedia('(max-width:850px)').matches?112:80;
+  check(row.offsetHeight<=maxRowHeight,'Launcher row is not compact at this viewport');
+  for(const control of row.querySelectorAll('button,input,label')){const r=control.getBoundingClientRect(),bounds=row.getBoundingClientRect();check(r.left>=bounds.left-1&&r.right<=bounds.right+1&&r.top>=bounds.top-1&&r.bottom<=bounds.bottom+1,'Wrapped launcher control escapes its row');}
   window.showSection('clipSection');document.getElementById('clipExcluded').closest('details').open=true;
   const host=document.getElementById('clipExcludedRows'),saved=pageSnapshot('clipSection');
   check(host.children.length===2&&host.children[0].textContent.includes('Legacy App')&&host.children[1].textContent.includes('com.example.uninstalled'),'Existing/uninstalled exclusions were lost');

@@ -9,7 +9,10 @@ hs={application={pathForBundleID=function()return nil end,nameForBundleID=functi
  hotkey={systemAssigned=function(_,key) return blocked and key=='9' end,assignable=function(mods,key) return not bindings[signature(mods,key)] end,
  bind=function(mods,key,callback) if fail and key=='8' then return nil end;local sig=signature(mods,key);bindings[sig]=callback;return {delete=function() bindings[sig]=nil end} end}}
 package.loaded['modules.sys_info']={start=function() end,menu=menu()}
-dofile('Toolkit/init.lua');assert(not desktopToolkit.popupShortcut and not desktopToolkit.popupBinding and next(bindings)==nil)
+dofile('Toolkit/init.lua');assert(desktopToolkit.popupShortcut.key=='V' and table.concat(desktopToolkit.popupShortcut.mods,'+')=='cmd+shift' and bindings['cmd+shift+V'])
+assert(stored['desktoptoolkit.clipboard.shortcut.v1']==nil,'Default startup must not rewrite preferences')
+local exportedDefaults=desktopToolkit.configuration.export(true).modules.popupShortcut
+assert(exportedDefaults.key=='V' and table.concat(exportedDefaults.mods,'+')=='cmd+shift')
 local ctrl={key='k',mods={'cmd','ctrl'}}
 assert(desktopToolkit.savePopup(ctrl));assert(desktopToolkit.popupShortcut.key=='K')
 assert(stored['desktoptoolkit.clipboard.shortcut.v1'].mods[1]=='ctrl')
@@ -20,7 +23,7 @@ assert(not desktopToolkit.savePopup({key='K',mods={'shift'}}));assert(bindings['
 blocked=true;assert(not desktopToolkit.savePopup({key='9',mods={'ctrl'}}));assert(bindings['ctrl+cmd+K'])
 fail=true;assert(not desktopToolkit.savePopup({key='8',mods={'ctrl'}}));assert(bindings['ctrl+cmd+K'])
 assert(stored['desktoptoolkit.clipboard.shortcut.v1'].key=='K')
-assert(desktopToolkit.savePopup({key='',mods={}}));assert(next(bindings)==nil and not stored['desktoptoolkit.clipboard.shortcut.v1'])
+assert(desktopToolkit.savePopup({key='',mods={}}));assert(next(bindings)==nil and stored['desktoptoolkit.clipboard.shortcut.v1']==false)
 assert(desktopToolkit.save({enabled=true,shortcuts={left={key='1',mods={'ctrl'}}}}))
 assert(not desktopToolkit.savePopup({key='1',mods={'ctrl'}}));assert(bindings['ctrl+1'])
 assert(desktopToolkit.savePopup(ctrl));assert(stored['desktoptoolkit.clipboard.shortcut.v1'].key=='K')

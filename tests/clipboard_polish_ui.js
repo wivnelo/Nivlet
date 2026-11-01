@@ -18,8 +18,8 @@ window.runClipboardPolishRegression=function(data){
   check(document.getElementById('clipLimit').tagName==='SELECT','Limit is not a select');
   fillClipboardChoices('clipLimit',limitChoices,77);fillClipboardChoices('clipMinutes',retentionChoices,113);
   check(document.getElementById('clipLimit').value==='77'&&document.getElementById('clipMinutes').value==='113','Legacy values lost');
-  uiLanguage='en';translateUI();check(document.getElementById('clipMinutes').selectedOptions[0].textContent==='113 minutes (custom)','Custom translation missing');
-  uiLanguage='zh-Hans';translateUI();check(document.getElementById('clipMinutes').selectedOptions[0].textContent==='113 分钟（自定义）','Custom translation did not restore');
+  uiLanguage='en';translations=data.testTranslations.en;translateUI();check(document.getElementById('clipMinutes').selectedOptions[0].textContent==='113 minutes (custom)','Custom translation missing');
+  uiLanguage='zh-Hans';translations=data.testTranslations['zh-Hans'];translateUI();check(document.getElementById('clipMinutes').selectedOptions[0].textContent==='113 分钟（自定义）','Custom translation did not restore');
   check(retentionChoices.map(pair=>pair[0]).join(',')==='30,60,120,240,480,720,1440,0','Retention choices wrong');
   let captured;send=body=>captured=body;
   fillClipboardChoices('clipMinutes',retentionChoices,0);document.getElementById('saveClip').onclick();check(captured.config.minutes===0&&captured.config.limit===77,'Permanent save payload wrong');
@@ -33,5 +33,5 @@ window.runClipboardPolishRegression=function(data){
   cards[1].querySelector('.clip-card-actions button:last-child').click();check(captured.action==='copyClipboard'&&captured.id===92,'Copy target wrong');
   clipMinutes=1440;renderHistory();check(!document.querySelector('#clipHistory .clip-card'),'Finite expiry not restored');
   return 'Clipboard dropdowns, custom values, i18n, permanent UI expiry, card actions and safe text rendering passed';
- }finally{send=oldSend;uiLanguage=language;receiveClipboard(data.clipboard,false);fillClipboardChoices('clipLimit',limitChoices,Number(limit));fillClipboardChoices('clipMinutes',retentionChoices,Number(minutes));translateUI()}
+ }finally{send=oldSend;uiLanguage=language;translations=data.translations;receiveClipboard(data.clipboard,false);fillClipboardChoices('clipLimit',limitChoices,Number(limit));fillClipboardChoices('clipMinutes',retentionChoices,Number(minutes));translateUI()}
 };

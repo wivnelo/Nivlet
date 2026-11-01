@@ -101,10 +101,18 @@ end
 function M.menuItems()
     local menu=readings()
     local prefixes={CPU="cpu",MEM="memory",Disk="disk",LAN="ipv4",IPv6="ipv6",MAC="mac",Date="date",Lunar="lunar"}
+    local labels={cpu="CPU 使用率",memory="内存使用率",disk="磁盘使用率",ipv4="局域网 IPv4",ipv6="IPv6 地址",mac="MAC 地址",date="公历与星期",lunar="农历"}
     local filtered={}
     for _,item in ipairs(menu) do
-        local field=prefixes[item.title:match("^(%w+):")]
-        if field and M.config[field] then table.insert(filtered,item) end
+        local prefix,value=item.title:match("^(%w+): (.*)$")
+        local field=prefixes[prefix]
+        if field and M.config[field] then
+            -- Keep readings/snapshot's stable machine prefixes and copy values.
+            -- Only the menu presentation is localized.
+            if field=="cpu" then value=value:gsub("(%d+) Core",function(count)return count.." "..i18n.t("核心")end) end
+            item.title=i18n.t(labels[field])..": "..value
+            table.insert(filtered,item)
+        end
     end
     if #filtered==0 then table.insert(filtered,{title=i18n.t("未选择显示信息"),disabled=true}) end
     table.insert(filtered,{title="-"})

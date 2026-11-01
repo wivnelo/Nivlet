@@ -18,9 +18,9 @@ window.runStageARegression=function(data){
   window.receive({...data,ok:false,action:'saveAllSettings',requestID:batch.requestID,saveBatch:{ok:false,failedPage:'launcherSection',message:'Fixture save failure',results:[{page:'launcherSection',status:'failed'}]}});check(!saveAllCoordinator.saving&&row.isConnected&&row.dataset.bundle==='com.example.stagea.third','Failed save erased replacement draft or left settings locked');
   check(document.querySelectorAll('.permission-state').length===1&&document.querySelector('#generalSection .permission-state'),'Repeated permission status');
   requests.length=0;window.showSection('clipSection');check(!requests.some(value=>value.action==='refreshPermissions'),'Clipboard tab rechecks permissions unnecessarily');
-  const icon=document.querySelector('.clip-menu-icon');check(icon&&getComputedStyle(icon).maskImage.includes('data:image/png'),'Clipboard hint icon missing');
-  window.receive({...data,action:'refreshPermissionsSilent',language:'en'});window.showSection('launcherSection');check(row.querySelector('.replace-launcher-app').textContent==='Replace App…','Replace label not translated');
+  check(!document.querySelector('.clipboard-usage,.clip-menu-icon'),'Retired clipboard menu help remains');
+  window.receive({...data,action:'refreshPermissionsSilent',language:'en',translations:data.testTranslations.en});window.showSection('launcherSection');check(row.querySelector('.replace-launcher-app').textContent==='Replace App…','Replace label not translated');
   window.receive({...data,action:'refreshPermissionsSilent',language:'zh-Hans'});check(row.querySelector('.replace-launcher-app').textContent==='更换应用…','Replace label did not restore Chinese');
-  return 'Replacement request, shortcut/order preservation, duplicate rejection, footer save/failure draft, General-only permission and monochrome hint passed';
+  return 'Replacement request, shortcut/order preservation, duplicate rejection, footer save/failure draft, General-only permission and compact clipboard settings passed';
  }finally{send=original;window.receive({...data,ok:true,action:'load'})}
 };

@@ -1,56 +1,46 @@
-> 当前正式发行：1.0.8 / Build 55；下方 Intel Build 33 为历史构建示例。正式构建请使用新的隔离目录及 NIVLET_BUILD_NUMBER=55。
-
 # 开发与构建
 
-## 当前工程基准（2026-10-29）
+当前开发候选为 **1.0.9 / Build 56**，macOS 13+，仅 Apple Silicon（arm64）。尚未正式发布，最终门槛见 [分发流程](DISTRIBUTION.md)。[1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后一个 Intel 版本；历史资产保留，后续停止 Intel 构建、发行与支持。
 
-1.0.8 / Build 55 于 2026-10-29 发布：禁止 Shortcuts 和 AppleScript 在 Nivlet 中执行 Lua，修复 localhost、单标签主机名和 IPv6 链接无法打开的问题；主 App 使用仓库 `Native/Nivlet.entitlements`。当前正式包位于本地忽略目录 `build/release-1.0.8-build55/dist/`，提供双架构 ZIP、DMG 与 SHA-256；签名、公证及升级验证边界见 VALIDATION。历史构建方式仅适用于其标注版本。
+## 隔离 Release 构建
 
-当前发行版本为 1.0.8 / Build 55（arm64 / x86_64），包含应用状态刷新、底部统一错误和双架构更新源。最终构建与回归见 [Build 55 验收](VALIDATION.md)，安装及发布状态以 [BASELINE.md](../BASELINE.md) 为准。
+使用完整 Xcode、Python 3、固定 Runtime 与 Sparkle 2.10.0。首次使用 `sh scripts/fetch-runtime.sh` 准备 Runtime，已有目录不自动覆盖。不要为发行自动升级依赖。
 
-- Runtime 固定来源；构建通过 `scripts/prepare-updater.sh` 准备固定 Sparkle 2.10.0，许可收集包含其原文。
-- Release 构建使用完整 Xcode：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=55 sh scripts/build-release.sh`。55 为本次 1.0.8 发行 Build；下一构建继续递增 Build；构建不自动安装。
-- 更新入口位于关于页，原生 Sparkle 桥接由 `patches/nivlet-updater.patch` 注入；有草稿先处理，默认手动检查、用户确认安装。
-- Feed 为 `docs/appcast.xml`，使用 `scripts/generate-update-feed.py <ARM64.zip> <X86_64.zip>` 生成、`tests/updates.py` 验证。Ed25519 私钥留 Keychain，不导出到源码、日志或安装包。
-- 发布顺序：新版本/Build → 构建和回归 → 打包/签名校验 → 上传新附件 → 发布 feed → 实测升级及最新检查 → 保留回滚备份。
-
-
-## 发布隐私检查（2026-10-12）
-
-Release 入口现在先检查当前仓库和 Git 提交身份，再把固定源码与依赖复制到全新的中性临时目录构建；不复用个人目录下的对象文件。完成扫描和签名后，仅将 App 与匹配 dSYM 复制回 `build/PrivateRelease/Build/Products/Release/`。已有输出目录时停止，可通过 `NIVLET_DERIVED_DATA_PATH` 指定另一空目录，避免覆盖旧产物。Debug 开发构建入口保留。
+Release 入口先检查当前仓库与 Git author/committer，再把源码和依赖复制到新的中性临时目录构建，避免复用个人目录的对象文件。仅将 App 和匹配 dSYM 复制回指定输出目录；已有输出拒绝覆盖。
 
 ```sh
 python3 tests/privacy.py
 python3 scripts/check-privacy.py --repo .
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=55 sh scripts/build-release.sh
-NIVLET_BUILD_CONFIGURATION=Release sh scripts/package-local.sh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=arm64 NIVLET_BUILD_NUMBER=56 NIVLET_DERIVED_DATA_PATH="$PWD/build/release-1.0.9-build56/arm64/DerivedData" sh scripts/build-release.sh
 ```
 
-Build 32 为历史隐私修正版构建；以上命令采用当前 Build 55，后续新构建继续递增。构建和打包使用相同 `NIVLET_DERIVED_DATA_PATH`；打包可用 `NIVLET_PACKAGE_OUTPUT` 指定独立目录。打包检查仓库、App、ZIP；feed 生成前再次检查仓库与 ZIP，发现个人 home 路径、常见凭据或敏感文件即停止，日志只输出文件和问题类型。仅精确放行 Runtime 两个文档资源内已核对的示例路径，不放行可执行文件里的用户目录。此规则不替代截图人工审查、完整历史审计或未知凭据识别。
+构建不会自动安装。正式签名、公证、ZIP/DMG 和更新源使用 [DISTRIBUTION](DISTRIBUTION.md) 的后续流程；`scripts/package-local.sh` 只生成本地验证包，不表示公证发行。
 
+## 架构与体积
 
-## 常用检查
+- 本次及后续正式包只构建 arm64。主程序、system-probe 和全部内嵌 Mach-O 必须具有且仅保留 arm64 切片；缺少切片时停止。
+- Release 主程序去除调试符号前，必须验证外部 dSYM 的 UUID 匹配；保留导出符号。dSYM 不进入 ZIP/DMG。
+- 发行副本在签名前裁剪明确的框架开发 Headers、PrivateHeaders、Modules 及对应顶层符号链接，保留运行库、Resources、版本链接、XPC、更新器和许可证。源码依赖保持完整。
+- 关于页 PNG 使用 160 × 160 资源；品牌图、Dock 和菜单栏资源保持原样。不为缩小体积删功能或运行模块。
+- 最终体积以同架构 ZIP 与 App 实测比较为准；停止打 Intel 包与单个 ARM 包的压缩收益分别说明。
 
-### 当前发行包的体积优化
-
-- Xcode 与 `system-probe` 编译为 arm64；打包前遍历所有 Mach-O，去除 Sparkle 等嵌套组件的 Intel 切片，缺少 arm64 时停止构建。
-- 关于页 PNG 生成 160 × 160 资源，对应 80 × 80 Retina 显示；原始品牌图、Dock 与菜单栏图标保持原样。
-- 可用 `NIVLET_DERIVED_DATA_PATH` 指定独立的绝对构建目录；构建与打包必须传入相同值。例如 `NIVLET_DERIVED_DATA_PATH="$PWD/build/DerivedData-arm64"`，避免覆盖旧双架构构建产物。
-
-从仓库根目录执行：
+## 回归与隐私检查
 
 ```sh
 for test_file in tests/*.lua; do lua "$test_file" || exit 1; done
-python3 tests/dock_activation.py
+python3 tests/browser_file_url.py
+python3 tests/privacy.py
 node tests/launcher_replace.js
 git diff --check
 ```
 
-构建前需要完整 Xcode、Python 3 和固定 Runtime；首次使用 `sh scripts/fetch-runtime.sh` 准备 Runtime，已有目录不自动覆盖。不要自动升级依赖或替换已安装 App。
+原生文件路径探针只处理隔离测试文件，不打开用户文件或修改默认应用。UI 回归应使用合成配置，实机测试不得覆盖用户草稿。完整验收状态按最终候选记录，不能把旧包或其他架构的结果用于本次。
 
-## 按架构独立构建（2026-10-13）
+构建、打包与 feed 生成均检查个人 home 路径、常见凭据和敏感文件，失败只输出文件与问题类型。仅精确放行已核对的 Runtime 文档示例路径；这不替代截图检查、完整历史审计或未知凭据识别。公证和更新私钥留 Keychain。
 
-`NIVLET_ARCH` 支持 `arm64`（默认）与 `x86_64`。主程序、原生 system-probe 及全部内嵌 Mach-O 必须具有目标架构；优化阶段统一裁剪，缺少切片即停止。Release 仍要求匹配架构的 dSYM，并保留隐私检查与严格签名检查。
+## 历史 Intel 构建示例（不用于后续发行）
+
+以下记录保留历史构建命令，不表示 1.0.9 继续支持 Intel。
 
 Intel 本地候选包沿用 1.0.0 功能，使用 Build 33，要求 macOS 13.0+；与已发布 Build 32 arm64 包分开，不能视为已经在 Intel 真机通过验收。
 
@@ -59,4 +49,5 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=x86_64 NIVL
 NIVLET_BUILD_CONFIGURATION=Release NIVLET_DERIVED_DATA_PATH="$PWD/build/intel-1.0.0-build33/DerivedData" sh scripts/package-local.sh
 ```
 
-以上为 Build 33 历史示例，当时 feed 仅 arm64。当前 1.0.8 支持双架构更新；生成 feed 必须同时传入 ARM 和 Intel ZIP，具体命令与选择规则见 DISTRIBUTION.md。
+
+以上为 1.0.0 / Build 33 历史证据。1.0.8 / Build 55 是最后 Intel 发行；后续新 feed 仅含受 arm64 硬件限制的项。

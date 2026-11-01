@@ -24,7 +24,7 @@ window.runKeyboardFocusRegression=async function(data){
   document.getElementById('tab-generalSection').focus();await key(document.activeElement,'Tab');check(document.activeElement.id==='autoLaunch','Tab did not enter current panel');
   await key(document.activeElement,'Tab',{shiftKey:true});check(document.activeElement.id==='tab-generalSection','Shift-Tab did not return to active tab');
   window.showSection('clipSection');const search=document.getElementById('clipSearch');search.focus();window.showImage({id:1,time:Date.now()/1000,url:'data:image/png;base64,iVBORw0KGgo='});
-  check(document.activeElement.id==='closeImage','Preview focus missing');imageDialog.close();await new Promise(resolve=>setTimeout(resolve,0));check(document.activeElement===search,'Preview close did not restore focus');
+  check(document.activeElement.id==='imageDialog','Preview focus missing');imageDialog.close();await new Promise(resolve=>setTimeout(resolve,0));check(document.activeElement===search,'Preview close did not restore focus');
   window.showSection('generalSection');window.previewConfiguration({modules:{}});requests=[];await key(document.getElementById('applyConfiguration'),'Escape');check(requests.at(-1)?.action==='cancelConfiguration','Esc did not cancel import preview');
   requests=[];await key(document.getElementById('applyConfiguration'),'s',{metaKey:true});check(!requests.length,'Command-S bypassed import confirmation');window.previewConfiguration(null);
   return 'Command-S priority, native W/Q routing, dialog Tab trap/return focus, panel traversal, preview focus and import Escape passed';

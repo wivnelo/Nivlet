@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import plistlib
 import shlex
 import subprocess
 import sys
@@ -16,6 +17,26 @@ MAGIC = {bytes.fromhex(value) for value in (
 )}
 
 
+def check_source_metadata(source, version, build, dry_run=False):
+    """Reject a stale build before creating output or invoking signing tools."""
+    if not source.is_dir():
+        if dry_run and not source.exists() and not source.is_symlink():
+            print('  plan only: source app is not built; metadata has NOT been verified; '
+                  f'require dev.local.DesktopToolkit, version {version}, build {build}')
+            return
+        raise ValueError('Missing built app: ' + str(source))
+    info = plistlib.loads((source / 'Contents/Info.plist').read_bytes())
+    if not isinstance(info, dict):
+        raise ValueError('Invalid source app Info.plist: ' + str(source))
+    expected = {'CFBundleIdentifier': 'dev.local.DesktopToolkit',
+                'CFBundleShortVersionString': version, 'CFBundleVersion': build}
+    for key, value in expected.items():
+        if info.get(key) != value:
+            raise ValueError(f'Source app {key} mismatch: expected {value!r}, '
+                             f'got {info.get(key)!r}: {source}')
+    print(f'  verified source metadata: dev.local.DesktopToolkit, version {version}, build {build}')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for flag, env in [('identity', 'SIGN_IDENTITY'), ('team-id', 'TEAM_ID'),
@@ -24,14 +45,14 @@ def main():
         parser.add_argument('--' + flag, default=os.environ.get('NIVLET_' + env),
                             help='or NIVLET_' + env)
     parser.add_argument('--dry-run', action='store_true')
-    parser.add_argument('archs', nargs='*', choices=['arm64', 'x86_64'])
+    parser.add_argument('archs', nargs='*', choices=['arm64'])
     args = parser.parse_args()
     for flag in ['identity', 'team_id', 'notary_profile', 'build_dir', 'build']:
         if not getattr(args, flag) or not getattr(args, flag).strip():
             parser.error('Missing required --' + flag.replace('_', '-') + ' (or its NIVLET environment variable)')
     if not args.build.isdecimal():
         parser.error('--build must be a numeric build number')
-    archs = args.archs or ['arm64', 'x86_64']
+    archs = args.archs or ['arm64']
     if len(set(archs)) != len(archs):
         parser.error('Duplicate architectures')
     version = (ROOT / 'VERSION').read_text().strip()
@@ -96,8 +117,7 @@ def main():
             if path.exists() or path.is_symlink():
                 raise ValueError('Refusing overwrite: ' + str(path))
         source = work / 'DerivedData/Build/Products/Release/Nivlet.app'
-        if not args.dry_run and not source.is_dir():
-            raise ValueError('Missing built app: ' + str(source))
+        check_source_metadata(source, version, args.build, args.dry_run)
     if not args.dry_run:
         dist.mkdir(parents=True, exist_ok=True)
     print(f'Version {version}, build {args.build}; release directory: {release}')
@@ -107,6 +127,7 @@ def main():
         app = work / 'Nivlet.app'
         base = f'Nivlet-{version}-build{args.build}-{arch}'
         run('ditto', source, app)
+        run(sys.executable, ROOT / 'scripts/trim-distribution.py', app)
         scan = source if args.dry_run else app
         binaries, bundles = [], []
         for path in scan.rglob('*'):
@@ -122,6 +143,12 @@ def main():
         if args.dry_run and not source.exists():
             print('  discover all nested Mach-O files, then code bundles; each deepest-first')
             binaries = [scan / 'Contents/MacOS/Nivlet']
+        if not binaries:
+            raise ValueError('No Mach-O files found in release app')
+        for path in binaries:
+            actual = run('lipo', '-archs', path, capture_output=True, text=True)
+            if actual and actual.stdout.strip() != 'arm64':
+                raise ValueError('All release binaries must be arm64: ' + str(path))
         for paths in [binaries, bundles]:
             for path in sorted(paths, key=lambda p: (-len(p.parts), str(p))):
                 target = app / path.relative_to(scan)

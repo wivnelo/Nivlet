@@ -18,9 +18,9 @@ window.runAppRulesFeedbackRegression=async function(data){
   check(host.firstElementChild.dataset.bundle==='com.example.new','New exclusion not first');drag(host.lastElementChild,host.firstElementChild);document.getElementById('saveClip').click();check(request.config.excluded[0]===rules[1].bundleID,'Excluded drag not serialized');
   host.children[1].querySelector('button:not(.rule-drag)').click();document.getElementById('saveClip').click();check(JSON.stringify(request.config.excluded)===JSON.stringify([rules[1].bundleID,rules[0].bundleID]),'Remove after reorder used stale order');
   document.getElementById('cancelSettings').click();await Promise.resolve();check(document.getElementById('clipExcluded').value===fixture.clipboard.config.excluded.join('\n'),'Excluded cancel changed saved IDs');
-  check(document.querySelectorAll('.clipboard-usage p').length===3,'Usage is not three separate rows');
-  document.getElementById('popupShortcut').closest('details').open=true;const popup=document.getElementById('popup-key');check(getComputedStyle(popup).width==='52px'&&getComputedStyle(popup).height==='30px','Popup shortcut geometry differs');
+  check(!document.querySelector('.clipboard-usage'),'Removed clipboard help remains');
+  const popup=document.getElementById('popupEnabled');check(getComputedStyle(popup).width==='34px'&&getComputedStyle(popup).height==='20px','Popup toggle does not match other switches');check(!document.getElementById('popup-key'),'Editable popup shortcut remains');
   check(document.documentElement.scrollWidth<=innerWidth+1,'Feedback UI overflows');
-  return 'Four icon handles, saved-order preservation/new-on-top/duplicate/no reorder, drag serialization/cancel/remove, test removal, usage and shortcut style passed';
+  return 'Four icon handles, saved-order preservation/new-on-top/duplicate/no reorder, drag serialization/cancel/remove, test removal, compact clipboard help and fixed shortcut style passed';
  }finally{send=oldSend;window.receive({...data,ok:true,action:'load'})}
 };

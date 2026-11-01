@@ -1,17 +1,17 @@
 # Nivlet 当前基准
 
-更新日期：2026-10-29。
+更新日期：2026-11-01。
 
-当前正式发行与开发基准：**1.0.8 / Build 55**，macOS 13+，Apple Silicon（arm64）与 Intel（x86_64）。GitHub Latest 为 v1.0.8，Build 55 发布于 2026-10-29（Asia/Manila）；tag 解引用至 `0772475`。双架构 App 和 DMG 继续使用 Apple Developer ID 签名、Apple 公证与附加票据。
+当前开发候选：**1.0.9 / Build 56**，macOS 13+，仅 Apple Silicon（arm64）。最终候选尚待独立代码审阅、回归、原生构建、Developer ID 签名、Apple 公证、Gatekeeper 与本机验收完成，未正式发布。安装状态、候选编号和真实验证结果以 [UI 实施与验收记录](documentation/UI-A-IMPLEMENTATION.md) 及 [VALIDATION](documentation/VALIDATION.md) 的对应版本记录为准；旧包通过不代表新包通过。
 
-本次禁止 Shortcuts 和 AppleScript 在 Nivlet 中执行 Lua（安全加固），修复 localhost、单标签主机名和 IPv6 链接无法打开的问题；主 App 使用仓库 `Native/Nivlet.entitlements`。既有 v1.0.8 Release 新增六个 Build 55 附件，Build 54 附件保留，tag 未移动。正式包位于本地忽略目录 `build/release-1.0.8-build55/dist/`，构建使用 `NIVLET_BUILD_NUMBER=55`。
+已核验的最新正式发行仍为 **[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8)**，Build 55 资产于 2026-10-29 发布。该 Release 保留 Build 54 与 Build 55 的双架构 ZIP、DMG 和 SHA-256；v1.0.8 tag 解引用至 `0772475f731ca887b23ca6ae49878d4e520c70c1`，未因新增 Build 55 资产而移动。下一版必须使用新 tag 和新资产，绑定最终源码提交，不覆盖历史发行。
 
-本次文档同步基于 origin/main `b17dce4`（含 Build 55 README 与版本说明）。
+**1.0.8 / Build 55 为最后 Intel（x86_64）版本。** 由于缺少 Intel 真机验收条件，从 1.0.9 起不再构建、发布或支持 Intel；历史 Intel 发行资产保留。新更新源只提供有 `hardwareRequirements=arm64` 限制的 Apple Silicon 项，不能向 Intel 发送 arm64 包。
 
-Build 55 双架构签名、公证、附加票据与 Gatekeeper 检查通过；feed 已发布。单台 Apple Silicon Mac 通过本地测试 feed 完成正式 Build 54 → 55 Sparkle 升级，EdDSA 与安装后 CDHash 核对通过；Intel 未运行，仅完成包级检查。辅助功能曾需重授，推测与此前 ad-hoc 开发版有关；两个 Developer ID 正式版之间的权限延续尚未验证。详见 [VALIDATION](documentation/VALIDATION.md)。
+1.0.9 改动范围：八个设置页采用左侧导航与右侧内容；本地 `.html`/`.htm` 交给已配置的实际浏览器；“保存全部设置”处理所有 dirty 页面并保留未成功保存的草稿；修复审阅确认的稳定性缺陷。新增繁体中文（台湾用语）与日语，香港环境使用繁中回退，不宣称母语人工审校。本轮另按用户要求把剪贴板菜单快捷键改为固定 ⌘⇧V 启用开关，保留旧自定义配置直至实际切换并保存；移除独立暂停/恢复，只保留历史记录总开关，关闭不清历史。图片预览支持 Nivlet 窗口内图片框外关闭；保存栏和两处指定说明同步简化。权限、其他快捷键、规则、复制/Option 粘贴和历史保留期限不变。浏览器并非支持任意协议或文件格式，详见 [1.0.9 说明](documentation/RELEASE-v1.0.9.md)。
 
-2026-10-29 测试机已安装正式 **1.0.8 / Build 55**（经 Sparkle 从正式 Build 54 升级，安装后 CDHash 与发行产物一致）；这不等同全功能实测。本轮仅同步文档，不修改用户配置、剪贴板、默认浏览器或系统权限。
+发行包仅在签名前去除明确不参与运行的框架开发头文件与模块描述；安装包保留运行组件、资源、许可证和有效签名；匹配 dSYM 独立保留在构建目录，不进入安装包。实际压缩包与安装体积需在最终产物上核对，不按预估宣传收益。
 
-下一开发建议仍为 A15 配置导入摘要预览，未开始；真实环境、双语辅助功能与特殊许可人工复核仍开放，见 [ROADMAP](ROADMAP.md)。
+历史 1.0.8 Build 55：双架构签名、公证、附加票据与 Gatekeeper 检查通过；单台 Apple Silicon Mac曾通过本地测试 feed 完成正式 Build 54 → 55 Sparkle 升级。Intel 仅完成包级检查，不能写成真机通过。完整历史证据见 [VALIDATION](documentation/VALIDATION.md)。
 
-官网来源为本仓库 `docs/`；独立本地 `website/` 不纳入当前提交。知识库使用 GitHub 与标准 Markdown，只同步项目摘要、决策和入口，不复制代码、安装包、配置或凭据。旧版本及原有验收证据保留，不能当作 Build 55 本轮实测。
+官网来源为本仓库 `docs/`；独立本地 `website/` 不纳入当前提交。不得覆盖原工作区已有未提交内容。知识库仅同步项目摘要、决策和入口，不复制安装包、私人配置或凭据。

@@ -40,6 +40,9 @@ with tempfile.TemporaryDirectory(prefix='nivlet-file-url-test-') as directory:
     start = source.index('    if ([openUrl hasPrefix:@"/"]) {', callback)
     end = source.index('    if (!url) {', start)
     conversion = source[start:end]
+    query_start = source.index('    NSString *query = [url query];', end)
+    query_end = source.index('    [skin pushLuaRef:', query_start)
+    query_parsing = source[query_start:query_end]
     delegate = (work / delegate_relative).read_text()
     extension_start = delegate.index('    NSString *fileExtension = [fileAndPath pathExtension];')
     extension_end = delegate.index('    NSDictionary *infoDict', extension_start)
@@ -53,6 +56,8 @@ with tempfile.TemporaryDirectory(prefix='nivlet-file-url-test-') as directory:
 static NSURL *URLForInput(NSString *openUrl) {
 '''
     harness += conversion + '\n    return url;\n}\n'
+    harness += ('static NSDictionary *QueryPairsForURL(NSURL *url) {\n'
+                + query_parsing + '    return pairs;\n}\n')
     harness += ('static BOOL HandlesDocument(NSString *fileAndPath, NSArray *flatSupportedExtensions) {\n'
                 + extension_normalization + '    return ' + document_predicate + ';\n}\n')
     harness += r'''
@@ -76,6 +81,34 @@ int main(void) { @autoreleasepool {
         assert([encoded containsString:escape]);
     }
     assert([URLForInput(paths[2]).absoluteString containsString:@"%2520"]);
+
+    // Invalid UTF-8 query escapes must not crash native handling before the
+    // full URL reaches Lua. Valid entries and the URL itself remain unchanged.
+    for (NSString *input in @[
+        @"https://example.com/?x=%FF",
+        @"https://example.com/?%FF=1",
+        @"https://example.com/?x=%E4%B8",
+        @"file:///tmp/plain.html?x=%FF",
+        @"file:///tmp/plain.html?%FF=1"
+    ]) {
+        NSURL *url = URLForInput(input);
+        assert(url);
+        assert(QueryPairsForURL(url).count == 0);
+        assert([url.absoluteString isEqualToString:input]);
+    }
+    NSURL *mixedQuery = URLForInput(@"https://example.com/?good=a%26b&bad=%FF&%FF=1&unicode=%E4%B8%AD%E6%96%87");
+    NSDictionary *mixedPairs = QueryPairsForURL(mixedQuery);
+    assert(mixedPairs.count == 2);
+    assert([mixedPairs[@"good"] isEqualToString:@"a&b"]);
+    assert([mixedPairs[@"unicode"] isEqualToString:@"中文"]);
+    // Preserve the established auxiliary-dictionary rules, including last-key
+    // wins, empty keys/values, and omission of pairs with no or multiple '='.
+    NSDictionary *existingPairs = QueryPairsForURL(URLForInput(@"https://example.com/?repeat=first&repeat=last&empty=&=value&missing&multiple=a=b"));
+    assert(existingPairs.count == 3);
+    assert([existingPairs[@"repeat"] isEqualToString:@"last"]);
+    assert([existingPairs[@"empty"] isEqualToString:@""]);
+    assert([existingPairs[@""] isEqualToString:@"value"]);
+    assert(QueryPairsForURL(URLForInput(@"https://example.com/no-query")).count == 0);
 
     // Real URL query/fragment components must not become filename characters.
     for (NSString *input in @[
@@ -102,7 +135,7 @@ int main(void) { @autoreleasepool {
     }
     assert(!HandlesDocument(@"/tmp/plain.HTML", @[]));
     assert(!HandlesDocument(@"/tmp/plain.HTM", @[@"html"]));
-    puts("Native paths preserve spaces, Unicode, #, ?, and %; URL components and HTML document routing pass");
+    puts("Native path encoding, HTML document routing, and malformed-query handling pass");
 } }
 '''
     (work / 'file-url.m').write_text(harness)

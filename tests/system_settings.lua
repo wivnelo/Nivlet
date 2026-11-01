@@ -6,7 +6,7 @@ hs={settings={set=function(_,v) saved=v end},host={cpuUsageTicks=function() retu
 local s=require('modules.sys_info');s.menu=nativeMenu;s.draw=function() drawn=true end;s.mac='fixture';s.openSettings=function() end
 local cfg=s.defaults();for _,field in ipairs(s.fields) do cfg[field]=false end
 assert(s.save(cfg) and drawn and saved.network==false);local menu=s.menuItems();assert(#menu==3 and menu[1].disabled and menu[3].fn)
-cfg.cpu=true;cfg.date=true;assert(s.save(cfg));menu=s.menuItems();assert(menu[1].title:match('^CPU:') and menu[2].title:match('^Date:') and #menu==4)
+cfg.cpu=true;cfg.date=true;assert(s.save(cfg));menu=s.menuItems();assert(menu[1].title:match('^CPU 使用率:') and menu[2].title:match('^公历与星期:') and #menu==4)
 local invalid=s.defaults();invalid.disk='yes';assert(not s.save(invalid));assert(s.config.disk==false)
 print('System display selection, all-hidden settings access and validation passed')
 
@@ -36,7 +36,7 @@ s.accept({interfaces={en0={rx=5000,tx=6000,mac="02:00:00:00:00:00"}}},"en0",31)
 assert(s.mac==nil and s.macRestricted)
 assert(s.snapshot().mac=="系统已隐藏")
 s.config=s.defaults();local restricted
-for _,item in ipairs(s.menuItems()) do if item.title:match("^MAC:") then restricted=item end end
+for _,item in ipairs(s.menuItems()) do if item.title:match("^MAC 地址:") then restricted=item end end
 assert(restricted and restricted.disabled and not restricted.fn,"Placeholder must not be copyable")
 s.accept({interfaces={en0={rx=6000,tx=7000,mac="02:12:34:56:78:9a"}}},"en0",33)
 assert(s.mac=="02:12:34:56:78:9a" and not s.macRestricted,"Legitimate private addresses must remain visible")

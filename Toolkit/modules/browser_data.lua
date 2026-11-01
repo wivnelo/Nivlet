@@ -2,6 +2,14 @@ local i18n=require("modules.i18n")
 local permissions=require("modules.permissions")
 local M={}
 local supported={["com.apple.Safari"]=true,["com.google.Chrome"]=true}
+-- Safari follows its own application language, which may differ from Nivlet.
+-- This opens the confirmation dialog only; clearing still requires the user.
+local safariHistoryMenus={
+    {"历史记录","清除历史记录…"},{"历史记录","清除历史记录..."},
+    {"History","Clear History…"},{"History","Clear History..."},
+    {"瀏覽記錄","清除瀏覽記錄…"},{"瀏覽記錄","清除瀏覽記錄..."},{"瀏覽記錄","清除瀏覽記錄"},
+    {"履歴","履歴を消去…"},{"履歴","履歴を消去..."},{"履歴","履歴を消去"},
+}
 local pending
 function M.open(id,done)
     if pending then done(false,i18n.t("正在打开浏览器，请稍候"));return end
@@ -19,7 +27,7 @@ function M.open(id,done)
                 done(true,i18n.t("已请求打开清除窗口，请在浏览器中确认"))
                 return
             end
-            for _,path in ipairs({{"历史记录","清除历史记录…"},{"历史记录","清除历史记录..."},{"History","Clear History…"},{"History","Clear History..."}}) do
+            for _,path in ipairs(safariHistoryMenus) do
                 if app:selectMenuItem(path) then
                     pending:stop();pending=nil
                     done(true,i18n.t("已请求打开清除窗口，请在浏览器中确认"))

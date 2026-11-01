@@ -1,14 +1,16 @@
 local i18n = require("modules.i18n")
 local bundleIDs = require("modules.bundle_id")
-local M = {entries={},paused=false,nextID=0}
+local M = {entries={},nextID=0}
 local settingsKey = "desktoptoolkit.clipboard.v1"
 function M.defaults()
     return {enabled=false,limit=50,minutes=30,images=true,persistent=false,excluded={"com.apple.Passwords","com.1password.1password","com.agilebits.onepassword7","com.bitwarden.desktop"}}
 end
 function M.validate(value)
     if type(value)~="table" or type(value.enabled)~="boolean" or type(value.limit)~="number" or value.limit%1~=0 or value.limit<10 or value.limit>100 or type(value.minutes)~="number" or value.minutes%1~=0 or value.minutes<0 or value.minutes>1440 or type(value.excluded)~="table" then return nil,i18n.t("容量须为 10–100 条，保留时间须为 1–1440 分钟或 0（永久）") end
-    if value.images~=nil and type(value.images)~="boolean" or value.persistent~=nil and type(value.persistent)~="boolean" then return nil,i18n.t("图片和缓存设置格式无效") end
-    local config,seen={enabled=value.enabled,limit=value.limit,minutes=value.minutes,images=value.images~=false,persistent=value.persistent==true,excluded={}},{}
+    if value.images~=nil and type(value.images)~="boolean" or value.persistent~=nil and type(value.persistent)~="boolean" or value.paused~=nil and type(value.paused)~="boolean" then return nil,i18n.t("图片和缓存设置格式无效") end
+    -- Read the retired flag only to preserve an explicitly recorded stop intent.
+    -- The previous release kept pause in memory; an absent flag cannot reveal it.
+    local config,seen={enabled=value.enabled and value.paused~=true,limit=value.limit,minutes=value.minutes,images=value.images~=false,persistent=value.persistent==true,excluded={}},{}
     for _,id in ipairs(value.excluded) do
         if not bundleIDs.valid(id) then return nil,i18n.t("排除应用须填写有效 Bundle ID") end
         if not seen[id] then table.insert(config.excluded,id);seen[id]=true end
@@ -29,10 +31,14 @@ local function ensureDirectory()
     if attr then return attr.mode=="directory" end
     return hs.fs.mkdir(path)
 end
+local function historyPersisted()
+    M.pendingHistoryWrite=nil;M.historyRetryAt=nil;M.historyPersistError=nil;M.historyErrorNotified=nil
+end
 function M.persist()
     if not M.config.persistent then
         hs.settings.clear(historyKey)
         for _,entry in ipairs(M.entries) do remove(entry) end
+        historyPersisted()
         return true
     end
     local saved={}
@@ -46,12 +52,45 @@ function M.persist()
             table.insert(saved,{id=entry.id,kind="image",time=entry.time,path=entry.path})
         else table.insert(saved,{id=entry.id,kind="text",time=entry.time,text=entry.text}) end
     end
-    hs.settings.set(historyKey,saved)
+    if hs.settings.set(historyKey,saved)==false then return false,i18n.t("保存失败，请检查设置") end
+    historyPersisted()
     return true
+end
+local function stopExpiryTimer()
+    M.expiryGeneration=(M.expiryGeneration or 0)+1
+    if M.expiryTimer then M.expiryTimer:stop();M.expiryTimer=nil end
+    M.expiryAt=nil
+end
+local function maintainExpiryTimer()
+    if M.stopped or not M.config or M.config.enabled then stopExpiryTimer();return end
+    local nextExpiry
+    if M.config.minutes>0 then
+        for _,entry in ipairs(M.entries) do
+            local expiry=entry.time+M.config.minutes*60
+            nextExpiry=not nextExpiry and expiry or math.min(nextExpiry,expiry)
+        end
+    end
+    if M.pendingHistoryWrite then
+        local retry=M.historyRetryAt or hs.timer.secondsSinceEpoch()+5
+        nextExpiry=not nextExpiry and retry or math.min(nextExpiry,retry)
+    end
+    if not nextExpiry then stopExpiryTimer();return end
+    if M.expiryTimer and M.expiryAt==nextExpiry then return end
+    stopExpiryTimer()
+    local generation=M.expiryGeneration
+    M.expiryAt=nextExpiry
+    -- An idle disabled recorder wakes only for the next expiry or a pending
+    -- history-write retry. Neither path reads the system clipboard.
+    M.expiryTimer=hs.timer.doAfter(math.max(0.01,nextExpiry-hs.timer.secondsSinceEpoch()),function()
+        if M.stopped or generation~=M.expiryGeneration then return end
+        M.expiryTimer=nil;M.expiryAt=nil
+        M.prune()
+    end)
 end
 function M.prune()
     local changed=false
-    local cutoff=hs.timer.secondsSinceEpoch()-M.config.minutes*60
+    local now=hs.timer.secondsSinceEpoch()
+    local cutoff=now-M.config.minutes*60
     local imageCount,textCount=0,0
     for i=#M.entries,1,-1 do
         if M.config.minutes>0 and M.entries[i].time<=cutoff then remove(M.entries[i]);table.remove(M.entries,i);changed=true end
@@ -62,7 +101,23 @@ function M.prune()
         if entry.kind=="image" and imageCount>10 or entry.kind~="image" and textCount>M.config.limit then remove(entry);changed=true else table.insert(keep,entry) end
     end
     M.entries=keep
-    if changed then M.persist() end
+    if changed then M.pendingHistoryWrite=true end
+    if M.pendingHistoryWrite and (not M.historyRetryAt or now>=M.historyRetryAt) then
+        local ran,ok,message=pcall(M.persist)
+        if ran and ok then historyPersisted()
+        else
+            -- Keep the pending empty list too: the last expiry must eventually
+            -- remove its stale disk index. A failed write cannot stop scheduling.
+            M.pendingHistoryWrite=true;M.historyRetryAt=now+5
+            M.historyPersistError=ran and message or i18n.t("保存失败，请检查设置")
+            if not M.historyErrorNotified and hs.alert and type(hs.alert.show)=="function" then
+                M.historyErrorNotified=true
+                pcall(hs.alert.show,M.historyPersistError)
+            end
+        end
+    end
+    maintainExpiryTimer()
+    return not M.pendingHistoryWrite,M.historyPersistError
 end
 local function thumbnail(image)
     local size=image:size()
@@ -74,9 +129,12 @@ function M.load()
     local saved=hs.settings.get(historyKey)
     if type(saved)~="table" then return end
     M.entries={}
+    local expiredMissing,unresolved=false,false
+    local cutoff=hs.timer.secondsSinceEpoch()-M.config.minutes*60
     for _,entry in ipairs(saved) do
-        if type(entry)=="table" and type(entry.id)=="number" and entry.id>0 and entry.id%1==0 and type(entry.time)=="number" then
-            local item
+        local item
+        local validTime=type(entry)=="table" and type(entry.time)=="number" and entry.time>-math.huge and entry.time<math.huge
+        if validTime and type(entry.id)=="number" and entry.id>0 and entry.id%1==0 then
             if entry.kind=="text" and type(entry.text)=="string" and #entry.text<=65536 then item={id=entry.id,time=entry.time,kind="text",text=entry.text} end
             if entry.kind=="image" and managed(entry.path) then
                 local attr=hs.fs.symlinkAttributes(entry.path)
@@ -85,18 +143,25 @@ function M.load()
                     if image then item={id=entry.id,time=entry.time,kind="image",image=image,path=entry.path,thumb=thumbnail(image),fingerprint=hs.hash.SHA256(image:encodeAsURLString(true,"PNG"))} end
                 end
             end
-            if item then M.nextID=math.max(M.nextID,item.id);table.insert(M.entries,item) end
         end
+        if item then M.nextID=math.max(M.nextID,item.id);table.insert(M.entries,item)
+        elseif validTime and M.config.minutes>0 and entry.time<=cutoff then expiredMissing=true
+        else unresolved=true end
     end
+    -- A prior expiry may have removed its image before an index write failed.
+    -- Repair that expired metadata only when no other filtered item might be
+    -- temporarily unreadable. A failed image load is not evidence to delete it.
+    if expiredMissing and not unresolved then M.pendingHistoryWrite=true end
     M.prune()
 end
 local ignored={['org.nspasteboard.ConcealedType']=true,['org.nspasteboard.TransientType']=true,['org.nspasteboard.AutoGeneratedType']=true,['public.file-url']=true}
 function M.poll()
+    if M.stopped then return end
     M.prune()
+    if not M.config.enabled then return end
     local count=hs.pasteboard.changeCount()
     if count==M.lastCount then return end
     M.lastCount=count
-    if not M.config.enabled or M.paused then return end
     local application=hs.application.frontmostApplication()
     local bundle=application and application:bundleID()
     for _,id in ipairs(M.config.excluded) do if bundle==id then return end end
@@ -121,17 +186,26 @@ function M.poll()
     end
     M.nextID=M.nextID+1
     table.insert(M.entries,1,{id=M.nextID,kind=image and "image" or "text",text=value,image=image,thumb=thumb,fingerprint=fingerprint,time=hs.timer.secondsSinceEpoch()})
+    -- A storage exception must not escape the native repeating timer (which
+    -- stops on callback errors). Retry the latest history through prune instead.
+    M.pendingHistoryWrite=true
     M.prune()
-    local ok,message=M.persist();if not ok then hs.alert.show(message) end
+end
+function M.stop()
+    M.stopped=true
+    if M.timer then M.timer:stop();M.timer=nil end
+    stopExpiryTimer()
 end
 function M.configure(config)
-    if M.timer then M.timer:stop();M.timer=nil end
+    M.stop();M.stopped=false
     M.config=config
     if config.enabled then
         M.lastCount=hs.pasteboard.changeCount() -- Never import the clipboard on enable/restart.
         M.prune()
         M.timer=hs.timer.doEvery(0.5,M.poll)
-    else M.paused=false end
+    else
+        if #M.entries>0 then M.prune() else maintainExpiryTimer() end
+    end
 end
 function M.save(value)
     local config,message=M.validate(value)
@@ -143,11 +217,6 @@ function M.save(value)
     if not ok then M.config=old;return false,errorMessage end
     M.configure(config);hs.settings.set(settingsKey,config)
     return true,i18n.t("剪贴板设置已保存")
-end
-function M.pause()
-    if not M.config.enabled then return false,i18n.t("请先启用剪贴板历史") end
-    M.paused=not M.paused;M.lastCount=hs.pasteboard.changeCount()
-    return true,M.paused and i18n.t("已暂停记录") or i18n.t("已恢复记录")
 end
 function M.copy(id,target)
     M.prune()
@@ -164,7 +233,7 @@ function M.copy(id,target)
     end
     return false,i18n.t("记录已过期或被清除")
 end
-function M.clear() for _,entry in ipairs(M.entries) do remove(entry) end;M.entries={};M.persist();return true,i18n.t("历史已清空") end
+function M.clear() for _,entry in ipairs(M.entries) do remove(entry) end;M.entries={};M.persist();maintainExpiryTimer();return true,i18n.t("历史已清空") end
 function M.confirmClear()
     if hs.dialog.blockAlert(i18n.t("清空剪贴板历史？"),i18n.t("将删除 Nivlet 的全部剪贴板历史和缓存，并清空系统当前剪贴板。此操作无法撤销。"),i18n.t("清空"),i18n.t("取消"),"warning")==i18n.t("清空") then
         hs.pasteboard.clearContents()
@@ -190,7 +259,7 @@ function M.snapshot()
     for _,entry in ipairs(M.entries) do
         table.insert(entries,{id=entry.id,kind=entry.kind,time=entry.time,text=entry.text or i18n.t("图片"),preview=entry.thumb and entry.thumb:encodeAsURLString(false,"PNG") or nil})
     end
-    return {config=M.config,paused=M.paused,entries=entries}
+    return {config=M.config,entries=entries}
 end
 local textMenuIcon
 local function menuThumbnail(image,kind)
@@ -262,11 +331,20 @@ function M.menuItems()
     table.insert(menu,{title="-"})
     table.insert(menu,{title=i18n.t("剪贴板设置…"),fn=function() M.openSettings("settings") end})
     table.insert(menu,{title=i18n.t("搜索历史…"),fn=function() M.openSettings("history") end})
-    table.insert(menu,{title=M.paused and i18n.t("恢复记录") or i18n.t("暂停记录"),disabled=not M.config.enabled,fn=function() M.pause() end})
     return menu
 end
 function M.start()
-    local config=M.validate(hs.settings.get(settingsKey)) or M.defaults()
+    local saved=hs.settings.get(settingsKey)
+    local config=M.validate(saved)
+    if config and saved.paused~=nil then
+        -- Persist the single switch before polling. Failure never re-enables a
+        -- migrated paused configuration; the saved legacy flag remains readable.
+        local ok,result=pcall(hs.settings.set,settingsKey,config)
+        if not ok or result==false then
+            if hs.alert then hs.alert.show(i18n.t("保存失败，请检查设置")) end
+        end
+    end
+    config=config or M.defaults()
     if config.persistent and not ensureDirectory() then config.persistent=false end
     M.configure(config);M.load()
 end

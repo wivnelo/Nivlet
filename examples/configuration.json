@@ -29,7 +29,13 @@
         "com.bitwarden.desktop"
       ]
     },
-    "popupShortcut": false,
+    "popupShortcut": {
+      "key": "V",
+      "mods": [
+        "cmd",
+        "shift"
+      ]
+    },
     "system": {
       "network": true,
       "cpu": true,

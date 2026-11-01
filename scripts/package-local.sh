@@ -24,8 +24,7 @@ base="Nivlet-$version-build$build-$arch-local"
 if [ "$configuration" = Release ]; then base="$base-release"; fi
 case "$arch" in
     arm64) architecture_zh='仅支持 Apple Silicon Mac（arm64）。'; architecture_en='Apple Silicon Mac (arm64) only.' ;;
-    x86_64) architecture_zh='仅支持 Intel Mac（x86_64），包括 2018 款 MacBook Pro；要求 macOS 13.0 或更高版本。'; architecture_en='Intel Mac (x86_64) only, including MacBook Pro (2018); requires macOS 13.0 or later.' ;;
-    *) echo "Unsupported package architecture: $arch" >&2; exit 1 ;;
+    *) echo "New Nivlet packages require Apple Silicon (arm64); 1.0.8 Build 55 is the final Intel release." >&2; exit 1 ;;
 esac
 stage=$(mktemp -d "$project_dir/build/package-stage.XXXXXX")
 trap 'rm -rf "$stage"' EXIT HUP INT TERM
