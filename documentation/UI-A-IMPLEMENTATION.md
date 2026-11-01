@@ -37,6 +37,6 @@ node scripts/test-settings-ui.cjs --suite layout_ui.js,tabs_ui.js --screenshots 
 
 ## 尚需原生候选包验收
 
-未构建或安装新的发行包，也未启动/替换用户的 Nivlet。真实 macOS WebView、Finder 文件派发、目标浏览器打开本地文件、系统快捷键注册，以及双架构签名包的端到端验收仍待候选构建阶段。原生补丁已做 Foundation 编译与逻辑检查，不能等同于整包构建验收。
+后续已按官方隔离 Release 流程完成 arm64 整包编译（Xcode 27.2，1.0.8 / Build55），24 个 Toolkit 源文件一致，101 个 Mach-O 的架构及主程序/dSYM UUID 匹配，隐私扫描通过。安装候选使用原有 Developer ID 身份与审核过的 entitlement，严格签名校验通过；Gatekeeper 返回 `rejected: source=Unnotarized Developer ID`，因此未替换或启动新应用，也未绕过系统保护。真实 macOS WebView、Finder 到实际浏览器、本机跨页持久化与 Intel 验收仍待公证和安装边界解决后进行。详细构建和校验记录在本地忽略目录 `build/native-compile/`。
 
 全局保存是有预检和恢复尝试的协调批次，不是跨模块原子事务。已成功的独立页面在后续失败时保持已保存；失败页保留草稿并使用模块报告的当前配置作为取消基线。`current` 仅表示模块内存配置，不证明原生菜单、快捷键、登录项与磁盘持久化已完全一致。恢复不完整会明确提示并保留重试入口；剪贴板保留策略已经清理的内容无法恢复。
