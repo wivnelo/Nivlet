@@ -44,7 +44,7 @@ window.runImagePreviewDismissRegression=async function(data){
   send=value=>requests.push(value);
   window.showSection('clipSection');
   receiveClipboard({...data.clipboard,config:{...data.clipboard.config,minutes:0},entries:[{id:901234,kind:'image',time:now,text:'Synthetic transparent image',preview:png}]},false);
-  copy=document.querySelector('#clipHistory .clip-card-actions button');
+  copy=document.querySelector('#clipHistory img[data-clip-action=preview]');
   check(copy,'Synthetic image preview trigger is missing');
   copy.scrollIntoView({block:'center'});requests=[];
   check(!document.getElementById('closeImage')&&!dialog.querySelector('button'),'Removed preview-close button remains');

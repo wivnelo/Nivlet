@@ -71,6 +71,10 @@ async function fresh(browser){
    if(functions.length!==1){results.push({file,status:'skipped',reason:'Expected one window regression function'});continue;}
    const {context,page,errors}=await fresh(browser);
    try{
+    if(opts['preview-states'])await page.exposeFunction('capturePreviewState',async state=>{
+     if(!/^[a-z-]+$/.test(state))throw Error('Invalid preview state name');
+     await page.screenshot({path:path.join(output,`preview-${state}-${language}-${theme}-${width}x${height}.png`),animations:'disabled'});
+    });
     if(opts['popup-states'])await page.exposeFunction('capturePopupState',async state=>{
      if(!/^[a-z-]+$/.test(state))throw Error('Invalid popup state name');
      await page.evaluate(()=>document.getElementById('popupShortcut').scrollIntoView({block:'center'}));

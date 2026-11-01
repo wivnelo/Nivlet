@@ -16,7 +16,7 @@ window.runShortcutCaptureRegression=async function(data){
   document.getElementById('cancelSettings').click();await Promise.resolve();
   check(document.getElementById('tab-windowSection').dataset.dirty==='false','Cancel did not restore draft');
   window.showSection('clipSection');const popup=document.getElementById('popupEnabled');popup.click();await Promise.resolve();
-  check(!popup.checked&&!document.getElementById('popup-key')&&document.getElementById('popupShortcutValue').textContent==='⌘⇧V','Popup must be a fixed shortcut toggle');
+  check(!popup.checked&&!document.getElementById('popup-key')&&document.getElementById('popupShortcutValue').textContent==='⌘⇧ + V','Popup must be a fixed shortcut toggle');
   check(!document.getElementById('saveSettings').disabled,'Popup toggle did not mark draft');
   document.getElementById('cancelSettings').click();await Promise.resolve();
   window.showSection('launcherSection');addLauncherRule({bundleID:'com.example.a07',name:'A07 Synthetic App',shortcut:{key:'',mods:[]}});await Promise.resolve();

@@ -10,7 +10,7 @@ window.runPopupToggleRegression=async function(data){
   const control=document.getElementById('popupEnabled'),readOnly=document.getElementById('popupShortcutValue');
   check(control.checked&&control.getAttribute('role')==='switch','Fixed shortcut is not an enabled switch');
   check(document.querySelectorAll('#popupShortcut input:not([type=hidden])').length===1&&!document.querySelector('#popupShortcut [data-shortcut-key],#popupShortcut select'),'Shortcut remains editable');
-  check(readOnly.textContent==='⌘⇧V'&&document.getElementById('popupLegacyHint').hidden,'Default combination presentation wrong');
+  check(readOnly.textContent==='⌘⇧ + V'&&document.getElementById('popupLegacyHint').hidden,'Default combination presentation wrong');
   if(window.capturePopupState)await window.capturePopupState('enabled');
   control.click();control.click();await tick();
   check(!dirtyPages().length&&document.getElementById('popupShortcutChanged').value==='false','Normal off/on return created a false draft');
@@ -24,15 +24,15 @@ window.runPopupToggleRegression=async function(data){
   window.showSection('clipSection');document.getElementById('cancelSettings').click();await tick();
   check(control.checked&&JSON.stringify(collectPopupShortcut())===JSON.stringify(fixed),'Cancel did not restore fixed shortcut');
   load(custom);
-  check(control.checked&&readOnly.textContent==='⌃K'&&!document.getElementById('popupLegacyHint').hidden,'Existing custom combination hidden or misrepresented');
+  check(control.checked&&readOnly.textContent==='⌃ + K'&&!document.getElementById('popupLegacyHint').hidden,'Existing custom combination hidden or misrepresented');
   if(window.capturePopupState)await window.capturePopupState('legacy');
   document.getElementById('clipImages').click();await tick();window.showSection('aboutSection');document.getElementById('saveSettings').click();
   check(JSON.stringify(request.pages.clipSection.popupShortcut)===JSON.stringify(custom)&&request.pages.clipSection.popupShortcutChanged===false,'Unrelated clipboard save migrated custom shortcut');
   window.receive({...data,ok:true,action:'saveAllSettings',requestID:request.requestID,popupShortcut:custom,clipboard:{...data.clipboard,config:request.pages.clipSection.config},saveBatch:{ok:true,results:[{page:'clipSection',status:'saved'}]}});
   load(custom);control.click();control.click();await tick();
-  check(control.checked&&readOnly.textContent==='⌘⇧V'&&document.getElementById('popupLegacyHint').hidden&&dirtyPages().length,'Off/on migration not captured when checked state returns to original');
+  check(control.checked&&readOnly.textContent==='⌘⇧ + V'&&document.getElementById('popupLegacyHint').hidden&&dirtyPages().length,'Off/on migration not captured when checked state returns to original');
   document.getElementById('cancelSettings').click();await tick();
-  check(readOnly.textContent==='⌃K'&&!dirtyPages().length,'Cancel did not restore legacy snapshot');
+  check(readOnly.textContent==='⌃ + K'&&!dirtyPages().length,'Cancel did not restore legacy snapshot');
   const conflict={...data,config:{enabled:true,shortcuts:{left:fixed}},popupShortcut:false,popupShortcutDefault:fixed};
   window.receive({...conflict,ok:true,action:'load',message:''});window.showSection('clipSection');control.click();await tick();
   request=null;document.getElementById('saveSettings').click();

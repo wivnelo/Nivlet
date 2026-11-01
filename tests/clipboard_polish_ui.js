@@ -28,8 +28,8 @@ window.runClipboardPolishRegression=function(data){
   const cards=[...document.querySelectorAll('#clipHistory .clip-card')];check(cards.length===2,'Permanent entries expired in UI');
   check(cards[0].querySelector('.clip-card-text').textContent==='<script>unchanged</script>'&&!cards[0].querySelector('script'),'Text not safely rendered');
   check(cards[0].querySelectorAll('.clip-card-actions button').length===1,'Text copy missing');
-  check(cards[1].querySelectorAll('.clip-card-actions button').length===2&&cards[1].querySelector('img')&&!cards[1].querySelector('.clip-card-text'),'Image actions/label incorrect');
-  cards[1].querySelector('.clip-card-actions button').click();check(captured.action==='previewClipboard'&&captured.id===92,'Preview target wrong');
+  check(cards[1].querySelectorAll('.clip-card-actions button').length===1&&cards[1].querySelector('img')&&!cards[1].querySelector('.clip-card-text'),'Image actions/label incorrect');
+  cards[1].querySelector('img').click();check(captured.action==='previewClipboard'&&captured.id===92,'Preview target wrong');
   cards[1].querySelector('.clip-card-actions button:last-child').click();check(captured.action==='copyClipboard'&&captured.id===92,'Copy target wrong');
   clipMinutes=1440;renderHistory();check(!document.querySelector('#clipHistory .clip-card'),'Finite expiry not restored');
   return 'Clipboard dropdowns, custom values, i18n, permanent UI expiry, card actions and safe text rendering passed';

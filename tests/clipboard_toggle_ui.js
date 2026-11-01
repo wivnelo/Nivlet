@@ -3,6 +3,10 @@ window.runClipboardToggleRegression=function(data){
  const previousLanguage=uiLanguage,oldSend=send;let captured;
  try{
   send=body=>captured=body;
+  const toggle=document.getElementById('clipEnabled'),summary=toggle.closest('.module-summary');
+  check(summary?.classList.contains('settings-group')&&toggle.parentElement.classList.contains('toggle-row')&&!toggle.closest('.clip-config'),'Recording master switch is not in the shared summary card');
+  check(summary.querySelector('p')?.textContent===t('关闭仅停止记录，已有历史仍按保留策略清理。'),'Recording stop/history explanation changed');
+  for(const key of ['未开启跨重启保留时，退出后历史不再保留。复制敏感内容前，请先关闭记录并保存。','应用排除不能覆盖所有敏感内容。'])check(![...document.querySelectorAll('#clipSection p')].some(p=>p.textContent===t(key)),'Removed clipboard hint remains visible');
   const disabled={...data.clipboard,config:{...data.clipboard.config,enabled:false,minutes:0}};
   receiveClipboard(disabled,true);
   check(!document.getElementById('clipEnabled').checked&&!document.getElementById('pauseClip'),'Only the persisted recording switch may control capture');

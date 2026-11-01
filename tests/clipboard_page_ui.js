@@ -27,7 +27,7 @@ window.runClipboardPageRegression=function(data){
   search.value='';receiveClipboard(payload(false,[]).clipboard,false);check(document.querySelector('#clipHistory [data-ui-empty]').textContent===t('暂无历史；启用并保存后开始记录'),'Off empty wrong');
   receiveClipboard(payload(true,[]).clipboard,false);check(document.querySelector('#clipHistory [data-ui-empty]').textContent===t('暂无历史；复制新内容即可记录'),'Recording empty wrong');
   receiveClipboard({...payload(true).clipboard,config:{...data.clipboard.config,enabled:true,minutes:1},entries:[{id:703,kind:'text',time:now-120,text:'Expired'}]},false);check(!document.querySelector('#clipHistory .clip-card')&&document.getElementById('clearClip').disabled,'Expiry count/clear state stale');
-  receiveClipboard(payload(true).clipboard,false);const image=document.querySelectorAll('#clipHistory .clip-card')[1];image.querySelector('button').click();check(request.action==='previewClipboard'&&request.id===702,'Preview routed incorrectly');
+  receiveClipboard(payload(true).clipboard,false);const image=document.querySelectorAll('#clipHistory .clip-card')[1];image.querySelector('img').click();check(request.action==='previewClipboard'&&request.id===702,'Preview routed incorrectly');
   window.receive({...payload(true),ok:false,action:'previewClipboard',message:'Synthetic preview failure'});check(note.textContent==='Synthetic preview failure'&&note.dataset.result==='error','Preview failure feedback missing');
   window.showImage({id:702,time:now,url:'data:image/png;base64,iVBORw0KGgo='});check(imageDialog.open&&note.textContent===t('已打开图片预览'),'Preview success feedback missing');imageDialog.close();
   window.receive({...payload(true),action:'refreshClipboard',message:''});check(note.textContent===t('历史已刷新'),'Refresh feedback missing');
