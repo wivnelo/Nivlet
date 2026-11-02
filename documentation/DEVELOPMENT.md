@@ -1,6 +1,8 @@
 # 开发与构建
 
-当前开发候选为 **1.0.9 / Build 56**，macOS 13+，仅 Apple Silicon（arm64）。尚未正式发布，最终门槛见 [分发流程](DISTRIBUTION.md)。[1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后一个 Intel 版本；历史资产保留，后续停止 Intel 构建、发行与支持。
+当前开发候选为 **2.0.0 / Build 57**，macOS 13+，仅 Apple Silicon（arm64）。尚未正式发布，最终门槛见 [分发流程](DISTRIBUTION.md)。[1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后一个 Intel 版本；历史资产保留，后续停止 Intel 构建、发行与支持。
+
+1.0.9 / Build 56 是未发布的历史候选；其构建、签名、公证和本机测试记录仅对应当时的产物。2.0.0 / Build 57 必须重新完成最终构建与验收，不能沿用旧包的通过结论。
 
 ## 隔离 Release 构建
 
@@ -11,7 +13,7 @@ Release 入口先检查当前仓库与 Git author/committer，再把源码和依
 ```sh
 python3 tests/privacy.py
 python3 scripts/check-privacy.py --repo .
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=arm64 NIVLET_BUILD_NUMBER=56 NIVLET_DERIVED_DATA_PATH="$PWD/build/release-1.0.9-build56/arm64/DerivedData" sh scripts/build-release.sh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=arm64 NIVLET_BUILD_NUMBER=57 NIVLET_DERIVED_DATA_PATH="$PWD/build/release-2.0.0-build57/arm64/DerivedData" sh scripts/build-release.sh
 ```
 
 构建不会自动安装。正式签名、公证、ZIP/DMG 和更新源使用 [DISTRIBUTION](DISTRIBUTION.md) 的后续流程；`scripts/package-local.sh` 只生成本地验证包，不表示公证发行。
@@ -40,7 +42,7 @@ git diff --check
 
 ## 历史 Intel 构建示例（不用于后续发行）
 
-以下记录保留历史构建命令，不表示 1.0.9 继续支持 Intel。
+以下记录保留历史构建命令，不表示 2.0.0 继续支持 Intel。
 
 Intel 本地候选包沿用 1.0.0 功能，使用 Build 33，要求 macOS 13.0+；与已发布 Build 32 arm64 包分开，不能视为已经在 Intel 真机通过验收。
 

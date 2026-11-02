@@ -1,20 +1,22 @@
 # Nivlet for Mac 分发准备与验收
 
-## 当前候选（2026-11-01）
+## 当前候选（2026-11-02）
 
-**1.0.9 / Build 56，仅 Apple Silicon（arm64），macOS 13+。** 本文为待发布流程；最终构建、回归、公证和实机验收全部通过后才可发布。实际状态见 [BASELINE](../BASELINE.md)、[候选说明](RELEASE-v1.0.9.md) 与 [验收](VALIDATION.md)。旧候选包的通过结果不能用于变更后的新包。
+**2.0.0 / Build 57，仅 Apple Silicon（arm64），macOS 13+。** 这是用户指定的大版本目标，替代未发布的 1.0.9 / Build 56 候选。新版本必须重新构建、签名、公证并完成最终包与更新验证；旧候选的公证/哈希/测试记录不得改名套用。用户已授权必要检查全部通过后直接发布。状态见 [BASELINE](../BASELINE.md)、[候选说明](RELEASE-v2.0.0.md) 与 [验收](VALIDATION.md)。
 
-最新已发布版本为 [1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8)，这是最后一个 Intel（x86_64）版本。历史 Intel 资产继续保留；从 1.0.9 起不再构建、发布或支持 Intel，不宣称经过 Intel 真机验证。新版本使用独立 tag、Build 和附件，不覆盖 v1.0.8 的 tag 或 Build 54/55 资产。
+新输出目录为 `build/release-2.0.0-build57/`，最终资产应为 `dist/Nivlet-2.0.0-build57-arm64.{zip,dmg,sha256}`。2026-11-02 只读核验 v2.0.0 tag/release 均不存在，latest 仍为 v1.0.8。`github` 指向 GitHub，`origin` 指向原本地仓库；正式推送使用核验后的 `github`，不覆盖原工作区。旧 1.0.9 r2 证据保留原路径与版本。
+
+最新已发布版本为 [1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8)，这是最后一个 Intel（x86_64）版本。历史 Intel 资产继续保留；从 2.0.0 起不再构建、发布或支持 Intel，不宣称经过 Intel 真机验证。新版本使用独立 tag、Build 和附件，不覆盖 v1.0.8 的 tag 或 Build 54/55 资产。
 
 - 固定 Runtime 与 Sparkle 2.10.0，不在发行时升级依赖；许可收集保留原文。
-- 在新的隔离目录构建：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=arm64 NIVLET_BUILD_NUMBER=56 NIVLET_DERIVED_DATA_PATH="$PWD/build/release-1.0.9-build56/arm64/DerivedData" sh scripts/build-release.sh`。已有输出拒绝覆盖；构建不自动安装。
-- 新 feed 只接受一个 arm64 ZIP；先隔离生成：`python3 scripts/generate-update-feed.py <arm64 ZIP> --output build/release-1.0.9-build56/appcast-candidate.xml`，未完成发布门槛前不覆盖 `docs/appcast.xml`。发行说明来自 `release-notes/1.0.9-build56.md`；草稿标记必须在真实门槛通过后删除。
+- 在新的隔离目录构建：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=arm64 NIVLET_BUILD_NUMBER=57 NIVLET_DERIVED_DATA_PATH="$PWD/build/release-2.0.0-build57/arm64/DerivedData" sh scripts/build-release.sh`。已有输出拒绝覆盖；构建不自动安装。
+- 新 feed 只接受一个 arm64 ZIP；先隔离生成：`python3 scripts/generate-update-feed.py <arm64 ZIP> --output build/release-2.0.0-build57/appcast-candidate.xml`，未完成发布门槛前不覆盖 `docs/appcast.xml`。发行说明来自 `release-notes/2.0.0-build57.md`；草稿标记必须在真实门槛通过后删除。
 - Feed 的每个新发行项必须保留 `sparkle:hardwareRequirements=arm64`，不把 arm64 包作为无架构限制的通用回退。Intel 用户继续使用最后的 1.0.8 Build 55。
 - Ed25519 私钥、公证配置和证书私钥留 Keychain，不导出到源码、日志、安装包或知识库。
 
 ## 正式发布门槛
 
-1. 核对最终源码提交、版本 1.0.9、Build 56 与新 tag；Git author/committer 均使用指定 noreply 身份。
+1. 核对最终源码提交、版本 2.0.0、Build 57 与新 tag；Git author/committer 均使用指定 noreply 身份。
 2. 完成独立性能和稳定性审阅、相关回归和 arm64 原生构建。全部内嵌 Mach-O 必须仅含 arm64；App 中 Toolkit 逐文件与源码一致。
 3. 只在发行副本、签名前精简明确的框架 Headers、PrivateHeaders、Modules 与对应顶层符号链接。保留框架二进制、Resources、版本链接、XPC 服务、更新器、许可证和其他运行资源。dSYM 留在构建产物中，与主程序 UUID 匹配，不放入安装包。
 4. Developer ID 签名全部嵌套代码，沿用既有 Team、Bundle ID 与 `Native/Nivlet.entitlements`；不新增权限。
@@ -29,16 +31,16 @@
 版本读取仓库 `VERSION`，示例：
 
 ```sh
-NIVLET_SIGN_IDENTITY=签名身份 NIVLET_TEAM_ID=团队标识 NIVLET_NOTARY_PROFILE=钥匙串配置 NIVLET_BUILD_NUMBER=56 NIVLET_RELEASE_DIR=build/release-1.0.9-build56 python3 scripts/sign-notarize.py arm64
+NIVLET_SIGN_IDENTITY=签名身份 NIVLET_TEAM_ID=团队标识 NIVLET_NOTARY_PROFILE=钥匙串配置 NIVLET_BUILD_NUMBER=57 NIVLET_RELEASE_DIR=build/release-2.0.0-build57 python3 scripts/sign-notarize.py arm64
 ```
 
 默认只处理 arm64；`--dry-run` 可预览，已有输出拒绝覆盖。沿用本机已有 `Nivlet-notary` 公证配置。主 App entitlement 仅为既有 `com.apple.security.automation.apple-events`；公证不代替辅助功能授权，也不等于 App Store 分发。
 
-应用内更新仍从关于页手动检查、用户确认安装；有草稿先处理。签名后的 ZIP 使用既有 Sparkle Keychain 密钥签名，feed 生成器验证实际架构、版本、Build、公钥和包内容，再生成架构受限的项。发布前运行 `python3 tests/updates.py --build 56 --dist build/release-1.0.9-build56/dist --appcast build/release-1.0.9-build56/appcast-candidate.xml` 及相应负向检查，确保 Intel 不会获得新的 arm64 包。
+应用内更新仍从关于页手动检查、用户确认安装；有草稿先处理。签名后的 ZIP 使用既有 Sparkle Keychain 密钥签名，feed 生成器验证实际架构、版本、Build、公钥和包内容，再生成架构受限的项。发布前运行 `python3 tests/updates.py --build 57 --dist build/release-2.0.0-build57/dist --appcast build/release-2.0.0-build57/appcast-candidate.xml` 及相应负向检查，确保 Intel 不会获得新的 arm64 包。
 
 ## 历史发行说明
 
-1.0.8 / Build 55 于 2026-10-29 发布双架构 ZIP、DMG 与 SHA-256；v1.0.8 tag 保留原位置。1.0.7 / Build 53 复用已验收 Build 49 的原生程序与匹配 dSYM，只更新 Toolkit 和版本元数据后重签名；该历史做法不适用于本次原生修复，1.0.9 必须重新编译。
+1.0.8 / Build 55 于 2026-10-29 发布双架构 ZIP、DMG 与 SHA-256；v1.0.8 tag 保留原位置。1.0.7 / Build 53 复用已验收 Build 49 的原生程序与匹配 dSYM，只更新 Toolkit 和版本元数据后重签名；2.0.0 必须使用新版本元数据重新编译、签名和公证，不改名复用旧候选。
 
 ## 1.0.6 构建兼容说明
 
@@ -47,4 +49,4 @@ NIVLET_SIGN_IDENTITY=签名身份 NIVLET_TEAM_ID=团队标识 NIVLET_NOTARY_PROF
 
 ## 历史双架构更新源（1.0.2–1.0.8）
 
-历史生成器同时接收同版本、Build、公钥的 arm64 与 x86_64 ZIP。Sparkle 2.10.0 同版本选择首个兼容项，ARM 项在前且带 `hardwareRequirements=arm64`，Intel 回退项在后。此段仅解释历史 feed；1.0.9 起不再使用双包生成流程，也不能去掉新 ARM 项的硬件限制。
+历史生成器同时接收同版本、Build、公钥的 arm64 与 x86_64 ZIP。Sparkle 2.10.0 同版本选择首个兼容项，ARM 项在前且带 `hardwareRequirements=arm64`，Intel 回退项在后。此段仅解释历史 feed；2.0.0 起不再使用双包生成流程，也不能去掉新 ARM 项的硬件限制。

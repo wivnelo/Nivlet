@@ -31,7 +31,7 @@ Nivlet is a free, open-source macOS menu bar utility that brings everyday deskto
 </p>
 
 <p align="center">
-  <sub>16-second UI demo · Synthetic data · No sound</sub><br>
+  <sub>28-second settings UI demo · Synthetic data and simulated native responses · No sound</sub><br>
   <a href="docs/assets/demos/overview-en.gif">View full size</a> · <a href="#screenshots">Still screenshots</a>
 </p>
 
@@ -40,7 +40,7 @@ Nivlet is a free, open-source macOS menu bar utility that brings everyday deskto
 <details>
 <summary>View all 8 screenshots</summary>
 
-Historical interface screenshots, rendered from the settings UI with synthetic demonstration data; they do not show the new 1.0.9 sidebar. Clipboard text, network addresses, app rules, shortcuts and permission states are examples, not default settings or live system readings. Click an image to enlarge it.
+The screenshots and demos show the 2.0.0 / Build 57 settings frontend (UI from `32d3395`, with updated version metadata), using synthetic data and simulated native responses in an isolated environment. They illustrate the interface, not a native end-to-end test. Clipboard text, network addresses, app rules, shortcuts and permission states are examples, not default settings or live system readings. Click an image to enlarge it.
 
 <table>
 <tr>
@@ -78,22 +78,22 @@ Historical interface screenshots, rendered from the settings UI with synthetic d
 | **Browser routing** | Choose the browser for a link based on its domain or source app |
 | **Input sources** | Assign an input source to an app and switch automatically when you activate it |
 | **System information** | See network speed in the menu bar and choose CPU, memory, disk, network addresses and dates to display |
-| **Personalization & migration** | Simplified/Traditional Chinese, English and Japanese in 1.0.9; light and dark appearances, sidebar ordering and JSON configuration import/export |
+| **Personalization & migration** | Simplified/Traditional Chinese, English and Japanese in 2.0.0; light and dark appearances, sidebar ordering and JSON configuration import/export |
 
 ## Get started
 
 1. Download **either the DMG or ZIP** from [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/latest).
 2. Move `Nivlet.app` to Applications and open it.
 3. Click the menu bar **N icon → Settings…**, enable your tools and configure their rules.
-4. In 1.0.9, click **Save All Settings** in the bottom-right corner to save every changed page. Switching sidebar sections keeps drafts; an orange dot marks each unsaved page. **Cancel Page Changes** affects only the current page.
+4. In 2.0.0, click **Save All Settings** in the bottom-right corner to save every changed page. Switching sidebar sections keeps drafts; an orange dot marks each unsaved page. **Cancel Page Changes** affects only the current page.
 
-Features are opt-in, and shortcuts are yours to configure. Window management and Option-click paste require **Accessibility permission**. Browser routing requires choosing **Nivlet as your default browser**.
+Features are opt-in. Window and app shortcuts are configurable; the clipboard menu has an enable switch for Command-Shift-V. Window management and Option-click paste require **Accessibility permission**. Browser routing requires choosing **Nivlet as your default browser**.
 
 ## Release and architecture support
 
-**1.0.9 / Build 56 is being prepared for Apple Silicon (arm64), macOS 13.0+.** Its final build, signing, notarization and acceptance checks must pass before publication. See the [candidate release notes](documentation/RELEASE-v1.0.9.md).
+**2.0.0 / Build 57 is being prepared for Apple Silicon (arm64), macOS 13.0+.** The new major version requires its own build, signing, notarization and final acceptance/update checks. Historical 1.0.9 candidate results do not validate the new package; publication follows when all required checks pass. See the [candidate release notes](documentation/RELEASE-v2.0.0.md).
 
-**[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) is the final Intel (x86_64) release.** Its existing signed and notarized downloads remain available. New releases will no longer build or support Intel; no Intel hardware validation is claimed for 1.0.9. Until the candidate is published, v1.0.8 remains the latest official release.
+**[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) is the final Intel (x86_64) release.** Its existing signed and notarized downloads remain available. New releases will no longer build or support Intel; no Intel hardware validation is claimed for 2.0.0. Until the candidate is published, v1.0.8 remains the latest official release.
 
 Download a published DMG or ZIP from [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/latest), move `Nivlet.app` to Applications and launch that copy. No separate Hammerspoon installation is needed.
 
@@ -121,4 +121,4 @@ Report problems or suggestions through [GitHub Issues](https://github.com/wivnel
 
 Nivlet uses the [MIT License](LICENSE). Its embedded Runtime is based on [Hammerspoon](https://github.com/Hammerspoon/hammerspoon). Third-party components retain their own licenses; see [third-party notices](THIRD-PARTY-NOTICES.md).
 
-The 1.0.9 candidate unifies all eight settings pages with a sidebar, adds local `.html`/`.htm` routing and saves drafts across pages together. Clipboard recording uses one enable switch; its menu shortcut uses an enable switch for ⌘⇧V, while existing custom shortcuts are preserved until that switch is changed and saved. Image previews close when clicking outside the image or pressing Escape. Existing HTTP/HTTPS routing remains in scope; see [detailed changes, migration rules and validation gates](documentation/RELEASE-v1.0.9.md).
+The 2.0.0 candidate unifies all eight settings pages with a sidebar, adds local `.html`/`.htm` routing and saves drafts across pages together. Clipboard recording uses one enable switch; its menu shortcut uses an enable switch for ⌘⇧V, while existing custom shortcuts are preserved until that switch is changed and saved. Click a thumbnail, or focus it and press Enter or Space, to open an image preview; click outside the image within Nivlet or press Escape to close it. Existing HTTP/HTTPS routing remains in scope; see [detailed changes, migration rules, package sizes and validation gates](documentation/RELEASE-v2.0.0.md).

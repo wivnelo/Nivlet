@@ -1,8 +1,8 @@
-> This guide describes the 1.0.9 / Build 56 candidate, not yet published. Apple Silicon (arm64) only; 1.0.8 Build 55 remains the final Intel release.
+> This guide describes the 2.0.0 / Build 57 candidate, not yet published. Requires macOS 13+ and Apple Silicon (arm64); 1.0.8 Build 55 remains the final Intel release.
 
 # Nivlet User Guide
 
-See [BASELINE](../BASELINE.md) for the final build, signing, notarization and acceptance status of the 1.0.9 candidate; results from earlier packages do not apply to it. Signing and notarization do not grant Accessibility access. See the [installation guide](INSTALLATION.en.md).
+See [BASELINE](../BASELINE.md) for the final build, signing, notarization and acceptance status of the 2.0.0 candidate; results from earlier packages do not apply to it. Signing and notarization do not grant Accessibility access. See the [installation guide](INSTALLATION.en.md).
 
 [Back to README](../README.md) · [简体中文](USAGE.md)
 
@@ -17,7 +17,7 @@ Enable and save recording in Settings → Clipboard, then copy new content. Open
 | Copy an entry | Click it in the menu, then paste into the target app |
 | Paste directly | Hold Option and click an entry to paste into the app active before opening the menu; requires Accessibility |
 | Search | Use Search History… in the menu or the settings search field; text search only, no image OCR |
-| Enlarge an image | Use the preview button on its settings history card; press Escape or click outside the image bounds within the Nivlet window to close |
+| Enlarge an image | Click its settings thumbnail, or focus it and press Enter or Space; press Escape or click outside the image bounds within the Nivlet window to close |
 | Stop recording | Turn off Enable Clipboard History and save; enabling it again captures only new copies |
 | Clear | Clear History… in the menu or settings; confirmation deletes history and cache **and clears the current system clipboard. This cannot be undone** |
 
@@ -25,11 +25,11 @@ Text history defaults to 50 entries, with choices from 10 to 100. Retention defa
 
 History is discarded on exit by default. Persistence across restarts is optional and uses a local plaintext cache. Duplicate content moves to the newest position; content copied before enabling or while recording is off is not backfilled. Turn recording off and save before copying sensitive information: app exclusions and filters cannot identify every sensitive item.
 
-The menu shortcut has an enable switch and uses **Command-Shift-V**. It is enabled for a fresh installation or when shortcut configuration is missing; an explicit off setting persists across restarts. Existing custom shortcuts remain unchanged on startup and when saving unrelated settings. Changing this switch and saving binds Command-Shift-V when enabled or removes the binding when disabled. This shortcut is independent of recording, so existing history remains accessible when recording is off.
+The menu shortcut has an enable switch, displays **⌘⇧ + V** and binds **Command-Shift-V**. It is enabled for a fresh installation or when shortcut configuration is missing; an explicit off setting persists across restarts. Existing custom shortcuts remain unchanged on startup and when saving unrelated settings. Changing this switch and saving binds Command-Shift-V when enabled or removes the binding when disabled. This shortcut is independent of recording, so existing history remains accessible when recording is off.
 
 There is no separate Pause/Resume action. Enable Clipboard History is the only recording control; turning it off does not clear history, change retention limits or backfill content when enabled again.
 
-The enlarged image preview has no close button. Clicking outside the image element’s bounds within the Nivlet window closes it; transparent pixels inside those bounds do not. Escape, focus restoration and prevention of click-through remain in place, without a global mouse permission.
+Image previews open directly from thumbnails, with no separate open or close button. Clicking outside the image element’s bounds within the Nivlet window closes the preview; transparent pixels inside those bounds do not. Escape, focus restoration after asynchronous history refresh and prevention of click-through remain in place, without a global mouse permission.
 
 ### Window management and app launching
 
@@ -45,7 +45,7 @@ Launcher rules open an app or bring it forward. Adding the same app again highli
 2. Enable and save, then test links from another app. Settings no longer include the internal rule-test panel.
 3. Click “Set as Default Browser…” and complete the macOS confirmation, then check again. If no prompt appears, use “Open Default Browser Settings…” and select Nivlet. Switch back to your previous browser to stop routing.
 
-Priority is **domain → source app → fallback**. Domain rules match from top to bottom, support subdomains and can be reordered with ↑ / ↓. Installed Safari, Chrome, Firefox, Edge and Brave are supported. Web routing handles HTTP/HTTPS. Version 1.0.9 also forwards local `.html`/`.htm` files to the configured fallback browser, without applying domain or source-app rules. It does not add local PDF, TXT, image, XHTML or `.url`/`.webloc` parsing support; `mailto:`, `tel:` and application-specific protocols remain with their system handlers. Some apps do not expose an identifiable source; domain rules or the fallback apply in that case.
+Priority is **domain → source app → fallback**. Domain rules match from top to bottom, support subdomains and can be reordered with ↑ / ↓. Installed Safari, Chrome, Firefox, Edge and Brave are supported. Web routing handles HTTP/HTTPS. Version 2.0.0 also forwards local `.html`/`.htm` files to the configured fallback browser, without applying domain or source-app rules. It does not add local PDF, TXT, image, XHTML or `.url`/`.webloc` parsing support; `mailto:`, `tel:` and application-specific protocols remain with their system handlers. Some apps do not expose an identifiable source; domain rules or the fallback apply in that case.
 
 ### System information and input sources
 
@@ -76,7 +76,7 @@ Browser app and domain rules are separate sections. Save rules, then test links 
 
 ## Permissions and validation
 
-Unsaved pages have an orange dot in the sidebar. Saving or discarding clears the corresponding marker. General retains Check Again even when Accessibility is off and refreshes permission status when its window regains focus. Default-browser setup no longer requests unrelated document associations. Historical manual acceptance on the maintainer's setup does not establish the final 1.0.9 candidate's results. See the [installation guide](INSTALLATION.en.md) for the current Developer ID/notarization limitations.
+Unsaved pages have an orange dot in the sidebar. Saving or discarding clears the corresponding marker. General retains Check Again even when Accessibility is off and refreshes permission status when its window regains focus. Default-browser setup no longer requests unrelated document associations. Historical manual acceptance on the maintainer's setup does not establish the final 2.0.0 candidate's results. See the [installation guide](INSTALLATION.en.md) for the current Developer ID/notarization limitations.
 
 ## Interface consistency
 

@@ -1,74 +1,117 @@
-// Capture bilingual, read-only UI interactions. Requires Playwright and the screenshot fixture.
+// Record actual interactions in the pinned settings frontend using sample data.
+// Native preview/save replies below are explicitly simulated; no system action runs.
 const fs=require('node:fs');
 const path=require('node:path');
 const {pathToFileURL}=require('node:url');
 const {chromium}=require('playwright');
-const {data,root}=require('./render-readme-screenshots.cjs');
+const {makeFixture,root,source,verifySource,version,build}=require('./render-readme-screenshots.cjs');
 const output=path.join(root,'build/readme-demo');
-const fps=8, seconds=16;
+const fps=8,seconds=28,width=1120,height=850,scale=.875,headerHeight=90;
 const scenes=[
-    {section:'windowSection',target:'#windowGroup',en:['Window layouts','Choose halves, thirds or a grid.'],zh:['窗口布局','半屏、三分区、九宫格，按需选择。']},
-    {section:'clipSection',target:'#clipSearch',en:['Clipboard history','Find a saved snippet as you type.'],zh:['剪贴板历史','输入关键词，快速找到保存的内容。']},
-    {section:'browserSection',target:'#browserDefault',en:['Browser routing','Choose a browser for unmatched links.'],zh:['浏览器分流','为未匹配规则的链接选择浏览器。']},
-    {section:'launcherSection',target:'.launcher-key',en:['App shortcuts','Give your favorite apps a shortcut.'],zh:['应用快捷启动','为常用应用设置顺手的快捷键。']}
+ {section:'windowSection',en:['Window layouts','Browse layout groups in the new sidebar interface.'],zh:['窗口布局','在统一侧边栏中切换布局分组。']},
+ {section:'clipSection',en:['Clipboard history','Click an image to preview it, then search saved text.'],zh:['剪贴板历史','点击图片放大预览，再搜索已记录的文字。']},
+ {section:'browserSection',en:['Browser routing','Change the fallback browser; keep the draft when navigating.'],zh:['浏览器分流','修改未匹配时使用的浏览器，切换页面仍保留草稿。']},
+ {section:'launcherSection',en:['Save changes across pages','Edit an app shortcut, then save both pages together.'],zh:['跨页面一起保存','再修改应用快捷键，一次保存两个页面的修改。']}
 ];
 (async()=>{
  fs.mkdirSync(output,{recursive:true});
  const wrapper=path.join(output,'preview.html');
  fs.writeFileSync(wrapper,`<!doctype html><html><meta charset="utf-8"><style>
- *{box-sizing:border-box}body{margin:0;background:#202023;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,sans-serif;overflow:hidden}
- header{height:86px;padding:16px 25px;display:flex;align-items:center;gap:14px;border-bottom:1px solid #45454b}
- header img{width:44px;height:44px;border-radius:10px}h1{font-size:21px;margin:0 0 5px;font-weight:650}p{font-size:14px;color:#b8bbc3;margin:0}
- #label{margin-left:auto;color:#9299a7;font-size:12px;text-align:right;line-height:1.7}
- iframe{border:0;width:1080px;height:800px;transform:scale(.888888889);transform-origin:top left;display:block}
- #pointer{position:absolute;z-index:4;width:22px;height:22px;border:2px solid #86c8ff;border-radius:50%;background:#469af044;box-shadow:0 0 0 5px #469af019;pointer-events:none;transform:translate(-50%,-50%)}
- #progress{position:absolute;bottom:0;left:0;height:3px;background:#68b7f7}
- </style><header><img src="${data.about.icon}"><div><h1 id="title"></h1><p id="caption"></p></div><div id="label"></div></header><iframe src="${pathToFileURL(path.join(root,'Toolkit/settings.html')).href}"></iframe><div id="pointer"></div><div id="progress"></div></html>`);
- const browser=await chromium.launch({headless:true,...(process.env.NIVLET_SCREENSHOT_BROWSER?{executablePath:process.env.NIVLET_SCREENSHOT_BROWSER}:{})});
+ *{box-sizing:border-box}body{margin:0;background:#1f1e20;color:#dedede;font-family:-apple-system,BlinkMacSystemFont,sans-serif;overflow:hidden}
+ header{height:90px;padding:15px 23px;display:flex;align-items:center;gap:14px;border-bottom:1px solid #302f31;background:#19191b}
+ header img{width:44px;height:44px;border-radius:10px}h1{font-size:21px;margin:0 0 6px;font-weight:650}p{font-size:13px;color:#bdbdbf;margin:0}
+ #label{margin-left:auto;color:#a9a9ad;font-size:11px;text-align:right;line-height:1.8;max-width:200px;flex-shrink:0}
+ iframe{border:0;width:1280px;height:${(height-headerHeight)/scale}px;transform:scale(${scale});transform-origin:top left;display:block}
+ #pointer{position:absolute;z-index:5;width:18px;height:18px;border:2px solid #92c7ff;border-radius:50%;background:#007aff33;box-shadow:0 0 0 4px #007aff16;pointer-events:none;transform:translate(-50%,-50%)}
+ #progress{position:absolute;bottom:0;left:0;height:3px;background:#007aff}
+ </style><header><img src="${makeFixture('en').about.icon}"><div><h1 id="title"></h1><p id="caption"></p></div><div id="label"></div></header><iframe title="Nivlet sample UI interaction demo" src="${pathToFileURL(path.join(root,'Toolkit/settings.html')).href}"></iframe><div id="pointer"></div><div id="progress"></div></html>`);
+ const browser=await chromium.launch({headless:true,chromiumSandbox:true,executablePath:process.env.NIVLET_SCREENSHOT_BROWSER||'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',args:['--disable-background-networking','--disable-component-update','--disable-default-apps','--disable-sync','--no-first-run','--no-default-browser-check']});
+ const reports=[];
  try{
   for(const language of ['en','zh']){
    const dir=path.join(output,language);fs.mkdirSync(dir,{recursive:true});
-   const context=await browser.newContext({viewport:{width:960,height:800},deviceScaleFactor:1,locale:language==='en'?'en-US':'zh-CN',timezoneId:'UTC',colorScheme:'dark'});
+   const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:1,locale:language==='en'?'en-US':'zh-CN',timezoneId:'UTC',colorScheme:'dark'});
    const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.route('**/*',route=>route.request().url().startsWith('file:')?route.continue():route.abort());
    await page.addInitScript(()=>{window.webkit={messageHandlers:{toolkit:{postMessage(){}}}};});
    await page.goto(pathToFileURL(wrapper).href);
    const frame=page.frames().find(f=>f.url().endsWith('/Toolkit/settings.html'));
    await frame.waitForFunction(()=>typeof window.receive==='function');
-   const fixture=structuredClone(data);
-   if(language==='zh'){
-    fixture.language='zh-Hans';fixture.general.language='zh-Hans';
-    const names=['灵感笔记','项目看板','阅读清单'];
-    for(const config of [fixture.input,fixture.launcher])config.rules.forEach((rule,i)=>rule.name=names[i]);
-    fixture.browser.appRules[0].name=names[0];
-    Object.values(fixture.applicationStates).forEach((state,i)=>state.name=names[i]);
-    fixture.sources[1].name='简体拼音';
-    fixture.clipboard.entries[0].text='少一点切换，多一点专注。';
-    fixture.clipboard.entries[1].text='设计参考：https://example.com/design-notes';
-    fixture.clipboard.entries[2].text='发布清单\n审阅变更 · 运行测试 · 更新文档';
+   await frame.evaluate(fixture=>{
+    window.mediaFixture=fixture;window.mediaRequests=[];window.mediaPendingSave=null;
+    window.webkit.messageHandlers.toolkit.postMessage=body=>{
+     const request=structuredClone(body);window.mediaRequests.push(request);
+     if(request.action==='previewClipboard'){
+      const entry=window.mediaFixture.clipboard.entries.find(item=>item.id===request.id);
+      if(!entry?.preview)throw Error('Missing synthetic preview');
+      window.showImage({...entry,url:entry.preview});
+     }
+     if(request.action==='saveAllSettings')window.mediaPendingSave=request;
+    };
+    window.receive(fixture);
+   },makeFixture(language==='en'?'en':'zh-Hans'));
+   await page.evaluate(({language,version,build})=>document.getElementById('label').innerHTML=(language==='en'?'SAMPLE DATA · UI DEMO<br>Simulated native replies':'示例数据 · 界面演示<br>原生回执为隔离模拟')+'<br>Nivlet '+version+' · Build '+build,{language,version,build});
+   let pointer={x:80,y:145};
+   const events=[];
+   async function moveTo(selector,click=false){
+    const control=frame.locator(selector).first();await control.scrollIntoViewIfNeeded();
+    const box=await control.boundingBox();if(!box)throw Error('Invisible '+selector);
+    pointer={x:box.x+box.width/2,y:box.y+box.height/2};
+    await page.mouse.move(pointer.x,pointer.y);if(click)await control.click();
    }
-   await frame.evaluate(data=>window.receive(data),fixture);
-   await page.evaluate(language=>document.getElementById('label').textContent=language==='en'?'NIVLET FOR MAC · UI DEMO':'NIVLET FOR MAC · 界面演示',language);
    for(let sceneIndex=0;sceneIndex<scenes.length;sceneIndex++){
     const scene=scenes[sceneIndex],copy=scene[language];
-    await frame.evaluate(section=>{window.showSection(section);document.querySelector('main').scrollTop=0;window.scrollTo(0,0)},scene.section);
+    await moveTo('#tab-'+scene.section,true);
     await page.evaluate(copy=>{document.getElementById('title').textContent=copy[0];document.getElementById('caption').textContent=copy[1]},copy);
-    const rect=await frame.locator(scene.target).first().evaluate(el=>{const r=el.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}});
-    for(let tick=0;tick<4*fps;tick++){
-     if(tick===14){
-      if(sceneIndex===0)await frame.locator('#windowGroup').selectOption('thirds');
-      if(sceneIndex===2)await frame.locator('#browserDefault').selectOption('com.google.Chrome');
-      if(sceneIndex===3){await frame.locator('.launcher-key').first().fill('N');}
+    events.push({frame:sceneIndex*56,action:'navigate',section:scene.section});
+    for(let tick=0;tick<56;tick++){
+     let click=false;
+     if(sceneIndex===0){
+      if(tick===8)await moveTo('#windowGroup');
+      if(tick===16){await frame.locator('#windowGroup').selectOption('thirds');events.push({frame:tick,action:'layout-group',value:'thirds'});click=true;}
+      if(tick===36){await frame.locator('#windowGroup').selectOption('grid');events.push({frame:tick,action:'layout-group',value:'grid'});click=true;}
      }
-     if(sceneIndex===1&&tick>=12&&tick<=22&&tick%2===0){const query=language==='en'?'design':'设计';await frame.locator('#clipSearch').fill(query.slice(0,(tick-10)/2));}
-     const t=Math.min(1,tick/12),ease=t*t*(3-2*t);
-     await page.evaluate(({x,y,progress,click})=>{const p=document.getElementById('pointer');p.style.left=x+'px';p.style.top=y+'px';p.style.background=click?'#91d0ff99':'#469af044';document.getElementById('progress').style.width=progress+'%'},{x:70+(rect.x*8/9-70)*ease,y:155+(rect.y*8/9+86-155)*ease,progress:(sceneIndex*32+tick+1)/(fps*seconds)*100,click:tick===14||tick===15});
-     await page.screenshot({path:path.join(dir,String(sceneIndex*32+tick).padStart(4,'0')+'.png'),animations:'disabled'});
+     if(sceneIndex===1){
+      if(tick===6)await moveTo('#clipHistory [data-clip-action="preview"]');
+      if(tick===10){await moveTo('#clipHistory [data-clip-action="preview"]',true);click=true;events.push({frame:56+tick,action:'thumbnail-preview'});}
+      if(tick===24){pointer={x:width-30,y:height-60};await page.mouse.click(pointer.x,pointer.y);click=true;if(await frame.locator('#imageDialog').evaluate(el=>el.open))throw Error('Preview did not close');events.push({frame:56+tick,action:'outside-dismiss'});}
+      if(tick===30)await moveTo('#clipSearch',true);
+      const query=language==='en'?'design':'设计';
+      if(tick>=34&&tick<34+query.length*2&&tick%2===0){await frame.locator('#clipSearch').pressSequentially(query[(tick-34)/2]);events.push({frame:56+tick,action:'search-input'});}
+      if(tick===50){const count=await frame.locator('#clipHistory .clip-card').count();if(count!==1)throw Error('Search should show exactly one synthetic text result');}
+     }
+     if(sceneIndex===2){
+      if(tick===10)await moveTo('#browserDefault');
+      if(tick===20){await frame.locator('#browserDefault').selectOption('com.google.Chrome');click=true;events.push({frame:112+tick,action:'browser-draft'});}
+      if(tick===42){const dirty=await frame.evaluate(()=>dirtyPages());if(dirty.join(',')!=='browserSection')throw Error('Expected only browser draft: '+dirty);}
+     }
+     if(sceneIndex===3){
+      if(tick===6)await moveTo('.launcher-key',true);
+      if(tick===12){await frame.locator('.launcher-key').first().fill('N');events.push({frame:168+tick,action:'launcher-draft'});}
+      if(tick===22){const dirty=await frame.evaluate(()=>dirtyPages());if(dirty.join(',')!=='browserSection,launcherSection')throw Error('Missing cross-page drafts: '+dirty);await moveTo('#saveSettings');}
+      if(tick===28){await moveTo('#saveSettings',true);click=true;const request=await frame.evaluate(()=>window.mediaPendingSave);if(!request||Object.keys(request.pages).join(',')!=='browserSection,launcherSection')throw Error('Save All did not collect both pages');events.push({frame:168+tick,action:'save-all-request',pages:Object.keys(request.pages)});}
+      if(tick===34){
+       await frame.evaluate(()=>{
+        const request=window.mediaPendingSave;if(!request)throw Error('No simulated save pending');
+        const fixture=window.mediaFixture;fixture.browser=request.pages.browserSection.config;fixture.launcher=request.pages.launcherSection.config;
+        window.receive({...fixture,action:'saveAllSettings',requestID:request.requestID,ok:true,message:'',saveBatch:{ok:true,results:Object.keys(request.pages).map(page=>({page,status:'saved'}))}});
+        window.mediaPendingSave=null;
+       });events.push({frame:168+tick,action:'simulated-save-ack'});
+      }
+      if(tick===48){const state=await frame.evaluate(()=>({dirty:dirtyPages(),disabled:document.getElementById('saveSettings').disabled,status:document.getElementById('status').textContent}));if(state.dirty.length||!state.disabled)throw Error('Save acknowledgement did not clear drafts');events.push({frame:168+tick,action:'saved-state',status:state.status});}
+     }
+     await page.evaluate(({x,y,progress,click})=>{const p=document.getElementById('pointer');p.style.left=x+'px';p.style.top=y+'px';p.style.background=click?'#92c7ffbb':'#007aff33';document.getElementById('progress').style.width=progress+'%'},{...pointer,progress:(sceneIndex*56+tick+1)/(fps*seconds)*100,click});
+     await page.screenshot({path:path.join(dir,String(sceneIndex*56+tick).padStart(4,'0')+'.png'),animations:'disabled'});
     }
     console.log(language,scene.section,'captured');
    }
    if(errors.length)throw new Error(errors.join('\n'));
+   reports.push({language,events,errors,requests:await frame.evaluate(()=>window.mediaRequests.map(({action,requestID,pages})=>({action,requestID,pages:pages?Object.keys(pages):undefined})))});
    await context.close();
   }
+  verifySource();
+  const manifest={width,height,fps,frames:fps*seconds,seconds,source,languages:['en','zh'],durationsMs:Array(fps*seconds).fill(1000/fps),syntheticData:true,nativeReplies:'simulated',reports};
+  fs.writeFileSync(path.join(output,'manifest.json'),JSON.stringify(manifest,null,2));
+  console.log(JSON.stringify({frames:manifest.frames,languages:manifest.languages,manifest:path.join(output,'manifest.json')}));
  }finally{await browser.close()}
 })().catch(error=>{console.error(error);process.exitCode=1});

@@ -1,6 +1,6 @@
 # 第三方许可工程核查
 
-历史已发布核查：1.0.8 / Build 55。1.0.9 Build 56 候选须重新核对最终包声明与保留资源，不能直接沿用旧包通过结果。Apple Developer ID 签名与 Apple 公证已完成；签名、公证与第三方许可人工复核分别记录，不以公证通过代替许可复核。包内收集 81 份许可原文及 Sparkle 声明，收集脚本回归覆盖 suffix-named 许可文件。完整特殊许可人工复核仍开放，见 [ROADMAP](../ROADMAP.md)。不将工程收集成功视为法律审查完成。
+当前待发布版本为 **2.0.0 / Build 57**，须重新核对最终包声明与保留资源。历史正式版为 1.0.8 / Build 55；1.0.9 / Build 56 是未发布的历史候选，其 Apple Developer ID 签名与 Apple 公证结果不能用于证明 2.0.0 已通过。签名、公证与第三方许可人工复核分别记录，不以公证通过代替许可复核。历史构建收集 81 份许可原文及 Sparkle 声明，收集脚本回归覆盖 suffix-named 许可文件；2.0.0 的最终包须单独核验。完整特殊许可人工复核仍开放，见 [ROADMAP](../ROADMAP.md)。不将工程收集成功视为法律审查完成。
 
 ## 当前来源
 
@@ -14,7 +14,7 @@ Runtime 固定为 Hammerspoon 1.1.1，commit `1469832361b4c3687ec7d589c1b4efe4d3
 | Lua 5.4.7 | 单独收集 README 中的版权与许可 |
 | Nivlet | 自有 LICENSE 随包保留，不能替代第三方许可证 |
 
-`scripts/collect-notices.py` 生成合并声明，放在应用 `Contents/Resources/Toolkit/THIRD-PARTY-NOTICES.md`；“关于”页读取此文件。当前构建收集日志为 81 个许可文件，另含 CocoaPods acknowledgements 和 Lua README；数量本身不证明全部义务已经满足。
+`scripts/collect-notices.py` 生成合并声明，放在应用 `Contents/Resources/Toolkit/THIRD-PARTY-NOTICES.md`；“关于”页读取此文件。历史构建收集日志为 81 个许可文件，另含 CocoaPods acknowledgements 和 Lua README；2.0.0 最终包的声明须与当次构建日志逐项核对，数量本身不证明全部义务已经满足。
 
 ## 发布前核查
 
