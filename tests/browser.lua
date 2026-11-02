@@ -57,7 +57,7 @@ assert(b.openDefaultSettings());assert(opened[1]=='x-apple.systempreferences:com
 print('Explicit default browser request and system settings fallback passed')
 
 
-hs.fs={attributes=function(path,field) assert(field=='mode');return path=='/installed.app' and 'directory' or nil end}
+hs.fs={displayName=function()return 'Safari.app' end,attributes=function(path,field) assert(field=='mode');return path=='/installed.app' and 'directory' or nil end}
 hs.application.pathForBundleID=function(id)
     if id=='com.apple.Safari' then return '/installed.app' end
     if id=='com.google.Chrome' then return '/removed/Google Chrome.app' end

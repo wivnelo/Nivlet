@@ -2,8 +2,6 @@
 #include <sys/sysctl.h>
 #include <net/route.h>
 #include <net/if.h>
-#include <ifaddrs.h>
-#include <net/if_dl.h>
 
 int main(void) {
     @autoreleasepool {
@@ -27,18 +25,6 @@ int main(void) {
                 }
             }
             free(buffer);
-        }
-        struct ifaddrs *addresses = NULL;
-        if (getifaddrs(&addresses) == 0) {
-            for (struct ifaddrs *a = addresses; a; a = a->ifa_next) {
-                if (!a->ifa_addr || a->ifa_addr->sa_family != AF_LINK) continue;
-                struct sockaddr_dl *link = (struct sockaddr_dl *)a->ifa_addr;
-                if (link->sdl_alen != 6) continue;
-                const unsigned char *mac = (const unsigned char *)LLADDR(link);
-                NSMutableDictionary *item = interfaces[@(a->ifa_name)];
-                if (item) item[@"mac"] = [NSString stringWithFormat:@"%02x:%02x:%02x:%02x:%02x:%02x", mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]];
-            }
-            freeifaddrs(addresses);
         }
         NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierChinese];
         NSDateComponents *date = [calendar components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:[NSDate date]];

@@ -8,6 +8,9 @@ derived_data=${NIVLET_DERIVED_DATA_PATH:-"$project_dir/build/DerivedData"}
 case "$configuration" in Debug|Release) ;; *) echo "Unsupported build configuration: $configuration" >&2; exit 1 ;; esac
 sh "$project_dir/scripts/preflight.sh"
 upstream_dir="$project_dir/vendor/hammerspoon"
+# Refuse an older prepared Runtime rather than silently omitting the power bridge.
+git -C "$upstream_dir" apply --reverse --check "$project_dir/patches/nivlet-keep-awake.patch"
+cp "$project_dir/Native/keep_awake.h" "$upstream_dir/extensions/caffeinate/nivlet_keep_awake.h"
 
 cp "$project_dir/Native/Nivlet.entitlements" "$upstream_dir/Hammerspoon/Hammerspoon.entitlements"
 python3 "$project_dir/scripts/prepare-icon.py"

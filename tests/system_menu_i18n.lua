@@ -8,8 +8,8 @@ hs={settings={get=function()return nil end},
 }
 local i18n=require('modules.i18n')
 local sys=require('modules.sys_info')
-sys.mac='02:12:34:56:78:9a';sys.lunar='fixture-lunar';sys.openSettings=function()end
-local labels={'CPU 使用率','内存使用率','磁盘使用率','局域网 IPv4','IPv6 地址','MAC 地址','公历与星期','农历'}
+sys.lunar='fixture-lunar';sys.openSettings=function()end
+local labels={'CPU 使用率','内存使用率','磁盘使用率','局域网 IPv4','IPv6 地址','公历与星期','农历'}
 sys.snapshot()
 for _,language in ipairs({'zh-Hans','en','zh-Hant','ja'}) do
  i18n.configure(language)
@@ -17,12 +17,12 @@ for _,language in ipairs({'zh-Hans','en','zh-Hant','ja'}) do
  for index,key in ipairs(labels) do assert(menu[index].title:sub(1,#i18n.t(key)+2)==i18n.t(key)..': ','Menu field '..key..' / '..language) end
  assert(menu[1].title:find('2 '..i18n.t('核心'),1,true),'Localized CPU unit')
  assert(menu[#menu].title==i18n.t('系统信息设置…'))
- for index,value in pairs({[4]='192.0.2.42',[5]='2001:db8::42',[6]='02:12:34:56:78:9a',[8]='fixture-lunar'}) do
+ for index,value in pairs({[4]='192.0.2.42',[5]='2001:db8::42',[7]='fixture-lunar'}) do
   menu[index].fn();assert(copied==value,'Copy must preserve the original machine value')
  end
  local snapshot=sys.snapshot()
  assert(snapshot.cpu=='50% / 2 Core','Internal CPU format changed')
  assert(snapshot.memory=='50% / 1 GB' and snapshot.disk=='50% / 1 GB')
- assert(snapshot.ipv4=='192.0.2.42' and snapshot.ipv6=='2001:db8::42' and snapshot.mac==sys.mac and snapshot.lunar=='fixture-lunar')
+ assert(snapshot.ipv4=='192.0.2.42' and snapshot.ipv6=='2001:db8::42' and snapshot.mac==nil and snapshot.lunar=='fixture-lunar')
 end
 print('System menu labels and core unit localized in four languages; snapshots, parsing and copied values unchanged')

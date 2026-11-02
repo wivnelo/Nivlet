@@ -39,9 +39,9 @@ function loadFixture() {
    {id:3,time:1793325480,text:language==='en'?'Release checklist\nReview the changes · Run tests · Update documentation':'发布清单\n审阅变更 · 运行测试 · 更新文档'}]},
   excludedAppNames:{},appIcons:{},applicationStates:Object.fromEntries(ids.map((id,i)=>[id,{installed:true,name:names[i]}])),
   popupShortcut:{key:'V',mods:['cmd','shift']},popupShortcutDefault:{key:'V',mods:['cmd','shift']},
-  system:Object.fromEntries(['network','cpu','memory','disk','ipv4','ipv6','mac','date','lunar'].map(id=>[id,true])),
+  system:Object.fromEntries(['network','cpu','memory','disk','ipv4','ipv6','date','lunar'].map(id=>[id,true])),
   browser:{enabled:true,defaultBrowser:'com.apple.Safari',rules:[{domain:'example.com',browser:'com.google.Chrome',subdomains:true}],appRules:[{bundleID:ids[0],name:names[0],browser:'com.apple.Safari'}]},
-  browserStatus:{active:true},browsers:[{id:'com.apple.Safari',name:'Safari'},{id:'com.google.Chrome',name:'Google Chrome'}],
+  browserStatus:{active:true},browsers:[{id:'com.apple.Safari',name:'Safari',capabilities:{clearBrowsingData:true}},{id:'com.google.Chrome',name:'Google Chrome',capabilities:{clearBrowsingData:true}}],
   about:{version:fs.readFileSync(path.join(root,'VERSION'),'utf8').trim(),build:'56',icon,license:fs.readFileSync(path.join(root,'LICENSE'),'utf8'),notices:fs.readFileSync(path.join(root,'THIRD-PARTY-NOTICES.md'),'utf8')}
  };
 }
@@ -55,7 +55,7 @@ async function fresh(browser){
  await page.addInitScript(()=>{window.webkit={messageHandlers:{toolkit:{postMessage(){}}}};});
  await page.goto(pathToFileURL(opts.html?path.resolve(opts.html):path.join(root,'Toolkit/settings.html')).href,{waitUntil:'load'});
  await page.evaluate(data=>window.receive(data),data);
- await page.evaluate(()=>window.receiveSystemValues({ok:true,values:{network:'↓ 24 KB/s  ↑ 8 KB/s',cpu:'12% / 8 Core',memory:'6.2 / 16 GB',disk:'128 / 512 GB',ipv4:'192.0.2.10',ipv6:'2001:db8::10',mac:'02:00:00:00:00:01',date:'2026-11-01',lunar:'—'}}));
+ await page.evaluate(()=>window.receiveSystemValues({ok:true,values:{network:'↓ 24 KB/s  ↑ 8 KB/s',cpu:'12% / 8 Core',memory:'6.2 / 16 GB',disk:'128 / 512 GB',ipv4:'192.0.2.10',ipv6:'2001:db8::10',date:'2026-11-01',lunar:'—'}}));
  await page.evaluate(()=>document.fonts.ready);
  return {context,page,errors};
 }

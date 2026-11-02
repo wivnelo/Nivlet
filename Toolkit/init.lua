@@ -15,8 +15,10 @@ local browser = require("modules.browser")
 local browserData=require("modules.browser_data")
 browser.start()
 clipboard.start()
+local keepAwake=require("modules.keep_awake")
 local previousShutdown=hs.shutdownCallback
 hs.shutdownCallback=function()
+    keepAwake.stop()
     clipboard.stop()
     if type(previousShutdown)=="function" then previousShutdown() end
 end
@@ -35,6 +37,9 @@ local function validateGeneral(value)
         return nil, i18n.t("通用设置格式无效")
     end
     if value.sleepShortcut~=nil and type(value.sleepShortcut)~="boolean" then return nil,i18n.t("通用设置格式无效") end
+    for _,field in ipairs({"keepAwake","keepDisplayOn"}) do
+        if value[field]~=nil and type(value[field])~="boolean" then return nil,i18n.t("通用设置格式无效") end
+    end
     local language=value.language or "system"
     if language~="system" and language~="zh-Hans" and language~="en" and language~="zh-Hant" and language~="ja" then return nil,i18n.t("语言设置无效") end
     local order,seen={},{}
@@ -46,13 +51,19 @@ local function validateGeneral(value)
         end
         for _,id in ipairs(value.tabOrder) do if id~="aboutSection" then order[#order+1]=id end end
     end
-    return {showMenu=value.showMenu, appearance=value.appearance,language=language,tabOrder=order,sleepShortcut=value.sleepShortcut==true}
+    return {showMenu=value.showMenu, appearance=value.appearance,language=language,tabOrder=order,sleepShortcut=value.sleepShortcut==true,keepAwake=value.keepAwake==true,keepDisplayOn=value.keepAwake==true and value.keepDisplayOn==true}
 end
-app.general = validateGeneral(hs.settings.get(generalKey)) or {showMenu=true,appearance="system",language="system"}
+app.general = validateGeneral(hs.settings.get(generalKey)) or validateGeneral({showMenu=true,appearance="system",language="system"})
 
 hs.menuIcon(false)
 hs.openConsoleOnDockClick(false)
 hs.nivletAppearance(app.general.appearance)
+local function reconcileGeneralPower()
+    if app.general.keepAwake==keepAwake.awake and app.general.keepDisplayOn==keepAwake.display then return end
+    local actual={};for field,value in pairs(app.general) do actual[field]=value end
+    actual.keepAwake=keepAwake.awake;actual.keepDisplayOn=keepAwake.display
+    app.general=actual
+end
 function app.saveGeneral(value)
     local config, message = validateGeneral(value)
     if not config then return false, message end
@@ -65,25 +76,51 @@ function app.saveGeneral(value)
     end
     local installed,result=sleep.configure(config.sleepShortcut)
     if not installed then return false,result end
-    hs.nivletAppearance(config.appearance)
-    if config.showMenu then
-        local wasVisible=app.menu:isInMenuBar()
-        app.menu:returnToMenuBar()
-        if app.mainIcon then app.menu:setIcon(app.mainIcon,true) end
-        if not wasVisible and app.arrangeMenus then app.arrangeMenus() end
-    else app.menu:removeFromMenuBar() end
-    app.general=config
-    i18n.configure(config.language)
-    if app.updateMenu then app.updateMenu() end
-    if app.settings then app.settings:windowTitle("Nivlet for Mac") end
-    clipboard.menu:setTooltip(i18n.t("Nivlet 剪贴板历史"))
-    system.menu:setTooltip(i18n.t("Nivlet 系统信息")):setMenu(nil):setMenu(system.menuItems)
-    hs.settings.set(generalKey,config)
+    local previous=app.general
+    local powered,powerMessage=keepAwake.configure(config.keepAwake,config.keepDisplayOn)
+    if not powered then
+        local restored=sleep.configure(previous.sleepShortcut)
+        reconcileGeneralPower()
+        return false,powerMessage..(restored and "" or i18n.t("；旧快捷键也无法恢复，请重新配置"))
+    end
+    local stored=hs.settings.get(generalKey)
+    local function applyMetadata(config)
+        hs.nivletAppearance(config.appearance)
+        if config.showMenu then
+            local wasVisible=app.menu:isInMenuBar()
+            app.menu:returnToMenuBar()
+            if app.mainIcon then app.menu:setIcon(app.mainIcon,true) end
+            if not wasVisible and app.arrangeMenus then app.arrangeMenus() end
+        else app.menu:removeFromMenuBar() end
+        app.general=config
+        i18n.configure(config.language)
+        if app.updateMenu then app.updateMenu() end
+        if app.settings then app.settings:windowTitle("Nivlet for Mac") end
+        clipboard.menu:setTooltip(i18n.t("Nivlet 剪贴板历史"))
+        system.menu:setTooltip(i18n.t("Nivlet 系统信息")):setMenu(nil):setMenu(system.menuItems)
+    end
+    local ran=pcall(function()
+        applyMetadata(config)
+        if hs.settings.set(generalKey,config)==false then error("General persistence failed") end
+    end)
+    if not ran then
+        local powerRestored=keepAwake.configure(previous.keepAwake,previous.keepDisplayOn)
+        local shortcutRestored=sleep.configure(previous.sleepShortcut)
+        local metadataRestored=pcall(applyMetadata,previous)
+        local storedRestored=pcall(function()
+            if stored==nil then hs.settings.clear(generalKey)
+            elseif hs.settings.set(generalKey,stored)==false then error("General persistence recovery failed") end
+        end)
+        reconcileGeneralPower()
+        local message=i18n.t("保存失败，请检查设置")
+        if not powerRestored or not shortcutRestored or not metadataRestored or not storedRestored then message=message..i18n.t("；部分状态无法恢复，请关闭保持唤醒后重试") end
+        return false,message
+    end
     return true, i18n.t("通用设置已保存")
 end
 function app.setShowMenu(enabled)
     if type(enabled)~="boolean" then return false,i18n.t("通用设置格式无效") end
-    local value={showMenu=enabled,appearance=app.general.appearance,language=app.general.language,sleepShortcut=app.general.sleepShortcut,tabOrder=app.general.tabOrder}
+    local value={showMenu=enabled,appearance=app.general.appearance,language=app.general.language,sleepShortcut=app.general.sleepShortcut,keepAwake=app.general.keepAwake,keepDisplayOn=app.general.keepDisplayOn,tabOrder=app.general.tabOrder}
     return app.saveGeneral(value)
 end
 _G.desktopToolkit = app
@@ -248,7 +285,7 @@ local ok, message = install(app.config)
 if not ok then hs.alert.show(message) end
 local configuration=require("modules.configuration")
 local adapters={
-    general={get=function() return app.general end,defaults=function() return {showMenu=true,appearance="system",language="system"} end,validate=validateGeneral,save=app.saveGeneral},
+    general={get=function() return app.general end,defaults=function() return validateGeneral({showMenu=true,appearance="system",language="system"}) end,validate=validateGeneral,save=app.saveGeneral},
     windows={get=function() return app.config end,defaults=preferences.defaults,validate=preferences.validate,save=app.save},
     popupShortcut={get=function() return app.popupShortcut or false end,defaults=defaultPopup,release=function() return app.savePopup(nil) end,validate=function(v) local item,message;if v~=false then item,message=normalizePopup(v) end;if message then return nil,message end;return item or false end,save=function(v) if v==false then return app.savePopup(nil) end;return app.savePopup(v) end},
 }
@@ -395,7 +432,7 @@ local function configuredAppIcons()
     end
     for _,rule in ipairs(browser.config.appRules or {}) do icons[rule.bundleID]=appIcons.get(rule.bundleID) or false end
     for _,id in ipairs(clipboard.config.excluded) do icons[id]=appIcons.get(id) or false end
-    for _,id in ipairs({"com.apple.Safari","com.google.Chrome"}) do icons[id]=appIcons.get(id) or false end
+    for _,item in ipairs(browser.browsers) do icons[item.id]=appIcons.get(item.id) or false end
     for _,id in ipairs(requestedApps) do icons[id]=appIcons.get(id) or false end
     return icons
 end
@@ -519,7 +556,7 @@ function app.openSettings(section, focus)
             app.settings:evaluateJavaScript("window.receiveSystemValues("..hs.json.encode({ok=ok,values=ok and values or {}})..")")
         end
         if body.action=="saveTabOrder" then
-            local config={showMenu=app.general.showMenu,appearance=app.general.appearance,language=app.general.language,sleepShortcut=app.general.sleepShortcut,tabOrder=body.order or false}
+            local config={showMenu=app.general.showMenu,appearance=app.general.appearance,language=app.general.language,sleepShortcut=app.general.sleepShortcut,keepAwake=app.general.keepAwake,keepDisplayOn=app.general.keepDisplayOn,tabOrder=body.order or false}
             local validated,message=validateGeneral(config)
             if validated then hs.settings.set(generalKey,validated);app.general=validated end
             reply(validated~=nil,message or "",body.action)
@@ -686,3 +723,9 @@ function app.showUpdateRecovery()
 end
 app.showUpdateRecovery()
 permissions.watch(function() reply(true,"","refreshPermissionsSilent") end)
+
+local powerStarted,powerMessage=keepAwake.configure(app.general.keepAwake,app.general.keepDisplayOn)
+if not powerStarted then
+    reconcileGeneralPower()
+    hs.alert.show(powerMessage)
+end

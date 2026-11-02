@@ -22,8 +22,9 @@ local function array(value)
     return true
 end
 local schemas={
- general={sleepShortcut=true,showMenu=true,appearance=true,language=true,tabOrder=true},windows={enabled=true,shortcuts=true},
+ general={keepAwake=true,keepDisplayOn=true,sleepShortcut=true,showMenu=true,appearance=true,language=true,tabOrder=true},windows={enabled=true,shortcuts=true},
  input={enabled=true,rules=true},clipboard={enabled=true,limit=true,minutes=true,images=true,persistent=true,excluded=true},
+ -- Accept the retired mac key from 2.0.0 exports; sys_info.validate ignores it.
  system={network=true,cpu=true,memory=true,disk=true,ipv4=true,ipv6=true,mac=true,date=true,lunar=true},
  browser={enabled=true,defaultBrowser=true,rules=true,appRules=true},launcher={enabled=true,rules=true},
 }

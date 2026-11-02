@@ -1,7 +1,7 @@
 window.runApplicationRefreshRegression=function(data){
  const check=(ok,message)=>{if(!ok)throw Error(message)};
  send=()=>{};
- const safari={id:'com.apple.Safari',name:'Safari'},chrome={id:'com.google.Chrome',name:'Chrome'};
+ const safari={id:'com.apple.Safari',name:'Safari',capabilities:{clearBrowsingData:true}},chrome={id:'com.google.Chrome',name:'Chrome',capabilities:{clearBrowsingData:true}};
  data.action='load';data.browsers=[safari];window.receive(data);window.showSection('browserSection');
  const select=document.getElementById('browserDefault');check(select.options.length===1,'Initial Safari');
  const host=document.querySelector('#browserRules input');host.value='draft.example';

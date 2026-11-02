@@ -1,0 +1,58 @@
+diff --git a/extensions/caffeinate/libcaffeinate.m b/extensions/caffeinate/libcaffeinate.m
+--- a/extensions/caffeinate/libcaffeinate.m
++++ b/extensions/caffeinate/libcaffeinate.m
+@@ -2,6 +2,37 @@
+ #import <Carbon/Carbon.h>
+ #import <IOKit/pwr_mgt/IOPMLib.h>
+ #import <LuaSkin/LuaSkin.h>
++#include "nivlet_keep_awake.h"
++
++static NivletKeepAwake nivletKeepAwakeState = {0};
++
++static int nivletCreateAssertion(bool display, uint32_t *identifier) {
++    return IOPMAssertionCreateWithName(display ? kIOPMAssertionTypePreventUserIdleDisplaySleep : kIOPMAssertionTypePreventUserIdleSystemSleep,
++                                      kIOPMAssertionLevelOn,
++                                      display ? CFSTR("Nivlet: keep display on") : CFSTR("Nivlet: keep awake"), identifier);
++}
++
++static int nivletReleaseOwnedAssertion(uint32_t identifier) {
++    return IOPMAssertionRelease(identifier);
++}
++
++static int caffeinate_nivletKeepAwake(lua_State *L) {
++    [[LuaSkin sharedWithState:L] checkArgs:LS_TBOOLEAN, LS_TBOOLEAN, LS_TBREAK];
++    bool restored = false;
++    bool ok = nivletSetKeepAwake(&nivletKeepAwakeState, lua_toboolean(L, 1), lua_toboolean(L, 2),
++                                nivletCreateAssertion, nivletReleaseOwnedAssertion, &restored);
++    lua_pushboolean(L, ok);
++    lua_pushboolean(L, restored);
++    lua_pushboolean(L, nivletKeepAwakeState.system != 0);
++    lua_pushboolean(L, nivletKeepAwakeState.display != 0);
++    return 4;
++}
++
++static int caffeinate_nivletStopKeepAwake(lua_State *L) {
++    [[LuaSkin sharedWithState:L] checkArgs:LS_TBREAK];
++    lua_pushboolean(L, nivletStopKeepAwake(&nivletKeepAwakeState, nivletReleaseOwnedAssertion));
++    return 1;
++}
+ 
+ // Apple Private API items
+ #define kIOPMAssertionAppliesToLimitedPowerKey  CFSTR("AppliesToLimitedPower")
+@@ -322,6 +353,7 @@
+ // ----------------------- Lua/hs glue GAR ---------------------
+ 
+ static int caffeinate_gc(lua_State *L) {
++    nivletStopKeepAwake(&nivletKeepAwakeState, nivletReleaseOwnedAssertion);
+     // TODO: We should register which of the assertions we have active, somewhere that persists a reload()
+     caffeinate_allowIdleDisplaySleep(L);
+     caffeinate_allowIdleSystemSleep(L);
+@@ -336,6 +368,8 @@
+ }
+ 
+ static const luaL_Reg caffeinatelib[] = {
++    {"nivletKeepAwake", caffeinate_nivletKeepAwake},
++    {"nivletStopKeepAwake", caffeinate_nivletStopKeepAwake},
+     {"preventIdleDisplaySleep", caffeinate_preventIdleDisplaySleep},
+     {"allowIdleDisplaySleep", caffeinate_allowIdleDisplaySleep},
+     {"isIdleDisplaySleepPrevented", caffeinate_isIdleDisplaySleepPrevented},

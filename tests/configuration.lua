@@ -70,3 +70,14 @@ history=false
 assert(manager.apply(retention(0)));assert(manager.export().modules.clipboard.minutes==0)
 assert(manager.apply(retention(1440)));assert(manager.export().modules.clipboard.minutes==1440)
 print('JSON retention protects history when leaving permanent mode and round-trips both modes')
+
+state=clone(defaults)
+for _,legacy in ipairs({true,false}) do
+ local old=clone(defaults.system);old.mac=legacy;old.ipv4=false;old.network=false
+ local plan=assert(manager.prepare(doc({system=old})))
+ assert(plan.modules.system.mac==nil and not plan.modules.system.ipv4 and not plan.modules.system.network and plan.modules.system.ipv6)
+ assert(manager.apply(doc({system=old})))
+ local exported=manager.export().modules.system
+ assert(exported.mac==nil and not exported.ipv4 and not exported.network and exported.ipv6)
+end
+print('2.0.0 MAC display option imports without resetting other selections; new export omits it')

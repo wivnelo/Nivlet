@@ -1,5 +1,10 @@
 
 return {
+    ["保持唤醒"] = "Keep awake",
+    ["保持屏幕长亮"] = "Keep display on",
+    ["无法更新保持唤醒设置，请重试"] = "Unable to update keep-awake settings. Try again.",
+    ["；部分状态无法恢复，请关闭保持唤醒后重试"] = " Some state could not be restored. Turn off Keep awake and try again.",
+
     ["启用菜单快捷键"] = "Enable menu shortcut",
     ["当前仍使用以前保存的组合。关闭后再启用并保存，将改为固定快捷键 ⌘⇧V。"] = "Your previous shortcut is still active. Turn this off, then on and save to switch to the fixed shortcut ⌘⇧V.",
     ["未开启跨重启保留时，退出后历史不再保留。复制敏感内容前，请先关闭记录并保存。"] = "History is lost on quit unless kept across restarts. Turn off recording and save before copying sensitive content.",
@@ -130,8 +135,6 @@ return {
     ["本地与隐私"] = "Local and Private",
     ["配置、剪贴板内容与系统信息在本机处理，不上传到服务器。无需账号，核心工具可离线使用。"] = "Settings, clipboard content and system information are processed on this Mac and are not uploaded to a server. No account is required. Core tools work offline.",
     ["打开网页和项目链接会使用网络。"] = "Opening web pages and project links uses the network.",
-    ["MAC 地址可能被 macOS 隐藏，这与辅助功能权限无关，不影响其他功能。"] = "macOS may hide MAC addresses. This is unrelated to Accessibility access and does not affect other features.",
-    ["系统已隐藏"] = "Hidden by macOS",
     ["关于"] = "About",
     ["运行权限"] = "Permissions",
     ["窗口管理和 Option 直接粘贴需要辅助功能权限。剪贴板记录、系统信息和应用启动不需要此权限。"] = "Accessibility access is required for window management and Option-paste. Clipboard history, system information and app launch do not require this access.",
@@ -381,7 +384,6 @@ return {
     ["磁盘使用率"] = "Disk Usage",
     ["局域网 IPv4"] = "Local IPv4",
     ["IPv6 地址"] = "IPv6 Addresses",
-    ["MAC 地址"] = "MAC Address",
     ["公历与星期"] = "Date and Weekday",
     ["农历"] = "Lunar Date",
     ["保存系统信息设置"] = "Save System Info Settings",

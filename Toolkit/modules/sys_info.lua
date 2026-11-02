@@ -1,7 +1,7 @@
 local i18n = require("modules.i18n")
-local M={rx=0,tx=0,lunar="N/A",mac=nil}
+local M={rx=0,tx=0,lunar="N/A"}
 local settingsKey="desktoptoolkit.system.v1"
-M.fields={"network","cpu","memory","disk","ipv4","ipv6","mac","date","lunar"}
+M.fields={"network","cpu","memory","disk","ipv4","ipv6","date","lunar"}
 function M.defaults()
     local config={};for _,field in ipairs(M.fields) do config[field]=true end;return config
 end
@@ -40,9 +40,6 @@ function M.accept(data,interface,now)
         M.tx=math.max(0,sample.tx-M.previous.tx)/elapsed
     end
     M.previous=sample and {interface=interface,rx=sample.rx,tx=sample.tx,time=now} or nil
-    local mac=sample and sample.mac or nil
-    M.macRestricted=type(mac)=="string" and mac:lower()=="02:00:00:00:00:00"
-    M.mac=not M.macRestricted and mac or nil
     M.lunar=data.lunar or "N/A"
 end
 local function copyItem(title,value)
@@ -76,8 +73,6 @@ local function readings()
     for _,kind in ipairs({"IPv4","IPv6"}) do
         for _,address in ipairs(details and details[kind] and details[kind].Addresses or {}) do table.insert(menu,copyItem(kind=="IPv4" and "LAN" or "IPv6",address)) end
     end
-    if M.macRestricted then table.insert(menu,{title="MAC: "..i18n.t("系统已隐藏"),disabled=true})
-    elseif M.mac then table.insert(menu,copyItem("MAC",M.mac)) end
     table.insert(menu,{title=i18n.t("WAN / Loc: 未开启外部查询"),disabled=true})
     table.insert(menu,{title="-"})
     local weekdays={i18n.t("周日"),i18n.t("周一"),i18n.t("周二"),i18n.t("周三"),i18n.t("周四"),i18n.t("周五"),i18n.t("周六")}
@@ -87,7 +82,7 @@ local function readings()
 end
 function M.snapshot()
     local values={}
-    local prefixes={CPU="cpu",MEM="memory",Disk="disk",LAN="ipv4",IPv6="ipv6",MAC="mac",Date="date",Lunar="lunar"}
+    local prefixes={CPU="cpu",MEM="memory",Disk="disk",LAN="ipv4",IPv6="ipv6",Date="date",Lunar="lunar"}
     for _,item in ipairs(readings()) do
         local prefix,value=item.title:match("^(%w+): (.*)$")
         local field=prefixes[prefix]
@@ -100,8 +95,8 @@ function M.snapshot()
 end
 function M.menuItems()
     local menu=readings()
-    local prefixes={CPU="cpu",MEM="memory",Disk="disk",LAN="ipv4",IPv6="ipv6",MAC="mac",Date="date",Lunar="lunar"}
-    local labels={cpu="CPU 使用率",memory="内存使用率",disk="磁盘使用率",ipv4="局域网 IPv4",ipv6="IPv6 地址",mac="MAC 地址",date="公历与星期",lunar="农历"}
+    local prefixes={CPU="cpu",MEM="memory",Disk="disk",LAN="ipv4",IPv6="ipv6",Date="date",Lunar="lunar"}
+    local labels={cpu="CPU 使用率",memory="内存使用率",disk="磁盘使用率",ipv4="局域网 IPv4",ipv6="IPv6 地址",date="公历与星期",lunar="农历"}
     local filtered={}
     for _,item in ipairs(menu) do
         local prefix,value=item.title:match("^(%w+): (.*)$")

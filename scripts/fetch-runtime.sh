@@ -46,3 +46,6 @@ git -C "$upstream_dir" apply "$project_dir/patches/browser-file-url.patch"
 
 
 cp "$project_dir/Native/Nivlet.entitlements" "$upstream_dir/Hammerspoon/Hammerspoon.entitlements"
+
+git -C "$upstream_dir" apply "$project_dir/patches/nivlet-keep-awake.patch"
+cp "$project_dir/Native/keep_awake.h" "$upstream_dir/extensions/caffeinate/nivlet_keep_awake.h"

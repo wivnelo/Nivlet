@@ -1,9 +1,11 @@
 local i18n = require("modules.i18n")
 local bundleIDs = require("modules.bundle_id")
 local localHTML = require("modules.local_html")
+local catalog=require("modules.browser_catalog")
+local appNames=require("modules.app_names")
 local M={}
 local settingsKey="desktoptoolkit.browser.v1"
-M.browsers={{id="com.apple.Safari",name="Safari"},{id="com.google.Chrome",name="Chrome"},{id="org.mozilla.firefox",name="Firefox"},{id="com.microsoft.edgemac",name="Edge"},{id="com.brave.Browser",name="Brave"}}
+M.browsers=catalog.browsers
 function M.defaults() return {enabled=false,defaultBrowser="com.apple.Safari",rules={},appRules={}} end
 local function known(id)
     for _,browser in ipairs(M.browsers) do if browser.id==id then return true end end
@@ -100,7 +102,7 @@ function M.installed()
     local result={}
     for _,browser in ipairs(M.browsers) do
         local path=hs.application.pathForBundleID(browser.id)
-        if path and hs.fs.attributes(path,"mode")=="directory" then table.insert(result,browser) end
+        if path and hs.fs.attributes(path,"mode")=="directory" then table.insert(result,{id=browser.id,name=appNames.get(browser.id,browser.name,path),capabilities={clearBrowsingData=browser.clearDataAdapter~=nil}}) end
     end
     return result
 end

@@ -1,7 +1,7 @@
 window.runBrowserDataRegression=function(data){
  const check=(ok,message)=>{if(!ok)throw Error(message)};
  let requests=[];send=value=>requests.push(value);
- data.browsers=[{id:'com.apple.Safari',name:'Safari'},{id:'com.google.Chrome',name:'Google Chrome'},{id:'org.mozilla.firefox',name:'Firefox'}];
+ data.browsers=[{id:'com.apple.Safari',name:'Safari',capabilities:{clearBrowsingData:true}},{id:'com.google.Chrome',name:'Google Chrome',capabilities:{clearBrowsingData:true}},{id:'org.mozilla.firefox',name:'Firefox'}];
  data.browser.defaultBrowser='com.apple.Safari';data.browser.rules=[];data.browser.appRules=[];
  window.receive(data);window.showSection('browserSection');
  check(browserDataMenu.hidden&&browserDataMenu.children.length===2,'Initial menu/filter');

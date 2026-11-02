@@ -54,7 +54,7 @@ function makeFixture(language='en') {
         ]},
         excludedAppNames:{},appIcons:{},applicationStates:Object.fromEntries(ids.map((id,i)=>[id,{installed:true,name:names[i]}])),
         popupShortcut:{key:'V',mods:['cmd','shift']},popupShortcutDefault:{key:'V',mods:['cmd','shift']},
-        system:Object.fromEntries(['network','cpu','memory','disk','ipv4','ipv6','mac','date','lunar'].map(id=>[id,true])),
+        system:Object.fromEntries(['network','cpu','memory','disk','ipv4','ipv6','date','lunar'].map(id=>[id,true])),
         browser:{enabled:true,defaultBrowser:'com.apple.Safari',rules:[{domain:'example.com',browser:'com.google.Chrome',subdomains:true}],appRules:[{bundleID:ids[0],name:names[0],browser:'com.apple.Safari'}]},
         browserStatus:{active:true},browsers:[{id:'com.apple.Safari',name:'Safari'},{id:'com.google.Chrome',name:'Google Chrome'}],
         about:{version,build,icon,license:fs.readFileSync(path.join(root,'LICENSE'),'utf8'),notices:fs.readFileSync(path.join(root,'THIRD-PARTY-NOTICES.md'),'utf8')}
@@ -82,7 +82,7 @@ if (require.main === module) (async()=>{
             await frame.waitForFunction(()=>typeof window.receive==='function');
             await page.evaluate(({language,version,build})=>document.getElementById('media-label').textContent=(language==='en'?'Sample data · UI preview':'示例数据 · 界面演示')+'  |  Nivlet '+version+' · Build '+build,{language,version,build});
             await frame.evaluate(data=>window.receive(data),makeFixture(language));
-            await frame.evaluate(()=>window.receiveSystemValues({ok:true,values:{network:'↓ 24 KB/s  ↑ 8 KB/s',cpu:'12% / 8 Core',memory:'6.2 / 16 GB',disk:'128 / 512 GB',ipv4:'192.0.2.10',ipv6:'2001:db8::10',mac:'02:00:00:00:00:01',date:'2026-11-01',lunar:'—'}}));
+            await frame.evaluate(()=>window.receiveSystemValues({ok:true,values:{network:'↓ 24 KB/s  ↑ 8 KB/s',cpu:'12% / 8 Core',memory:'6.2 / 16 GB',disk:'128 / 512 GB',ipv4:'192.0.2.10',ipv6:'2001:db8::10',date:'2026-11-01',lunar:'—'}}));
             for (const [name,section] of Object.entries(pages)) {
                 await frame.evaluate(section=>{window.showSection(section);document.querySelector('main').scrollTop=0;window.scrollTo(0,0)},section);
                 await frame.evaluate(async()=>{await document.fonts.ready;await Promise.all([...document.images].map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve})))});
