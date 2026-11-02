@@ -7,7 +7,7 @@ const {execFileSync} = require('node:child_process');
 const {pathToFileURL} = require('node:url');
 const {chromium} = require('playwright');
 const root = path.resolve(__dirname, '..');
-const sourceCommit = '32d3395';
+const sourceCommit = 'db0fe0dbaae419ac49d73c54347ac2442a2f085c';
 const version = '2.0.0';
 const build = process.env.NIVLET_SCREENSHOT_BUILD || '57';
 if (build !== '57') throw Error('This media set illustrates 2.0.0 / Build 57');
