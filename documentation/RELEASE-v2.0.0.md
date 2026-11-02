@@ -1,6 +1,6 @@
 # Nivlet 2.0.0 · Build 57
 
-**2.0.0 / Build 57 发行就绪，尚未公开发布。** 最终安装包已使用 Developer ID 签名并通过 Apple 公证，包校验与本地更新签名、篡改拒绝及 Intel 不匹配检查通过。GitHub 发布、公开附件回核、Pages 与知识库同步仍待完成。原生测试保留实际来源和范围，详见 [验收记录](VALIDATION.md)。
+**[2.0.0 / Build 57 已正式发布](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.0)。** 最终安装包已使用 Developer ID 签名并通过 Apple 公证，包校验与本地更新签名、篡改拒绝及 Intel 不匹配检查通过。正式 tag `v2.0.0` 指向 `9937af7`，产品源码为 `9c96dc0`；公开附件下载与最终产物一致。Pages、线上 appcast 与知识库同步仍待完成。原生测试保留实际来源和范围，详见 [验收记录](VALIDATION.md)。
 
 ## 改动范围
 
@@ -51,7 +51,7 @@
 
 ## Release notes (English)
 
-Version 2.0.0 / Build 57 is ready for release. The final packages are Developer ID signed and notarized by Apple; package verification and local signed-update, tamper-rejection and Intel-mismatch checks have passed. GitHub publication, public-download verification and website deployment remain pending. Historical native tests keep their original commit attribution and scope; this is not a claim that the new package completed a fresh full native test. The release unifies eight settings pages with a sidebar, adds local HTML/HTM forwarding, saves changed pages together, and adds Traditional Chinese (Taiwan terminology) and Japanese. Hong Kong locales use the Traditional Chinese fallback; this is not a separate Hong Kong localization or a claim of native-speaker review.
+Version 2.0.0 / Build 57 is now available. The final packages are Developer ID signed and notarized by Apple; package verification and local signed-update, tamper-rejection and Intel-mismatch checks have passed. The v2.0.0 tag points to `9937af7`, with product source `9c96dc0`; public downloads match the final artifacts. Website deployment and the online update feed still await synchronization. Historical native tests keep their original commit attribution and scope; this is not a claim that the new package completed a fresh full native test. The release unifies eight settings pages with a sidebar, adds local HTML/HTM forwarding, saves changed pages together, and adds Traditional Chinese (Taiwan terminology) and Japanese. Hong Kong locales use the Traditional Chinese fallback; this is not a separate Hong Kong localization or a claim of native-speaker review.
 
 The release keeps the normal save footer at 60px, removes the helper text below the main-icon switch, and simplifies clipboard controls. Recording uses one enable switch in its own card instead of a separate pause/resume state; disabling it keeps history subject to existing limits. The menu-shortcut switch displays ⌘⇧ + V and binds ⌘⇧V: new or missing settings default on, explicit `false` stays off, and legacy custom shortcuts remain until the switch is actually changed and saved. An explicitly stored legacy `paused: true` state migrates to recording disabled at startup; an absent field does not imply a previous in-memory pause.
 

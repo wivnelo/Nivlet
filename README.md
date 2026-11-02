@@ -91,9 +91,9 @@ Enable the tools you need. Window and app shortcuts are configurable; the clipbo
 
 ## Release and architecture support
 
-**2.0.0 / Build 57 is ready for release for Apple Silicon (arm64), macOS 13.0+.** The final packages are Developer ID signed and notarized by Apple. Package verification and local update checks have passed; GitHub publication, public-download verification and website deployment are still pending. See the [release notes](documentation/RELEASE-v2.0.0.md).
+**[2.0.0 / Build 57](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.0) is now available for Apple Silicon (arm64), macOS 13.0+.** The final packages are Developer ID signed and notarized by Apple. Public downloads match the verified release artifacts. See the [release notes](documentation/RELEASE-v2.0.0.md).
 
-**[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) is the final Intel (x86_64) release.** Its existing signed and notarized downloads remain available. New releases will no longer build or support Intel; no Intel hardware validation is claimed for 2.0.0. Until 2.0.0 is published, v1.0.8 remains the latest official release.
+**[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) is the final Intel (x86_64) release.** Its existing signed and notarized downloads remain available. New releases will no longer build or support Intel; no Intel hardware validation is claimed for 2.0.0.
 
 Download a published DMG or ZIP from [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/latest), move `Nivlet.app` to Applications and launch that copy. No separate Hammerspoon installation is needed.
 
