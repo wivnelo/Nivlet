@@ -87,13 +87,13 @@ The screenshots and demos show the 2.0.0 / Build 57 settings frontend (UI from `
 3. Click the menu bar **N icon → Settings…**, enable your tools and configure their rules.
 4. In 2.0.0, click **Save All Settings** in the bottom-right corner to save every changed page. Switching sidebar sections keeps drafts; an orange dot marks each unsaved page. **Cancel Page Changes** affects only the current page.
 
-Features are opt-in. Window and app shortcuts are configurable; the clipboard menu has an enable switch for Command-Shift-V. Window management and Option-click paste require **Accessibility permission**. Browser routing requires choosing **Nivlet as your default browser**.
+Enable the tools you need. Window and app shortcuts are configurable; the clipboard menu has an enable switch for Command-Shift-V. Window management and Option-click paste require **Accessibility permission**. Browser routing requires choosing **Nivlet as your default browser**.
 
 ## Release and architecture support
 
-**2.0.0 / Build 57 is being prepared for Apple Silicon (arm64), macOS 13.0+.** The new major version requires its own build, signing, notarization and final acceptance/update checks. Historical 1.0.9 candidate results do not validate the new package; publication follows when all required checks pass. See the [candidate release notes](documentation/RELEASE-v2.0.0.md).
+**2.0.0 / Build 57 is ready for release for Apple Silicon (arm64), macOS 13.0+.** The final packages are Developer ID signed and notarized by Apple. Package verification and local update checks have passed; GitHub publication, public-download verification and website deployment are still pending. See the [release notes](documentation/RELEASE-v2.0.0.md).
 
-**[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) is the final Intel (x86_64) release.** Its existing signed and notarized downloads remain available. New releases will no longer build or support Intel; no Intel hardware validation is claimed for 2.0.0. Until the candidate is published, v1.0.8 remains the latest official release.
+**[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) is the final Intel (x86_64) release.** Its existing signed and notarized downloads remain available. New releases will no longer build or support Intel; no Intel hardware validation is claimed for 2.0.0. Until 2.0.0 is published, v1.0.8 remains the latest official release.
 
 Download a published DMG or ZIP from [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/latest), move `Nivlet.app` to Applications and launch that copy. No separate Hammerspoon installation is needed.
 
@@ -121,4 +121,4 @@ Report problems or suggestions through [GitHub Issues](https://github.com/wivnel
 
 Nivlet uses the [MIT License](LICENSE). Its embedded Runtime is based on [Hammerspoon](https://github.com/Hammerspoon/hammerspoon). Third-party components retain their own licenses; see [third-party notices](THIRD-PARTY-NOTICES.md).
 
-The 2.0.0 candidate unifies all eight settings pages with a sidebar, adds local `.html`/`.htm` routing and saves drafts across pages together. Clipboard recording uses one enable switch; its menu shortcut uses an enable switch for ⌘⇧V, while existing custom shortcuts are preserved until that switch is changed and saved. Click a thumbnail, or focus it and press Enter or Space, to open an image preview; click outside the image within Nivlet or press Escape to close it. Existing HTTP/HTTPS routing remains in scope; see [detailed changes, migration rules, package sizes and validation gates](documentation/RELEASE-v2.0.0.md).
+Version 2.0.0 unifies all eight settings pages with a sidebar, adds local `.html`/`.htm` routing and saves drafts across pages together. Clipboard recording uses one enable switch; its menu shortcut uses an enable switch for ⌘⇧V, while existing custom shortcuts are preserved until that switch is changed and saved. Click a thumbnail, or focus it and press Enter or Space, to open an image preview; click outside the image within Nivlet or press Escape to close it. Existing HTTP/HTTPS routing remains in scope; see [detailed changes, migration rules, package sizes and validation gates](documentation/RELEASE-v2.0.0.md).

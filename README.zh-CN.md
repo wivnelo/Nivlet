@@ -91,9 +91,9 @@ Nivlet 是一款免费开源的 macOS 菜单栏工具，将常用操作放在一
 
 ## 发行状态与架构支持
 
-**2.0.0 / Build 57 正在准备，要求 Apple Silicon（arm64）与 macOS 13.0+。** 新版本需重新构建、签名、公证并完成最终包验收与更新检查；历史 1.0.9 候选的通过结果不能替代新包验证，必要检查通过后正式发布。见[候选版本说明](documentation/RELEASE-v2.0.0.md)。
+**2.0.0 / Build 57 发行就绪，要求 Apple Silicon（arm64）与 macOS 13.0+。** 最终安装包已使用 Developer ID 签名并通过 Apple 公证，包校验与本地更新检查通过；GitHub 发布、公开下载回核和官网部署仍待完成。见[版本说明](documentation/RELEASE-v2.0.0.md)。
 
-**[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后一个 Intel（x86_64）版本。** 其已有正式签名与 Apple 公证安装包继续保留；后续版本不再构建或支持 Intel，2.0.0 不宣称通过 Intel 真机验证。候选发布前，最新正式版仍为 v1.0.8。
+**[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后一个 Intel（x86_64）版本。** 其已有正式签名与 Apple 公证安装包继续保留；后续版本不再构建或支持 Intel，2.0.0 不宣称通过 Intel 真机验证。2.0.0 发布前，最新正式版仍为 v1.0.8。
 
 从 [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/latest) 下载已发布版本的 DMG 或 ZIP，将 `Nivlet.app` 放入应用程序后打开，无需另装 Hammerspoon。
 
@@ -119,4 +119,4 @@ Nivlet 是一款免费开源的 macOS 菜单栏工具，将常用操作放在一
 
 Nivlet 使用 [MIT License](LICENSE)。内置 Runtime 基于 [Hammerspoon](https://github.com/Hammerspoon/hammerspoon)；第三方组件保留各自许可证，见 [第三方声明](THIRD-PARTY-NOTICES.md)。
 
-2.0.0 候选统一八页侧边栏，增加本地 `.html`/`.htm` 转交与跨页保存。剪贴板记录改为单一启用开关，菜单快捷键使用固定 ⌘⇧V 的启用开关；已有自定义快捷键在实际切换该开关并保存前保留。点击缩略图或聚焦后按 Enter / Space 打开预览，点击 Nivlet 窗口内图片外部或按 Esc 关闭。详见[完整改动、迁移规则、包体与发布门槛](documentation/RELEASE-v2.0.0.md)。
+2.0.0 统一八页侧边栏，增加本地 `.html`/`.htm` 转交与跨页保存。剪贴板记录改为单一启用开关，菜单快捷键使用固定 ⌘⇧V 的启用开关；已有自定义快捷键在实际切换该开关并保存前保留。点击缩略图或聚焦后按 Enter / Space 打开预览，点击 Nivlet 窗口内图片外部或按 Esc 关闭。详见[完整改动、迁移规则、包体与发布门槛](documentation/RELEASE-v2.0.0.md)。

@@ -1,10 +1,19 @@
-# 2.0.0 / Build 57 · 当前发布准备
+# 2.0.0 / Build 57 · 发行就绪，公开发布待完成
 
-2026-11-02 用户指定本轮以 2.0.0 大版本正式发布，取代未发布的 1.0.9 / Build 56。远端 v2.0.0 tag/release 均不存在，正式 latest 仍为 v1.0.8。版本元数据由主任务更新，输出目录为 `build/release-2.0.0-build57/`；新包编译、签名、公证、票据/Gatekeeper、最终资源/包体、更新签名及兼容性验证尚待完成。必须使用新产物证据，不将下方旧候选成功结果改名套用。
+2026-11-02 最终源码为 `9c96dc0955198270d48e6dbc6ec1346acb835b3d`，发行输出为 `build/release-2.0.0-build57-r2/`。本地发行门槛已通过；GitHub tag/release、公开附件下载回核、线上 appcast、Pages 与知识库同步尚待完成。本节不宣称已经公开发布。
 
-已完成的元数据相关检查为 bundle localizations 1 项、signing preflight 4 项、release architecture 4 项；不能据此声称新包已通过。菜单问题的解除来自用户停止共享、退出重开后的人工对照，没有菜单代码补丁，不再接管 App。下方历史记录保留当时失败、只读调查、恢复和用户复测的完整边界。
+- arm64 Release 构建、26 项 Toolkit 源资源与最终源码核对、101 个 arm64 Mach-O、四语原生菜单、匹配 dSYM、entitlements 与严格签名检查通过。
+- App 公证 `015a8cae-4ae5-49d2-9993-560bff521959`、DMG 公证 `dea1bf91-5951-4e20-922c-1c3e25041229` 均为 Accepted；票据、Gatekeeper 与严格签名通过。ZIP CRC、校验清单和文件匹配通过；DMG 只读挂载后的 338 项内容与签后 App 一致，已正常卸载。保留 81 份依赖许可与相关声明。
+- 最终 ZIP：11,395,276 bytes，SHA-256 `0b435b55a81a88aefbf0cb5a9f1c157b3a8e4ade27f80ce57fa8ab0dc399e26c`；DMG：13,313,896 bytes，SHA-256 `c8c55324fa4dd85e2e7845c0565c785b2187b513bcc457df8db75b269c60f8ab`。App 普通文件 41,733,870 bytes，磁盘占用 41,444 KiB。相较 1.0.8 / Build 55 arm64，ZIP/DMG/App 普通文件/磁盘占用分别减少 0.8883%/6.1022%/0.4587%/0.7567%；不得把整版差值全部归因于框架裁剪、注释清理或停止 Intel 构建。
+- `tests/updates.py --build 57 --dist build/release-2.0.0-build57-r2/dist --appcast build/release-2.0.0-build57-r2/appcast-candidate.xml` 通过：最终更新签名、篡改拒绝与 Intel 不匹配检查通过。发行说明已移除 DRAFT，用于本地暂存 feed；这不是线上 feed 发布，也没有在本轮执行实际 Sparkle 安装。
+- 本轮隔离前端的四语言 × 深浅色检查共 **256/256** 通过，证据为 `build/comment-audit/web/ui-fixed/summary.json`；夹具调整单独记录，不作为产品功能变化或原生端到端测试。Lua 33 项、同步补丁后的 Python 12 个入口通过；语言 AST/token/字节码、配置规则与补丁重放证据见 `build/comment-audit/`。
+- `db0fe0d` 清理 **295 条普通自有注释、占用 296 行**，涉及 89 个 tracked 文件，保留物理换行、字符串与程序语义。保留 13 条 shebang、25 条 Python docstring、1 条 JS 测试边界和 2 条原生工具文档，以及第三方上下文、版权许可、条件编译和工具指令。独立审阅通过，7 个 vendor 文件仅按精确哈希同步相应注释变化，没有 reset 目录。
 
-当前双语发行说明为 `release-notes/2.0.0-build57.md`，保留 DRAFT 至新构建、签名、公证及相应验证完成；生成候选 feed 不等于公开发布，更新测试必须在正式发布前通过。最终提交与包资源一致性、真实资产、tag/commit 和发布后下载校验仍为门槛。
+原生证据沿用：三项 Finder → Chrome 本地 HTML 链路实际测于 `97cc58f`；八页、全局保存和图片预览等记录来自 `32d3395`；菜单 Esc/外部关闭通过来自用户关闭共享并重启后的人工对照。新包已完成源码、资源及原生实现等价审阅，见 `build/r2/static-inheritance-review.json`，据此沿用对应未变行为的回归证据；不改称 2.0.0 新包重新完成全部真机测试。原生窄窗缩放、全部浏览器/硬件或所有文件场景仍不在已证实范围。未再次接管或替换运行中的 App。
+
+下一步只在真实远端核验后补写正式 tag/commit、附件下载哈希、线上 arm64 appcast 与发布说明、Pages 及知识库同步状态。[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 仍是最后 Intel 版，历史附件保留。
+
+下方保留历史候选当时的失败、成功与待办原文；当前发行状态以本节为准。
 
 # 历史未发布候选 1.0.9 / Build 56 r2 · 验证记录
 

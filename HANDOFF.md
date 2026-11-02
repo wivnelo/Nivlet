@@ -1,12 +1,13 @@
-# Nivlet 会话交接 · 2026-11-01
+# Nivlet 会话交接 · 2026-11-02
 
-## 当前目标 · 2026-11-02
+## 当前状态 · 2.0.0 / Build 57 发行就绪
 
-- 用户指定正式大版本 **2.0.0 / Build 57**，替代未发布的 1.0.9 / Build 56 候选。远端 v2.0.0 tag/release 均未占用，最新正式版仍为 [v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8)，也是最后 Intel 版本。
-- 版本元数据已由主任务更新；本次功能范围不扩展。新输出 `build/release-2.0.0-build57/`，必须重新编译、签名、公证、核验最终包和更新源，说明保持 DRAFT 至相应门槛完成。旧候选的公证 submission、哈希及包体只保留为历史，不改名套用。
-- 菜单关闭异常已由用户手工停止共享并重开后的人工对照解除；不做菜单代码补丁，不接管 App，不将该观察扩大为其他原生场景通过。语言/外观测试偏好已恢复，8 项哈希一致。
-- 本轮源码元数据检查：bundle localizations 1 项、signing preflight 4 项、release architecture 4 项通过；这些不代替 2.0.0 新包验收。媒体只更新版本元数据后重新渲染，保持真实前端＋合成数据与模拟原生回执边界。
-- 当前说明为 [2.0.0](documentation/RELEASE-v2.0.0.md)。GitHub 正式发布仅在必要门槛全部通过后由主任务执行；不要求再次看图确认，不改历史 Intel 资产，不覆盖原工作区。
+- 最终产品源码冻结于 `9c96dc0955198270d48e6dbc6ec1346acb835b3d`，输出 `build/release-2.0.0-build57-r2/`。仅支持 Apple Silicon（arm64）、macOS 13.0+；[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后 Intel 版本，历史资产保留。
+- 构建、26 源资源、101 arm64 Mach-O、四语菜单、dSYM/权限、Developer ID 签名、App/DMG Apple 公证、票据/Gatekeeper、ZIP 和只读挂载 DMG 核对通过。App submission `015a8cae-4ae5-49d2-9993-560bff521959`；DMG submission `dea1bf91-5951-4e20-922c-1c3e25041229`。实际大小与 SHA-256 见 VALIDATION 顶部及本轮 `final-asset-review.json`。
+- 本地更新签名、篡改拒绝与 Intel 不匹配检查通过；发行说明已去 DRAFT，暂存 feed 不等于线上发布。本轮未执行 Sparkle 实际安装。**GitHub 正式发布、公开下载回核、线上 appcast、Pages 与知识库同步仍待完成。** 不提前记为成功。
+- 普通注释清理为 295 条、占用 296 行；13 条 shebang、25 条 Python docstring、1 条测试边界和 2 条原生工具文档保留，第三方、法律声明、指令与字面量不动。独立审阅和等价验证通过；7 文件 vendor 同步无 reset。四语言 × 深浅色 UI **256/256**、Lua 33 项及 Python 12 个入口通过。证据在 `build/comment-audit/`。
+- 不再接管 App。最终包静态等价审阅通过，沿用历史原生验收时保留 `97cc58f` HTML、`32d3395` UI/保存/预览与用户人工菜单关闭复测的来源；不声称新包进行了全部真机验收。历史失败和测试偏好恢复事实保持。
+- 本轮文档是发行就绪状态，无“已在线”承诺；发布成功后只更新状态段和真实回核。官网主要下载仍指当前正式版，之后切 v2.0.0；明确保留 Intel 历史入口。README 媒体仍为合成数据和模拟原生回执的前端演示。
 
 ## 历史未发布候选 1.0.9 / Build 56：菜单调查与用户复测
 

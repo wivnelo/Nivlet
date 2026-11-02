@@ -1,6 +1,6 @@
 # Nivlet 2.0.0 · Build 57
 
-**候选，尚未发布。** 用户已指定以 2.0.0 / Build 57 发布本轮大版本，替代未发布的 1.0.9 / Build 56 候选。2.0.0 必须重新构建、签名、公证并核验最终包与更新源；旧候选的公证票据、哈希、包体和原生测试不得改名作为新包通过证据。必要检查通过后才正式发布，状态见 [验收记录](VALIDATION.md) 与 [BASELINE](../BASELINE.md)。
+**2.0.0 / Build 57 发行就绪，尚未公开发布。** 最终安装包已使用 Developer ID 签名并通过 Apple 公证，包校验与本地更新签名、篡改拒绝及 Intel 不匹配检查通过。GitHub 发布、公开附件回核、Pages 与知识库同步仍待完成。原生测试保留实际来源和范围，详见 [验收记录](VALIDATION.md)。
 
 ## 改动范围
 
@@ -10,6 +10,7 @@
 - 增加繁体中文（台湾用语）与日语；界面语言为简体中文、English、繁體中文、日本語及跟随系统。香港语言环境使用繁体中文回退，不是独立港式本地化；不宣称完成母语人工审校。
 - 稳定性修复包括异常 URL query 解码的空值防护、全局保存批次回执与重复提交保护、取消修改时保留最新运行数据，以及历史异步刷新后预览焦点恢复。剪贴板关闭采集后，仅在有待过期历史时安排清理计时器，避免无用轮询。
 - 安装包仅精简不参与运行的框架开发头文件、模块描述和对应链接，保留所有运行组件与许可。体积须以最终 2.0.0 签后包实测，不把整版差值全部归因于裁剪。
+- 清理 295 条普通自有注释（占用 296 行），保留换行、字符串和代码语义；保留版权与许可、shebang、工具/测试边界注释、Python docstring，以及第三方源码和补丁上下文。本项不新增功能，也不作为运行性能提升的声明。
 
 ## 设置与剪贴板交互调整
 
@@ -42,22 +43,24 @@
 - 保活功能仍处于设计咨询阶段，未实现，不属于本次发行。
 - 测试时曾观察到原生菜单不能通过 Esc/外部点击关闭；用户关闭共享并手工重开后，菜单栏和快捷键两种入口均恢复正常。该人工对照支持远程控制状态干扰的判断，不构成本次菜单代码修复，也不代表所有原生场景均已验收。
 
-## 构建、包体与验证门槛
+## 构建、包体与验证记录
 
-2.0.0 / Build 57 的 arm64 编译、Developer ID 签名、App/DMG 公证及票据、Gatekeeper、资源/架构/许可核对、最终更新签名与负向测试均须针对新产物完成。包名使用 `Nivlet-2.0.0-build57-arm64`，不得改名复用旧候选包。
+最终源码为 `9c96dc0`，产物为 `Nivlet-2.0.0-build57-arm64`。arm64 编译、Developer ID 签名、App/DMG 公证与票据、Gatekeeper、资源/架构/许可及压缩包核对通过；本地更新签名、篡改拒绝与 Intel 不匹配测试通过。实际 Sparkle 安装未在本轮执行。
 
-1.0.9 / Build 56 r2 的历史 UI、原生测试、包校验和体积记录保留于 [VALIDATION](VALIDATION.md)，不表示 2.0.0 包已经通过。最终体积与正式 1.0.8 / Build 55 的 arm64 包比较，分别记录 ZIP、DMG、App 普通文件及磁盘占用；不以停止 Intel 构建当作单个 arm64 包缩小，也不把全部差值归于开发文件裁剪。
+最终 ZIP 为 11,395,276 bytes，DMG 为 13,313,896 bytes，App 普通文件合计 41,733,870 bytes，本机磁盘占用 41,444 KiB。与正式 1.0.8 / Build 55 arm64 比较，分别减少 0.8883%、6.1022%、0.4587% 与 0.7567%。差异包含资源、编译、签名和维护清理，不全部归因于框架裁剪或停止 Intel 构建。校验值与验证范围见 [VALIDATION](VALIDATION.md)；1.0.9 的历史测量保持原版本归属。
 
-## Release candidate (English)
+## Release notes (English)
 
-Version 2.0.0 / Build 57 is the requested major release, replacing the unpublished 1.0.9 / Build 56 candidate. It must be rebuilt, signed, notarized and checked as a new artifact before publication. Historical candidate hashes, notarization tickets, sizes and native results are not evidence that the 2.0.0 package passed. The release unifies eight settings pages with a sidebar, adds local HTML/HTM forwarding, saves changed pages together, and adds Traditional Chinese (Taiwan terminology) and Japanese. Hong Kong locales use the Traditional Chinese fallback; this is not a separate Hong Kong localization or a claim of native-speaker review.
+Version 2.0.0 / Build 57 is ready for release. The final packages are Developer ID signed and notarized by Apple; package verification and local signed-update, tamper-rejection and Intel-mismatch checks have passed. GitHub publication, public-download verification and website deployment remain pending. Historical native tests keep their original commit attribution and scope; this is not a claim that the new package completed a fresh full native test. The release unifies eight settings pages with a sidebar, adds local HTML/HTM forwarding, saves changed pages together, and adds Traditional Chinese (Taiwan terminology) and Japanese. Hong Kong locales use the Traditional Chinese fallback; this is not a separate Hong Kong localization or a claim of native-speaker review.
 
-The candidate keeps the normal save footer at 60px, removes the helper text below the main-icon switch, and simplifies clipboard controls. Recording uses one enable switch in its own card instead of a separate pause/resume state; disabling it keeps history subject to existing limits. The menu-shortcut switch displays ⌘⇧ + V and binds ⌘⇧V: new or missing settings default on, explicit `false` stays off, and legacy custom shortcuts remain until the switch is actually changed and saved. An explicitly stored legacy `paused: true` state migrates to recording disabled at startup; an absent field does not imply a previous in-memory pause.
+The release keeps the normal save footer at 60px, removes the helper text below the main-icon switch, and simplifies clipboard controls. Recording uses one enable switch in its own card instead of a separate pause/resume state; disabling it keeps history subject to existing limits. The menu-shortcut switch displays ⌘⇧ + V and binds ⌘⇧V: new or missing settings default on, explicit `false` stays off, and legacy custom shortcuts remain until the switch is actually changed and saved. An explicitly stored legacy `paused: true` state migrates to recording disabled at startup; an absent field does not imply a previous in-memory pause.
 
 The clipboard menu-help disclosure and three requested clipboard explanations are removed while copy, Option-click paste, privacy and app exclusions remain. Click a thumbnail, or focus it and press Enter or Space, to open a preview without a separate preview button. There is no close button: clicks inside Nivlet but outside the image element dismiss the preview; transparent pixels inside the image do not. Escape and click-through prevention remain, and focus restoration after asynchronous history refresh is fixed, without new global mouse permissions. Native menu resources follow macOS's app startup language; changing the Toolkit preference does not force AppKit or Sparkle dialogs to switch immediately.
 
 Stability work covers malformed URL query decoding, save-batch acknowledgements and duplicate submissions, preserving current runtime data when cancelling drafts, and avoiding clipboard expiry polling when nothing can expire. Save All Settings validates before applying changes, leaves unchanged pages untouched and preserves failed drafts; it is not a cross-module atomic transaction. Local file forwarding is limited to readable HTML/HTM files on this Mac. Other local formats, remote file hosts and arbitrary schemes are outside this change. Existing native document-registration and cold-start multi-event limitations remain. Keep-awake functionality is not implemented in this release.
 
+Removed 295 ordinary first-party comments spanning 296 lines, preserving line breaks, strings and code semantics. Copyright and license notices, shebangs, tool/test markers, Python docstrings, and third-party source and patch context are retained. This maintenance change adds no features and makes no runtime-performance claim.
+
 During testing, native menus temporarily failed to dismiss with Escape or an outside click. After the user stopped sharing and manually relaunched Nivlet, both the menu-bar and shortcut entry paths dismissed normally. This manual comparison supports interference from the remote-control state; no menu code patch was added, and the result does not establish acceptance of every native interaction.
 
-New releases support **Apple Silicon (arm64), macOS 13+ only**. [1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) remains the final Intel release, with its existing downloads retained. No Intel hardware test is claimed. Runtime resources, four native menu localizations and dependency licenses must remain in the final package. Final sizes and validation results will be recorded for the new `Nivlet-2.0.0-build57-arm64` artifacts; unpublished 1.0.9 candidate measurements are kept only as historical evidence.
+New releases support **Apple Silicon (arm64), macOS 13+ only**. [1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) remains the final Intel release, with its existing downloads retained. No Intel hardware test is claimed. Runtime resources, all four native menu localizations and dependency licenses are verified in the final package. Final sizes, checksums and validation scope are recorded in VALIDATION; unpublished 1.0.9 measurements retain their historical attribution.
