@@ -1,6 +1,6 @@
 # 2.0.0 / Build 57 · 已正式发布并完成下载回核
 
-2026-11-02 最终源码为 `9c96dc0955198270d48e6dbc6ec1346acb835b3d`，发行输出为 `build/release-2.0.0-build57-r2/`。[v2.0.0](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.0) 已作为正式 Latest 发布，tag 指向 `9937af75694e2784815f23ce5c01e34690f15984`；该提交包含发行文档，产品源码仍为上述 `9c96dc0`。三份公开附件下载与最终本地产物的 SHA-256 一致，下载 App 的严格签名及 Gatekeeper 通过；旧版全部附件保持不变。证据为同目录 `public-release-verification.json`。线上 appcast、Pages 与知识库同步仍待完成。
+2026-11-02 最终源码为 `9c96dc0955198270d48e6dbc6ec1346acb835b3d`，发行输出为 `build/release-2.0.0-build57-r2/`。[v2.0.0](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.0) 已作为正式 Latest 发布，tag 指向 `9937af75694e2784815f23ce5c01e34690f15984`；该提交包含发行文档，产品源码仍为上述 `9c96dc0`。三份公开附件下载与最终本地产物的 SHA-256 一致，下载 App 的严格签名及 Gatekeeper 通过；旧版全部附件保持不变。证据为同目录 `public-release-verification.json`。线上 arm64 appcast、Pages 与新版媒体均已核验通过；知识库维护另行同步并记录。
 
 - arm64 Release 构建、26 项 Toolkit 源资源与最终源码核对、101 个 arm64 Mach-O、四语原生菜单、匹配 dSYM、entitlements 与严格签名检查通过。
 - App 公证 `015a8cae-4ae5-49d2-9993-560bff521959`、DMG 公证 `dea1bf91-5951-4e20-922c-1c3e25041229` 均为 Accepted；票据、Gatekeeper 与严格签名通过。ZIP CRC、校验清单和文件匹配通过；DMG 只读挂载后的 338 项内容与签后 App 一致，已正常卸载。保留 81 份依赖许可与相关声明。
@@ -11,7 +11,7 @@
 
 原生证据沿用：三项 Finder → Chrome 本地 HTML 链路实际测于 `97cc58f`；八页、全局保存和图片预览等记录来自 `32d3395`；菜单 Esc/外部关闭通过来自用户关闭共享并重启后的人工对照。新包已完成源码、资源及原生实现等价审阅，见 `build/r2/static-inheritance-review.json`，据此沿用对应未变行为的回归证据；不改称 2.0.0 新包重新完成全部真机测试。原生窄窗缩放、全部浏览器/硬件或所有文件场景仍不在已证实范围。未再次接管或替换运行中的 App。
 
-下一步只在实际同步与线上核验后更新 arm64 appcast、Pages 及知识库状态；不将正式 Release 和附件通过误写为这些步骤已完成。[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 仍是最后 Intel 版，历史附件保留。
+主分支 `a713783bf9c3d922e62b4e85b7e24c0a24d4c745` 的 [Pages 部署](https://github.com/wivnelo/Nivlet/actions/runs/41371400213) 成功；官网、脚本、样式、appcast、16 张 JPG 与两份 GIF 共 22 个文件与本地逐字节一致，双语 README 亦与提交一致。线上 appcast 配合实际公开 ZIP 再次通过更新签名、篡改拒绝和 Intel 不匹配检查，证据为 `pages-verification.json` 与 `public-updates.log`。知识库维护由外部同步流程单独记录。[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 仍是最后 Intel 版，历史附件保留。
 
 下方保留历史候选当时的失败、成功与待办原文；当前发行状态以本节为准。
 

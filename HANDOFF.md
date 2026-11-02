@@ -4,10 +4,10 @@
 
 - 最终产品源码冻结于 `9c96dc0955198270d48e6dbc6ec1346acb835b3d`，输出 `build/release-2.0.0-build57-r2/`。仅支持 Apple Silicon（arm64）、macOS 13.0+；[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后 Intel 版本，历史资产保留。
 - 构建、26 源资源、101 arm64 Mach-O、四语菜单、dSYM/权限、Developer ID 签名、App/DMG Apple 公证、票据/Gatekeeper、ZIP 和只读挂载 DMG 核对通过。App submission `015a8cae-4ae5-49d2-9993-560bff521959`；DMG submission `dea1bf91-5951-4e20-922c-1c3e25041229`。实际大小与 SHA-256 见 VALIDATION 顶部及本轮 `final-asset-review.json`。
-- 本地更新签名、篡改拒绝与 Intel 不匹配检查通过；发行说明已去 DRAFT，暂存 feed 不等于线上发布。本轮未执行 Sparkle 实际安装。**GitHub v2.0.0 已正式发布并完成公开下载回核**；tag 为 `9937af75694e2784815f23ce5c01e34690f15984`，产品源码保持 `9c96dc0`。三份公开附件 SHA-256 与最终产物一致，下载 App 的严格签名/Gatekeeper 通过，旧版全部附件保持原样。线上 appcast、Pages 与知识库同步仍待完成。
+- 本地更新签名、篡改拒绝与 Intel 不匹配检查通过；发行说明已去 DRAFT，线上 feed 与公开 ZIP 的版本、签名及架构限制已回核。本轮未执行 Sparkle 实际安装。**GitHub v2.0.0 已正式发布并完成公开下载回核**；tag 为 `9937af75694e2784815f23ce5c01e34690f15984`，产品源码保持 `9c96dc0`。三份公开附件 SHA-256 与最终产物一致，下载 App 的严格签名/Gatekeeper 通过，旧版全部附件保持原样。线上 arm64 appcast、Pages 与新版媒体均已核验通过；知识库维护另行同步并记录。
 - 普通注释清理为 295 条、占用 296 行；13 条 shebang、25 条 Python docstring、1 条测试边界和 2 条原生工具文档保留，第三方、法律声明、指令与字面量不动。独立审阅和等价验证通过；7 文件 vendor 同步无 reset。四语言 × 深浅色 UI **256/256**、Lua 33 项及 Python 12 个入口通过。证据在 `build/comment-audit/`。
 - 不再接管 App。最终包静态等价审阅通过，沿用历史原生验收时保留 `97cc58f` HTML、`32d3395` UI/保存/预览与用户人工菜单关闭复测的来源；不声称新包进行了全部真机验收。历史失败和测试偏好恢复事实保持。
-- 当前文档记录正式 Release 与公开下载回核通过；官网源文件两个主下载入口已指向 v2.0.0，Intel v1.0.8 入口保留。线上官网和 appcast 尚未在此步骤同步或验真；README 媒体仍为合成数据和模拟原生回执的前端演示。
+- 当前文档记录正式 Release 与公开下载回核通过；官网源文件两个主下载入口已指向 v2.0.0，Intel v1.0.8 入口保留。线上官网、16 张 JPG、两份 GIF 与 appcast 已逐字节回核，共 22 个文件一致；README 媒体仍为合成数据和模拟原生回执的前端演示。
 
 ## 历史未发布候选 1.0.9 / Build 56：菜单调查与用户复测
 

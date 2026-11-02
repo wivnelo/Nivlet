@@ -2,7 +2,7 @@
 
 更新日期：2026-11-02。
 
-当前状态：**[2.0.0 / Build 57 已正式发布](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.0)**，macOS 13+，仅 Apple Silicon（arm64）。最终产品源码为 `9c96dc0`，输出 `build/release-2.0.0-build57-r2/`。构建、Developer ID 签名、App/DMG Apple 公证、票据/Gatekeeper、最终资源/压缩包核对及本地更新签名、篡改拒绝和 Intel 不匹配检查通过。正式 tag 指向 `9937af75694e2784815f23ce5c01e34690f15984`，产品源码保持 `9c96dc0`。三份公开附件下载与最终本地产物一致，下载 App 的严格签名和 Gatekeeper 通过；线上 appcast、Pages 与知识库同步仍待完成。详见 [2.0.0 说明](documentation/RELEASE-v2.0.0.md) 及 [VALIDATION](documentation/VALIDATION.md)。
+当前状态：**[2.0.0 / Build 57 已正式发布](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.0)**，macOS 13+，仅 Apple Silicon（arm64）。最终产品源码为 `9c96dc0`，输出 `build/release-2.0.0-build57-r2/`。构建、Developer ID 签名、App/DMG Apple 公证、票据/Gatekeeper、最终资源/压缩包核对及本地更新签名、篡改拒绝和 Intel 不匹配检查通过。正式 tag 指向 `9937af75694e2784815f23ce5c01e34690f15984`，产品源码保持 `9c96dc0`。三份公开附件下载与最终本地产物一致，下载 App 的严格签名和 Gatekeeper 通过；线上 arm64 appcast、Pages 与新版媒体均已核验通过；知识库维护另行同步并记录。详见 [2.0.0 说明](documentation/RELEASE-v2.0.0.md) 及 [VALIDATION](documentation/VALIDATION.md)。
 
 历史正式发行 **[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8)**，Build 55 资产于 2026-10-29 发布。该 Release 保留 Build 54 与 Build 55 的双架构 ZIP、DMG 和 SHA-256；v1.0.8 tag 解引用至 `0772475f731ca887b23ca6ae49878d4e520c70c1`，未因新增 Build 55 资产而移动。本次 v2.0.0 使用独立 tag 与新资产；已核验旧版全部附件保持不变。
 
