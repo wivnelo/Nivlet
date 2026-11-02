@@ -40,7 +40,7 @@ Nivlet is a free, open-source macOS menu bar utility that brings everyday deskto
 <details>
 <summary>View all 8 screenshots</summary>
 
-The screenshots and demos show the 2.0.0 / Build 57 settings frontend (UI from `32d3395`, with updated version metadata), using synthetic data and simulated native responses in an isolated environment. They illustrate the interface, not a native end-to-end test. Clipboard text, network addresses, app rules, shortcuts and permission states are examples, not default settings or live system readings. Click an image to enlarge it.
+The screenshots and demos show the 2.0.1 / Build 61 settings frontend (product source `9ddcbf9`), using synthetic data and simulated native responses in an isolated environment. They illustrate the interface, not a native end-to-end test. Clipboard text, network addresses, app rules, shortcuts and permission states are examples, not default settings or live system readings. Click an image to enlarge it.
 
 <table>
 <tr>
@@ -75,7 +75,8 @@ The screenshots and demos show the 2.0.0 / Build 57 settings frontend (UI from `
 | **Clipboard history** | Keep text and images with search, thumbnails, larger previews and Option-click paste; turn recording on or off, exclude apps and choose retention limits |
 | **Window management** | 29 actions for halves, quarters, thirds, a 3×3 grid, centering, resizing, display moves and restore |
 | **App shortcuts** | Launch apps or bring them forward; replace apps, drag to reorder and check shortcut conflicts |
-| **Browser routing** | Choose the browser for a link based on its domain or source app |
+| **Browser routing** | Choose browsers by domain or source app, with installed-browser icons; open Safari, Chrome or Brave clear-data confirmation |
+| **Keep awake** | Optional idle-sleep prevention and a dependent Keep display on switch, both off by default |
 | **Input sources** | Assign an input source to an app and switch automatically when you activate it |
 | **System information** | See network speed in the menu bar and choose CPU, memory, disk, network addresses and dates to display |
 | **Personalization & migration** | Simplified/Traditional Chinese, English and Japanese in 2.0.0; light and dark appearances, sidebar ordering and JSON configuration import/export |
@@ -91,7 +92,7 @@ Enable the tools you need. Window and app shortcuts are configurable; the clipbo
 
 ## Release and architecture support
 
-**[2.0.0 / Build 57](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.0) is now available for Apple Silicon (arm64), macOS 13.0+.** The final packages are Developer ID signed and notarized by Apple. Public downloads match the verified release artifacts. See the [release notes](documentation/RELEASE-v2.0.0.md).
+**[2.0.1 / Build 61](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.1) is now available for Apple Silicon (arm64), macOS 13.0+.** The final packages are Developer ID signed and notarized by Apple. Public downloads match the verified release artifacts. See the [release notes](documentation/RELEASE-v2.0.1.md).
 
 **[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) is the final Intel (x86_64) release.** Its existing signed and notarized downloads remain available. New releases will no longer build or support Intel; no Intel hardware validation is claimed for 2.0.0.
 
@@ -122,3 +123,5 @@ Report problems or suggestions through [GitHub Issues](https://github.com/wivnel
 Nivlet uses the [MIT License](LICENSE). Its embedded Runtime is based on [Hammerspoon](https://github.com/Hammerspoon/hammerspoon). Third-party components retain their own licenses; see [third-party notices](THIRD-PARTY-NOTICES.md).
 
 Version 2.0.0 unifies all eight settings pages with a sidebar, adds local `.html`/`.htm` routing and saves drafts across pages together. Clipboard recording uses one enable switch; its menu shortcut uses an enable switch for ⌘⇧V, while existing custom shortcuts are preserved until that switch is changed and saved. Click a thumbnail, or focus it and press Enter or Space, to open an image preview; click outside the image within Nivlet or press Escape to close it. Existing HTTP/HTTPS routing remains in scope; see [detailed changes, migration rules, package sizes and validation gates](documentation/RELEASE-v2.0.0.md).
+
+Version 2.0.1 adds the two power switches and browser icon/Brave clear-dialog refinements, and removes the unused MAC address display. [Release details](documentation/RELEASE-v2.0.1.md).

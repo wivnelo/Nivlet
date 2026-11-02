@@ -1,8 +1,8 @@
 # 公开截图与更新方式
 
-## 当前媒体 · 2.0.0 / Build 57 · 2026-11-02
+## 当前媒体 · 2.0.1 / Build 61 · 2026-11-02
 
-中英文 README 的 16 张截图与 2 个 GIF 均使用与 commit `32d3395` 一致的真实 `Toolkit/settings.html`；界面功能不变，展示版本同步为 2.0.0 / Build 57，版本元数据独立核对当前 `VERSION`。`docs/screenshots.html` 使用同一套中文截图。此次没有独立视频文件或视频嵌入。
+中英文 README 的 16 张截图与 2 个 GIF 均使用与 commit `9ddcbf9` 一致的真实 `Toolkit/settings.html`；通用保活、浏览器图标、系统信息 MAC 移除同步当前产品，展示版本为 2.0.1 / Build 61，版本元数据独立核对当前 `VERSION`。`docs/screenshots.html` 使用同一套中文截图。此次没有独立视频文件或视频嵌入。
 
 这些是隔离浏览器中的真实前端演示，不是原生 App 端到端录像。图内持续标注“示例数据 / UI demo”；权限、默认浏览器、应用安装状态、剪贴板和系统数值都是演示值，不代表默认配置或实际检测结果。应用名/Bundle ID、规则、文本和网络地址使用虚构或文档示例；图片预览使用仓库公开 Nivlet 图标，不读取个人图片。
 
@@ -15,11 +15,11 @@ GIF 逐帧捕捉真实 DOM 操作：侧边栏导航、三分区与九宫格、�
 
 ### 可重复生成
 
-需要 Node.js、Lua、Playwright、本机 Chromium / Chrome，以及 macOS Swift / ImageIO（GIF 编码不需要 Pillow）。浏览器使用临时独立配置，拦截所有非本地网络请求，原生桥仅处理明确的模拟演示。生成前后会校验 `settings.html`、英文翻译与固定 UI 源码一致，并独立校验 `VERSION` 为 2.0.0。
+需要 Node.js、Lua、Playwright、本机 Chromium / Chrome，以及 macOS Swift / ImageIO（GIF 编码不需要 Pillow）。浏览器使用临时独立配置，拦截所有非本地网络请求，原生桥仅处理明确的模拟演示。生成前后会校验 `settings.html`、英文翻译与固定 UI 源码一致，并独立校验 `VERSION` 为 2.0.1。
 
 ```sh
-NIVLET_SCREENSHOT_BUILD=57 node scripts/render-readme-screenshots.cjs
-NIVLET_SCREENSHOT_BUILD=57 node scripts/render-readme-demo.cjs
+NIVLET_SCREENSHOT_BUILD=61 node scripts/render-readme-screenshots.cjs
+NIVLET_SCREENSHOT_BUILD=61 node scripts/render-readme-demo.cjs
 python3 scripts/encode-readme-demo.py
 # Inspect build/media-final/overview-*-contactsheet.png, then publish the reviewed GIFs.
 cp build/media-final/overview-en.gif build/media-final/overview-zh.gif docs/assets/demos/
@@ -29,6 +29,8 @@ node scripts/verify-readme-media.cjs
 可用 `NIVLET_SCREENSHOT_BROWSER` 指定浏览器可执行文件。截图先生成到被 Git 忽略的 `build/media-final/screenshots/`，通过语言、布局、图片及源码校验后复制到公开路径；GIF 帧和交互清单位于 `build/readme-demo/`，编码和逐帧回读报告位于 `build/media-final/`。只有最终 JPG/GIF 进入文档，所有临时素材均不进入安装包。
 
 更新时逐页实际查看像素，再回读 GIF 帧数、尺寸、时间和循环信息，并用浏览器播放确认；核对 README/官网引用及版本说明。生成脚本只验证前端演示，不代替原生功能验收。保持 Git 中的旧媒体历史，不上传本机个人配置截图。
+
+浏览器演示使用 Safari/Chrome 应用的公开图标，只读取应用图标资源，不读取浏览记录或个人页面。
 
 ## 历史记录（已被本次媒体替换）
 

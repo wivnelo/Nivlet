@@ -1,8 +1,8 @@
 # 开发与构建
 
-当前开发候选为 **2.0.0 / Build 57**，macOS 13+，仅 Apple Silicon（arm64）。尚未正式发布，最终门槛见 [分发流程](DISTRIBUTION.md)。[1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后一个 Intel 版本；历史资产保留，后续停止 Intel 构建、发行与支持。
+当前正式基准为 **2.0.1 / Build 61**，macOS 13+，仅 Apple Silicon（arm64）。发行门槛见 [分发流程](DISTRIBUTION.md)。[1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后一个 Intel 版本；历史资产保留，后续停止 Intel 构建、发行与支持。
 
-1.0.9 / Build 56 是未发布的历史候选；其构建、签名、公证和本机测试记录仅对应当时的产物。2.0.0 / Build 57 必须重新完成最终构建与验收，不能沿用旧包的通过结论。
+1.0.9 / Build 56 是未发布的历史候选；其构建、签名、公证和本机测试记录仅对应当时的产物。2.0.1 / Build 61 已完成独立的最终包验收；后续构建仍须重新验证，不能沿用旧包结论。
 
 ## 隔离 Release 构建
 
@@ -13,7 +13,7 @@ Release 入口先检查当前仓库与 Git author/committer，再把源码和依
 ```sh
 python3 tests/privacy.py
 python3 scripts/check-privacy.py --repo .
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=arm64 NIVLET_BUILD_NUMBER=57 NIVLET_DERIVED_DATA_PATH="$PWD/build/release-2.0.0-build57/arm64/DerivedData" sh scripts/build-release.sh
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=arm64 NIVLET_BUILD_NUMBER=61 NIVLET_DERIVED_DATA_PATH="$PWD/build/release-2.0.1-build61/arm64/DerivedData" sh scripts/build-release.sh
 ```
 
 构建不会自动安装。正式签名、公证、ZIP/DMG 和更新源使用 [DISTRIBUTION](DISTRIBUTION.md) 的后续流程；`scripts/package-local.sh` 只生成本地验证包，不表示公证发行。

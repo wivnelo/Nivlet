@@ -1,12 +1,12 @@
 # Nivlet 发布与推广用语
 
-适用候选：2.0.0 / Build 57，尚未发布。以下文字仅在最终门槛通过、正式 Release 可访问后改为发布口吻；当前公开下载仍为 1.0.8。
+适用正式版本：2.0.1 / Build 61。
 
 ## 简短介绍
 
 Nivlet 是免费开源的 macOS 桌面工具箱，提供窗口布局、文字与图片剪贴板历史、应用快捷启动、按应用切换输入法、浏览器分流和菜单栏系统信息。无需账号，核心功能在本机运行。
 
-2.0.0 候选统一八页侧边栏，支持本地 HTML/HTM 转交与跨页保存全部修改，新增繁体中文（台湾用语）和日语。新版本仅支持 Apple Silicon（arm64）与 macOS 13+；[1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后 Intel 版，历史下载保留。
+2.0.1 增加保持唤醒与保持屏幕长亮、统一浏览器图标并支持打开 Brave 清理确认框，移除 MAC 地址展示；保留八页设置及四语言。新版本仅支持 Apple Silicon（arm64）与 macOS 13+；[1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后 Intel 版，历史下载保留。
 
 - 官网：https://wivnelo.github.io/Nivlet/
 - 源码：https://github.com/wivnelo/Nivlet
@@ -25,4 +25,4 @@ Nivlet 是免费开源的 macOS 桌面工具箱，提供窗口布局、文字与
 
 ## English
 
-Nivlet is a free, open-source macOS toolkit for windows, clipboard history, app shortcuts, input switching, browser routing and menu-bar system information. The 2.0.0 candidate adds a unified sidebar, local HTML/HTM forwarding, Save All Settings, Traditional Chinese (Taiwan) and Japanese. New versions support Apple Silicon (arm64), macOS 13+ only. Version 1.0.8 Build 55 remains the final Intel release, with historical downloads retained. Final release gates are still pending.
+Nivlet is a free, open-source macOS toolkit for windows, clipboard history, app shortcuts, input switching, browser routing and menu-bar system information. Version 2.0.1 adds optional Keep awake and Keep display on switches, shared browser icons and the Brave clear-data confirmation entry, and removes the MAC address display. New versions support Apple Silicon (arm64), macOS 13+ only. Version 1.0.8 Build 55 remains the final Intel release, with historical downloads retained.

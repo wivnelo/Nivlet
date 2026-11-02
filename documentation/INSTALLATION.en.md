@@ -1,12 +1,12 @@
 # Installation, updates and removal
 
-Candidate: **2.0.0 / Build 57, not yet published**, macOS 13.0+, Apple Silicon (arm64) only. Final build, signing, notarization and acceptance gates must pass first. [简体中文](INSTALLATION.md)
+Release: **2.0.1 / Build 61**, macOS 13.0+, Apple Silicon (arm64) only. [简体中文](INSTALLATION.md)
 
-The latest published release remains [1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8), the **final Intel (x86_64) release**. Its downloads stay available. New versions no longer build or support Intel; no Intel hardware validation is claimed for 2.0.0.
+[1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) is the **final Intel (x86_64) release**. Its downloads stay available. New versions no longer build or support Intel; no Intel hardware validation is claimed for 2.0.1.
 
 ## Signing status
 
-The published 1.0.8 apps and DMGs are Developer ID signed, Apple notarized and stapled. The 2.0.0 arm64 candidate must complete the same final gates before publication. Sparkle update signatures independently protect archive integrity. Notarization does not grant Accessibility permission or mean App Store distribution.
+The 2.0.1 / Build 61 app and DMG are Developer ID signed, Apple notarized and stapled, with Gatekeeper checks passed. Sparkle update signatures independently protect archive integrity. Notarization does not grant Accessibility permission or mean App Store distribution.
 
 ## Install
 
@@ -27,10 +27,10 @@ For browser routing, save rules first, then choose Nivlet as the system default 
 
 ## Verify downloads
 
-Once 2.0.0 is published, place its DMG, ZIP and `.sha256` file together, then run:
+Place the release DMG, ZIP and `.sha256` file together, then run:
 
 ```sh
-shasum -a 256 -c Nivlet-2.0.0-build57-arm64.sha256
+shasum -a 256 -c Nivlet-2.0.1-build61-arm64.sha256
 ```
 
 Both archives should report OK. If you downloaded only one, the missing archive reports a missing-file error; inspect the result for the archive you have. Checksums do not replace Apple signing or notarization.

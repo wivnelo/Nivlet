@@ -1,6 +1,10 @@
 # Nivlet 会话交接 · 2026-11-02
 
-## 当前状态 · 2.0.0 / Build 57 已正式发布
+## 当前状态 · 2.0.1 / Build 61
+
+当前范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.0.1 版本说明](documentation/RELEASE-v2.0.1.md)。产品源码 `9ddcbf9`，仅 Apple Silicon；本次不改变 2.0.0 已确认的其他功能。知识库另行同步，不复制内部测试记录或用户数据。
+
+## 历史 · 2.0.0 / Build 57 已正式发布
 
 - 最终产品源码冻结于 `9c96dc0955198270d48e6dbc6ec1346acb835b3d`，输出 `build/release-2.0.0-build57-r2/`。仅支持 Apple Silicon（arm64）、macOS 13.0+；[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后 Intel 版本，历史资产保留。
 - 构建、26 源资源、101 arm64 Mach-O、四语菜单、dSYM/权限、Developer ID 签名、App/DMG Apple 公证、票据/Gatekeeper、ZIP 和只读挂载 DMG 核对通过。App submission `015a8cae-4ae5-49d2-9993-560bff521959`；DMG submission `dea1bf91-5951-4e20-922c-1c3e25041229`。实际大小与 SHA-256 见 VALIDATION 顶部及本轮 `final-asset-review.json`。

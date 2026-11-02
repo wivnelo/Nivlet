@@ -7,10 +7,10 @@ const {execFileSync} = require('node:child_process');
 const {pathToFileURL} = require('node:url');
 const {chromium} = require('playwright');
 const root = path.resolve(__dirname, '..');
-const sourceCommit = 'db0fe0dbaae419ac49d73c54347ac2442a2f085c';
-const version = '2.0.0';
-const build = process.env.NIVLET_SCREENSHOT_BUILD || '57';
-if (build !== '57') throw Error('This media set illustrates 2.0.0 / Build 57');
+const sourceCommit = '9ddcbf9dd6ac951463a9c0c8ed929357c44996c9';
+const version = '2.0.1';
+const build = process.env.NIVLET_SCREENSHOT_BUILD || '61';
+if (build !== '61') throw Error('This media set illustrates 2.0.1 / Build 61');
 const viewport = {width:1280,height:900};
 const pages = {windows:'windowSection',clipboard:'clipSection',general:'generalSection',input:'inputSection',browser:'browserSection',launcher:'launcherSection',system:'systemSection',about:'aboutSection'};
 const sha256 = value => crypto.createHash('sha256').update(value).digest('hex');
@@ -41,7 +41,7 @@ function makeFixture(language='en') {
     const ids = names.map((_,i)=>`com.example.demo${i+1}`);
     return {
         ok:true,action:'load',message:'',language,translations:en?{...english}:{},
-        general:{sleepShortcut:false,showMenu:true,appearance:'dark',language,tabOrder:[]},autoLaunch:false,
+        general:{keepAwake:false,keepDisplayOn:false,sleepShortcut:false,showMenu:true,appearance:'dark',language,tabOrder:[]},autoLaunch:false,
         permissions:{accessibility:'granted'},
         config:{enabled:true,shortcuts:Object.fromEntries([['left','LEFT'],['right','RIGHT'],['top','UP'],['bottom','DOWN'],['maximize','RETURN']].map(([id,key])=>[id,{key,mods:['ctrl','alt']}]))},
         sources:[{id:'demo.us',name:'ABC'},{id:'demo.pinyin',name:en?'Pinyin – Simplified':'简体拼音'}],
@@ -52,11 +52,11 @@ function makeFixture(language='en') {
             {id:1,kind:'text',time:1793530740,text:en?'A little less switching. A little more focus.':'少一点切换，多一点专注。'},
             {id:2,kind:'text',time:1793530680,text:en?'Design reference: https://example.com/design-notes':'设计参考：https://example.com/design-notes'}
         ]},
-        excludedAppNames:{},appIcons:{},applicationStates:Object.fromEntries(ids.map((id,i)=>[id,{installed:true,name:names[i]}])),
+        excludedAppNames:{},appIcons:Object.fromEntries([['com.apple.Safari','safari'],['com.google.Chrome','chrome']].map(([id,name])=>[id,'data:image/png;base64,'+fs.readFileSync(path.join(root,'docs/assets/browser-icons',name+'.png')).toString('base64')])),applicationStates:Object.fromEntries(ids.map((id,i)=>[id,{installed:true,name:names[i]}])),
         popupShortcut:{key:'V',mods:['cmd','shift']},popupShortcutDefault:{key:'V',mods:['cmd','shift']},
         system:Object.fromEntries(['network','cpu','memory','disk','ipv4','ipv6','date','lunar'].map(id=>[id,true])),
         browser:{enabled:true,defaultBrowser:'com.apple.Safari',rules:[{domain:'example.com',browser:'com.google.Chrome',subdomains:true}],appRules:[{bundleID:ids[0],name:names[0],browser:'com.apple.Safari'}]},
-        browserStatus:{active:true},browsers:[{id:'com.apple.Safari',name:'Safari'},{id:'com.google.Chrome',name:'Google Chrome'}],
+        browserStatus:{active:true},browsers:[{id:'com.apple.Safari',name:'Safari',capabilities:{clearBrowsingData:true}},{id:'com.google.Chrome',name:'Google Chrome',capabilities:{clearBrowsingData:true}}],
         about:{version,build,icon,license:fs.readFileSync(path.join(root,'LICENSE'),'utf8'),notices:fs.readFileSync(path.join(root,'THIRD-PARTY-NOTICES.md'),'utf8')}
     };
 }
@@ -82,7 +82,7 @@ if (require.main === module) (async()=>{
             await frame.waitForFunction(()=>typeof window.receive==='function');
             await page.evaluate(({language,version,build})=>document.getElementById('media-label').textContent=(language==='en'?'Sample data · UI preview':'示例数据 · 界面演示')+'  |  Nivlet '+version+' · Build '+build,{language,version,build});
             await frame.evaluate(data=>window.receive(data),makeFixture(language));
-            await frame.evaluate(()=>window.receiveSystemValues({ok:true,values:{network:'↓ 24 KB/s  ↑ 8 KB/s',cpu:'12% / 8 Core',memory:'6.2 / 16 GB',disk:'128 / 512 GB',ipv4:'192.0.2.10',ipv6:'2001:db8::10',date:'2026-11-01',lunar:'—'}}));
+            await frame.evaluate(()=>window.receiveSystemValues({ok:true,values:{network:'↓ 24 KB/s  ↑ 8 KB/s',cpu:'12% / 8 Core',memory:'6.2 / 16 GB',disk:'128 / 512 GB',ipv4:'192.0.2.10',ipv6:'2001:db8::10',date:'2026-11-02',lunar:'—'}}));
             for (const [name,section] of Object.entries(pages)) {
                 await frame.evaluate(section=>{window.showSection(section);document.querySelector('main').scrollTop=0;window.scrollTo(0,0)},section);
                 await frame.evaluate(async()=>{await document.fonts.ready;await Promise.all([...document.images].map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve})))});

@@ -1,6 +1,6 @@
 # 配置备份与导入
 
-> 适用于 2.0.0 / Build 57 候选（尚未发布；配置格式版本仍为 1）。1.0.8 是最后 Intel 版，后续仅支持 arm64。当前状态见 [BASELINE.md](../BASELINE.md)。直接编辑配置并重新加载仍在开发计划中，本页说明现有导入导出功能。
+> 适用于 2.0.1 / Build 61（配置格式版本仍为 1）。1.0.8 是最后 Intel 版，后续仅支持 arm64。当前状态见 [BASELINE.md](../BASELINE.md)。直接编辑配置并重新加载仍在开发计划中，本页说明现有导入导出功能。
 
 
 在 **设置 → 通用 → 配置备份与迁移** 中操作。
@@ -80,3 +80,7 @@
 ## 语言配置与原生菜单
 
 `general.language` 支持 `zh-Hans`、`en`、`zh-Hant`、`ja` 和 `system`（跟随系统）。繁中采用台湾用语，香港语言环境使用繁中回退。原生菜单提供四语言资源，由 macOS 在应用启动时选取；Toolkit 的界面语言偏好不强制 AppKit 菜单或 Sparkle 对话框即时切换。
+
+## 2.0.1 通用电源选项与旧 MAC 字段
+
+`general.keepAwake` 和 `general.keepDisplayOn` 均为可选布尔值，缺省关闭。`keepDisplayOn` 只有在 `keepAwake` 为 `true` 时才生效；导入沿用确认、校验及失败回滚。旧配置的 `system.mac` 仍可被接受并忽略；新导出不包含该字段，不会全局重置其他配置。

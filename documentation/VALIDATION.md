@@ -1,3 +1,9 @@
+# 当前验收：2.0.1 / Build 61
+
+54 个回归文件、408 项隔离 UI/布局检查及独立代码复审通过；最终 App/DMG 签名、公证、票据、Gatekeeper 及 arm64 架构检查通过。31 个偏好键在最终安装前后语义无变化；原生与用户人工验收范围、未测试边界、源码及附件校验值见 [2.0.1 版本说明](RELEASE-v2.0.1.md)。不上传内部日志、用户配置或原始截图。
+
+以下保留历史验收，不作为新包证据。
+
 # 2.0.0 / Build 57 · 已正式发布并完成下载回核
 
 2026-11-02 最终源码为 `9c96dc0955198270d48e6dbc6ec1346acb835b3d`，发行输出为 `build/release-2.0.0-build57-r2/`。[v2.0.0](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.0) 已作为正式 Latest 发布，tag 指向 `9937af75694e2784815f23ce5c01e34690f15984`；该提交包含发行文档，产品源码仍为上述 `9c96dc0`。三份公开附件下载与最终本地产物的 SHA-256 一致，下载 App 的严格签名及 Gatekeeper 通过；旧版全部附件保持不变。证据为同目录 `public-release-verification.json`。线上 arm64 appcast、Pages 与新版媒体均已核验通过；知识库维护另行同步并记录。

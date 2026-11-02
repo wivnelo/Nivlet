@@ -1,8 +1,8 @@
-> This guide describes the 2.0.0 / Build 57 candidate, not yet published. Requires macOS 13+ and Apple Silicon (arm64); 1.0.8 Build 55 remains the final Intel release.
+> This guide covers 2.0.1 / Build 61, macOS 13+, Apple Silicon (arm64). Version 1.0.8 Build 55 remains the final Intel release.
 
 # Nivlet User Guide
 
-See [BASELINE](../BASELINE.md) for the final build, signing, notarization and acceptance status of the 2.0.0 candidate; results from earlier packages do not apply to it. Signing and notarization do not grant Accessibility access. See the [installation guide](INSTALLATION.en.md).
+See the [release notes](RELEASE-v2.0.1.md) for changes and verification boundaries. Signing and notarization do not grant Accessibility access. See the [installation guide](INSTALLATION.en.md).
 
 [Back to README](../README.md) · [简体中文](USAGE.md)
 
@@ -49,7 +49,7 @@ Priority is **domain → source app → fallback**. Domain rules match from top 
 
 ### System information and input sources
 
-Choose network speed, CPU, memory, disk, IPv4, IPv6, MAC address, calendar date/weekday and lunar date in System Information, then save. Settings show current values; an information entry remains when network speed is hidden. Click addresses or dates in the menu to copy them. macOS may hide the MAC address; “Hidden by system” is unrelated to Accessibility permission.
+Choose network speed, CPU, memory, disk, IPv4, IPv6, calendar date/weekday and lunar date in System Information, then save. Settings show current values; an information entry remains when network speed is hidden. Click addresses or dates in the menu to copy them.
 
 In Input Sources, add an app and choose one of the system's enabled input sources, then enable and save. The rule applies when you next activate that app; unconfigured apps keep the current input source.
 
@@ -76,7 +76,7 @@ Browser app and domain rules are separate sections. Save rules, then test links 
 
 ## Permissions and validation
 
-Unsaved pages have an orange dot in the sidebar. Saving or discarding clears the corresponding marker. General retains Check Again even when Accessibility is off and refreshes permission status when its window regains focus. Default-browser setup no longer requests unrelated document associations. Historical manual acceptance on the maintainer's setup does not establish the final 2.0.0 candidate's results. See the [installation guide](INSTALLATION.en.md) for the current Developer ID/notarization limitations.
+Unsaved pages have an orange dot in the sidebar. Saving or discarding clears the corresponding marker. General retains Check Again even when Accessibility is off and refreshes permission status when its window regains focus. Default-browser setup no longer requests unrelated document associations. Manual acceptance on one setup does not establish compatibility with every Mac or macOS version. See the [installation guide](INSTALLATION.en.md) for the current Developer ID/notarization limitations.
 
 ## Interface consistency
 
@@ -84,4 +84,10 @@ Disclosure arrows share the same size, spacing and expanded direction. The exclu
 
 ### Clear browsing data and reopen settings
 
-Click Clear Browsing Data… at the top right of Browser. After the Accessibility check, choose Safari or Chrome and confirm the scope in the browser. Nivlet does not confirm deletion. Reopening an existing settings window through an app shortcut or the Dock preserves its page; first open goes to General.
+Click Clear Browsing Data… at the top right of Browser. After the Accessibility check, choose installed Safari, Chrome or Brave and confirm the scope in the browser. Nivlet does not confirm deletion. Reopening an existing settings window through an app shortcut or the Dock preserves its page; first open goes to General.
+
+### Keep awake and Keep display on
+
+Both General switches are off by default and take effect through Save All Settings. Keep display on requires Keep awake; disabling the parent also disables the child. Keep awake alone allows normal display sleep. Keep display on additionally prevents idle display sleep and may delay locks that depend on the display turning off. Disabling the parent or quitting releases only Nivlet’s own assertions. It does not adjust brightness, change persistent power/security settings or bypass a password.
+
+All three native browser selectors show the selected browser’s real icon. Shared installed-browser information supplies names, icons and clear-data capabilities; focus/page refresh preserves drafts. Version 2.0.1 removes the MAC address and its display switch while keeping other network information and interface selection unchanged.
