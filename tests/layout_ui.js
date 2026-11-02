@@ -1,4 +1,4 @@
-// Run in an isolated WebView at wide and compact sizes, with synthetic data.
+
 window.runLayoutRegression=function(data){
  const check=(ok,message)=>{if(!ok)throw new Error(message)},main=document.querySelector('main'),footer=document.querySelector('footer');
  const visible=e=>{const r=e.getBoundingClientRect();return r.top>=main.getBoundingClientRect().top-1&&r.bottom<=footer.getBoundingClientRect().top+1};

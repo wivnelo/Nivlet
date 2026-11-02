@@ -1,4 +1,4 @@
-// Execute in the actual settings WebView with its current backend payload.
+
 window.runConfigurationRegression=function(data){
     const check=(ok,message)=>{if(!ok)throw new Error(message)};
     const originalSend=send,originalModules=window.importedModules;

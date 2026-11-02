@@ -1,5 +1,5 @@
-// Encode captured UI frames, then independently decode every output frame.
-// Uses macOS system frameworks; never opens the product App.
+
+
 import Foundation
 import CoreGraphics
 import ImageIO
@@ -93,7 +93,7 @@ do {
     try require(abs(manifest.durationsMs.reduce(0, +) - manifest.seconds * 1000) < 0.01, "Requested durations do not match total seconds")
     try require(abs(Double(manifest.frames) / manifest.fps - manifest.seconds) < 0.01, "Frame rate and total seconds disagree")
 
-    // GIF stores centiseconds. Cumulative rounding preserves the requested duration.
+
     var elapsedMs = 0.0, previousCentiseconds = 0
     let delays: [Int] = manifest.durationsMs.map { duration in
         elapsedMs += duration

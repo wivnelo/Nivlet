@@ -83,8 +83,8 @@ def install_localizations(app, source, catalog, compiler=compile_nib):
         target = folder / 'MainMenu.nib'
         if folder.is_symlink() or (folder.exists() and not folder.is_dir()) or target.is_symlink() or (target.exists() and not target.is_file()):
             raise ValueError('Unexpected localized native menu output: ' + language)
-    # Compile everything before changing the built bundle. A failing compiler
-    # leaves the original native interface and existing resources untouched.
+
+
     with tempfile.TemporaryDirectory(prefix='nivlet-menu-', dir='/private/tmp') as temporary:
         prepared = Path(temporary)
         shutil.copyfile(original, prepared / 'en.nib')
@@ -96,9 +96,9 @@ def install_localizations(app, source, catalog, compiler=compile_nib):
             folder = resources / (language + '.lproj')
             folder.mkdir(exist_ok=True)
             shutil.copyfile(prepared / (language + '.nib'), folder / 'MainMenu.nib')
-    # A nonlocalized resource can take precedence over localized resources.
-    # Its exact bytes are retained in en.lproj; only that redundant root copy
-    # is removed, before any signing step.
+
+
+
     if root_nib.exists():
         root_nib.unlink()
     return {'languages': list(LANGUAGES), 'titles_per_language': len(catalog['source_titles']),

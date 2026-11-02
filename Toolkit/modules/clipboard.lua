@@ -8,8 +8,8 @@ end
 function M.validate(value)
     if type(value)~="table" or type(value.enabled)~="boolean" or type(value.limit)~="number" or value.limit%1~=0 or value.limit<10 or value.limit>100 or type(value.minutes)~="number" or value.minutes%1~=0 or value.minutes<0 or value.minutes>1440 or type(value.excluded)~="table" then return nil,i18n.t("容量须为 10–100 条，保留时间须为 1–1440 分钟或 0（永久）") end
     if value.images~=nil and type(value.images)~="boolean" or value.persistent~=nil and type(value.persistent)~="boolean" or value.paused~=nil and type(value.paused)~="boolean" then return nil,i18n.t("图片和缓存设置格式无效") end
-    -- Read the retired flag only to preserve an explicitly recorded stop intent.
-    -- The previous release kept pause in memory; an absent flag cannot reveal it.
+
+
     local config,seen={enabled=value.enabled and value.paused~=true,limit=value.limit,minutes=value.minutes,images=value.images~=false,persistent=value.persistent==true,excluded={}},{}
     for _,id in ipairs(value.excluded) do
         if not bundleIDs.valid(id) then return nil,i18n.t("排除应用须填写有效 Bundle ID") end
@@ -79,8 +79,8 @@ local function maintainExpiryTimer()
     stopExpiryTimer()
     local generation=M.expiryGeneration
     M.expiryAt=nextExpiry
-    -- An idle disabled recorder wakes only for the next expiry or a pending
-    -- history-write retry. Neither path reads the system clipboard.
+
+
     M.expiryTimer=hs.timer.doAfter(math.max(0.01,nextExpiry-hs.timer.secondsSinceEpoch()),function()
         if M.stopped or generation~=M.expiryGeneration then return end
         M.expiryTimer=nil;M.expiryAt=nil
@@ -106,8 +106,8 @@ function M.prune()
         local ran,ok,message=pcall(M.persist)
         if ran and ok then historyPersisted()
         else
-            -- Keep the pending empty list too: the last expiry must eventually
-            -- remove its stale disk index. A failed write cannot stop scheduling.
+
+
             M.pendingHistoryWrite=true;M.historyRetryAt=now+5
             M.historyPersistError=ran and message or i18n.t("保存失败，请检查设置")
             if not M.historyErrorNotified and hs.alert and type(hs.alert.show)=="function" then
@@ -148,9 +148,9 @@ function M.load()
         elseif validTime and M.config.minutes>0 and entry.time<=cutoff then expiredMissing=true
         else unresolved=true end
     end
-    -- A prior expiry may have removed its image before an index write failed.
-    -- Repair that expired metadata only when no other filtered item might be
-    -- temporarily unreadable. A failed image load is not evidence to delete it.
+
+
+
     if expiredMissing and not unresolved then M.pendingHistoryWrite=true end
     M.prune()
 end
@@ -172,7 +172,7 @@ function M.poll()
         local size=image:size()
         if size.w<=0 or size.h<=0 or size.w*size.h>25000000 then return end
         local encoded=image:encodeAsURLString(true,"PNG")
-        if not encoded or #encoded>13981070 then return end -- 10 MiB PNG, including base64 expansion.
+        if not encoded or #encoded>13981070 then return end
         fingerprint=hs.hash.SHA256(encoded)
         thumb=thumbnail(image)
     else
@@ -186,8 +186,8 @@ function M.poll()
     end
     M.nextID=M.nextID+1
     table.insert(M.entries,1,{id=M.nextID,kind=image and "image" or "text",text=value,image=image,thumb=thumb,fingerprint=fingerprint,time=hs.timer.secondsSinceEpoch()})
-    -- A storage exception must not escape the native repeating timer (which
-    -- stops on callback errors). Retry the latest history through prune instead.
+
+
     M.pendingHistoryWrite=true
     M.prune()
 end
@@ -200,7 +200,7 @@ function M.configure(config)
     M.stop();M.stopped=false
     M.config=config
     if config.enabled then
-        M.lastCount=hs.pasteboard.changeCount() -- Never import the clipboard on enable/restart.
+        M.lastCount=hs.pasteboard.changeCount()
         M.prune()
         M.timer=hs.timer.doEvery(0.5,M.poll)
     else
@@ -337,8 +337,8 @@ function M.start()
     local saved=hs.settings.get(settingsKey)
     local config=M.validate(saved)
     if config and saved.paused~=nil then
-        -- Persist the single switch before polling. Failure never re-enables a
-        -- migrated paused configuration; the saved legacy flag remains readable.
+
+
         local ok,result=pcall(hs.settings.set,settingsKey,config)
         if not ok or result==false then
             if hs.alert then hs.alert.show(i18n.t("保存失败，请检查设置")) end

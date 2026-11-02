@@ -1,4 +1,4 @@
-// Synthetic clipboard only; assertions exercise the production DOM/receive path.
+
 window.runClipboardPageRegression=function(data){
  const check=(ok,message)=>{if(!ok)throw new Error(message)},oldSend=send,oldTimeout=window.setTimeout,oldClear=window.clearTimeout;
  let request,timer;const search=document.getElementById('clipSearch'),note=document.getElementById('status');

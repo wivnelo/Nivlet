@@ -1,4 +1,4 @@
-// Synthetic history only. A background snapshot must not strand modal return focus.
+
 window.runImagePreviewFocusRefreshRegression=async function(data){
  const check=(value,message)=>{if(!value)throw Error(message)},tick=()=>new Promise(resolve=>setTimeout(resolve,0));
  const oldSend=send,now=Date.now()/1000,canvas=document.createElement('canvas');canvas.width=320;canvas.height=120;
@@ -63,7 +63,7 @@ window.runImagePreviewFocusRefreshRegression=async function(data){
   check(!dialog.open&&document.activeElement===search,'Expired preview left focus on its removed row');
 
   for(let i=0;i<3;i++){await open();receive('refreshApplications');await closeTo(preview())}
-  // Unrelated stable focus stays where it was; no automatic navigation occurs.
+
   await open();await closeTo(preview());search.focus();window.showImage({...entry,url});await image.decode();receive('refreshPermissionsSilent');await closeTo(search);
   return 'Background receipts, changed history, other-entry TTL, filtering, removal/expiry before rerender, repeated cycles, stable focus and correct preview action passed';
  }finally{if(dialog.open)closeImagePreview();await tick();send=oldSend;search.value='';window.receive({...data,action:'load'})}

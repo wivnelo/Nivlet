@@ -34,7 +34,7 @@ def check_repo(root):
     paths = subprocess.check_output(["git", "-C", str(root), "ls-files", "-z", "--cached", "--others", "--exclude-standard"]).decode().split("\0")
     for name in sorted(set(filter(None, paths))):
         path = root / name
-        # Existing nested workspaces have their own audit and publication boundary.
+
         if name == "website/" and (path / ".git").exists():
             continue
         if path.is_file():

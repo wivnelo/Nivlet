@@ -1,4 +1,4 @@
-// Isolated settings WebView only: no backend saves or user data.
+
 window.runStageARegression=function(data){
  const check=(ok,message)=>{if(!ok)throw new Error(message)},original=send;
  try{

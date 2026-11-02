@@ -1,6 +1,6 @@
 from pathlib import Path
 import subprocess,tempfile
-# Compile the actual patched Runtime logic against isolated fakes: no AppKit UI or user defaults.
+
 root=Path(__file__).resolve().parent.parent
 source=(root/'vendor/hammerspoon/Hammerspoon/MJDockIcon.m').read_text()
 source='\n'.join(line for line in source.splitlines() if not line.startswith('#import'))

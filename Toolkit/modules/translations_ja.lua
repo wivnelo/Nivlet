@@ -1,5 +1,5 @@
--- Japanese UI copy for Nivlet. Keys are stable Simplified Chinese source strings.
--- Reviewed in feature context; brand names, identifiers and shortcut syntax stay unchanged.
+
+
 return {
     ["启用菜单快捷键"] = "メニューのショートカットを有効にする",
     ["当前仍使用以前保存的组合。关闭后再启用并保存，将改为固定快捷键 ⌘⇧V。"] = "以前に保存したキーの組み合わせを使用中です。一度オフにしてからオンに戻して保存すると、固定のショートカット ⌘⇧V に切り替わります。",

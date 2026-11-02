@@ -17,7 +17,7 @@ spec.loader.exec_module(generator)
 
 
 def macho(arm=True):
-    # Minimal Mach-O header for lipo's architecture inspection; never executed.
+
     return struct.pack('<8I', 0xfeedfacf, 0x0100000c if arm else 0x01000007, 0 if arm else 3, 2, 0, 0, 0, 0)
 
 

@@ -1,4 +1,4 @@
--- Real runtime adapters against the existing in-memory hs mock only.
+
 dofile('tests/runtime.lua')
 local app=desktopToolkit
 local i18n=require('modules.i18n')

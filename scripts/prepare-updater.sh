@@ -1,5 +1,5 @@
 #!/bin/sh
-# Pinned official Sparkle distribution; private signing key stays in Keychain.
+
 set -eu
 project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 source="$project_dir/vendor/sparkle-2.10.0"

@@ -1,4 +1,4 @@
-// Run inside the isolated settings document with synthetic language catalogues.
+
 window.runI18nRegression=function(data){
     const check=(value,message)=>{if(!value)throw new Error(message)};
     const key=document.getElementById('left-key'),originalKey=key.value,control=document.getElementById('left-ctrl'),originalControl=control.checked;

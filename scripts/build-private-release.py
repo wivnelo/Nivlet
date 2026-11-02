@@ -23,7 +23,7 @@ with tempfile.TemporaryDirectory(prefix="nivlet-release-", dir="/private/tmp") a
                         ignore=shutil.ignore_patterns(".git", ".DS_Store", "xcuserdata", "*.xcuserstate"))
     for name in ["VERSION", "LICENSE", "THIRD-PARTY-NOTICES.md", "Hammerspoon-Downstream.xcconfig"]:
         shutil.copy2(root / name, workspace / name)
-    # Upstream's version phase reads its pinned Git tag and commit count.
+
     shutil.copytree(root / "vendor/hammerspoon/.git", workspace / "vendor/hammerspoon/.git", symlinks=True)
     derived = Path(temporary) / "DerivedData"
     env = dict(os.environ, NIVLET_BUILD_CONFIGURATION="Release", NIVLET_DERIVED_DATA_PATH=str(derived))

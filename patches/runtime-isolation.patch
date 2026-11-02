@@ -270,10 +270,10 @@ index 1f0d2fb..d990cbc 100644
          // No test environment detected, this is a live user run
 -        NSString* userMJConfigFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"MJConfigFile"];
 -        if (userMJConfigFile) MJConfigFile = userMJConfigFile ;
-+        // Nivlet owns its bootstrap and never loads personal Hammerspoon config.
++
 +        NSBundle *bundle = [NSBundle mainBundle];
 +        if (![bundle.bundleIdentifier isEqualToString:@"dev.local.DesktopToolkit"]) abort();
-+        // Do not allow competing instances to register the same global shortcuts.
++
 +        for (NSRunningApplication *running in [NSRunningApplication runningApplicationsWithBundleIdentifier:bundle.bundleIdentifier]) {
 +            if (running.processIdentifier != NSProcessInfo.processInfo.processIdentifier && !running.terminated) {
 +                [running activateWithOptions:NSApplicationActivateIgnoringOtherApps];
@@ -366,7 +366,7 @@ index 4c3e3ed..14c8dbf 100644
      _lua_stackguard_entry(skin.L);
  
      lua_getglobal(L, "hs");
-+    // A duplicate instance can exit before the hs global has been initialized.
++
 +    if (!lua_istable(L, -1)) {
 +        lua_pop(L, 1);
 +        _lua_stackguard_exit(skin.L);
@@ -393,7 +393,7 @@ index 9740d89..b14166d 100644
      } else {
          theWindow.opaque = !(lua_toboolean(L, 2));
 +        theWindow.backgroundColor = theWindow.opaque ? [NSColor windowBackgroundColor] : [NSColor clearColor];
-+        // Draw the titlebar over the opaque window color instead of the system material.
++
 +        theWindow.titlebarAppearsTransparent = theWindow.opaque;
          [theWindow.contentView setValue:@(lua_toboolean(L, 2)) forKey:@"drawsTransparentBackground"];
          lua_settop(L, 1) ;

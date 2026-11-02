@@ -1,4 +1,4 @@
-// Synthetic saves only. Optional screenshot hook is supplied by the test harness.
+
 window.runFooterStateUIRegression=async function(data){
  const check=(ok,message)=>{if(!ok)throw new Error(message)},original=send,states=[];
  let requests=[];
@@ -27,8 +27,8 @@ window.runFooterStateUIRegression=async function(data){
   saveError('systemSection',{message:longMessage});updateSaveState();const long=await record('long-error');
   const feedback=document.querySelector('.footer-feedback'),status=document.getElementById('status');
   if(feedback){feedback.scrollTop=feedback.scrollHeight;await record('long-error-end')}
-  // Normal save feedback occupies one stable left-hand slot; both buttons retain
-  // their positions and width even while the Save label changes to Saving.
+
+
   const normal=states.filter(item=>['clean','dirty','multi-page-dirty','saving','success'].includes(item.name)),base=normal[0];
   for(const state of normal){
    check(Math.abs(state.footer.height-base.footer.height)<1,'Footer height changed for '+state.name+': '+base.footer.height+' -> '+state.footer.height);

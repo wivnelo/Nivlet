@@ -29,7 +29,7 @@ versions = [(item.find('s:version', ns).text, item.find('s:shortVersionString', 
 for build, short_version in versions:
     assert short_version == version, 'Feed shortVersionString must match VERSION'
     assert build == args.build, 'Feed sparkle:version must match the requested build'
-# New releases must never offer the arm64 archive to an Intel client.
+
 for arm in (True, False):
     eligible = [item for item in items if arm or item.find('s:hardwareRequirements', ns) is None]
     if arm:

@@ -25,7 +25,7 @@ local permissions=require("modules.permissions")
 local about=require("modules.about")
 local sleep=require("modules.sleep")
 local app = {bindings={}}
--- Only set while a selected-page shortcut group is being applied/restored.
+
 local batchCandidates,batchShortcutConflicts
 local generalKey = "desktoptoolkit.general.v1"
 local tabIDs={windowSection=true,inputSection=true,clipSection=true,systemSection=true,browserSection=true,launcherSection=true,aboutSection=true}
@@ -49,7 +49,7 @@ local function validateGeneral(value)
     return {showMenu=value.showMenu, appearance=value.appearance,language=language,tabOrder=order,sleepShortcut=value.sleepShortcut==true}
 end
 app.general = validateGeneral(hs.settings.get(generalKey)) or {showMenu=true,appearance="system",language="system"}
--- The upstream hammer menu duplicates our own settings entry.
+
 hs.menuIcon(false)
 hs.openConsoleOnDockClick(false)
 hs.nivletAppearance(app.general.appearance)
@@ -151,7 +151,7 @@ function app.savePopup(value)
         end
     end
     app.popupShortcut=shortcut
-    -- Missing means the enabled default; an explicit false remembers a user's off choice.
+
     hs.settings.set(popupKey,shortcut or false)
     app.popupShortcutError=nil
     return true, shortcut and i18n.t("剪贴板菜单快捷键已保存") or i18n.t("剪贴板菜单快捷键已解除")
@@ -189,8 +189,8 @@ function app.saveClipboardPage(value,popupShortcut,popupShortcutChanged)
     local ran,success,result=pcall(function()
         local installed,installMessage
         if popupShortcutChanged==false then
-            -- A coordinated batch may have released the unchanged binding.
-            -- Restore only the runtime binding, without migrating its saved form.
+
+
             installed=true
             if app.popupShortcut and not app.popupBinding then installed,installMessage=installPopup(app.popupShortcut) end
         else installed,installMessage=app.savePopup(popupShortcut) end
@@ -282,7 +282,7 @@ app.configuration=configuration.new(adapters,{
         return true
     end,
 })
--- Page values are captured independently, so a batch never rewrites clean pages.
+
 local pageAdapters={}
 local function configPage(module,validator)
     return {get=function() return {config=module.config} end,
@@ -354,7 +354,7 @@ local saveBatch=require("modules.save_batch").new(pageAdapters,{
     end,
     groupPages=function(plan)
         local result={}
-        -- Clipboard comes last because retention/cache changes can be irreversible.
+
         for _,page in ipairs({"windowSection","launcherSection","generalSection","clipSection"}) do if plan.selected[page] then result[#result+1]=page end end
         return result
     end,
@@ -626,7 +626,7 @@ clipboard.startMenu(function(mode)
     local id=mode=="settings" and "clipEnabled" or "clipSearch"
     app.openSettings("clipSection",id)
 end)
--- A newly introduced default must not take a shortcut from an existing app rule.
+
 local defaultLauncherConflict=false
 if usingDefaultPopup and app.popupShortcut then
     local savedLauncher=launcher.validate(hs.settings.get("desktoptoolkit.launcher.v1"))
@@ -656,7 +656,7 @@ else
 end
 launcher.start(function(shortcut) if batchCandidates then return batchShortcutConflicts(shortcut,"launcherSection") end;return sleep.conflicts(shortcut) or sameShortcut(shortcut,app.popupShortcut) or (shortcut and popupConflicts(shortcut,app.config)) end)
 system.start(function() app.openSettings("systemSection") end)
--- New status items are placed to the left: create/restore Main, Clipboard, then System Info.
+
 function app.arrangeMenus()
     clipboard.menu:removeFromMenuBar():returnToMenuBar():setTitle("")
         :setIcon(assert(hs.image.imageFromPath(root.."assets/document.on.clipboard.png")):size({w=18,h=18}),true)
@@ -670,12 +670,12 @@ hs.dockIconClickCallback = function()
 end
 print("Nivlet ready", hs.configdir, hs.settings.bundleID, "bindings", #app.bindings)
 
--- Route the embedded runtime API to the same settings page.
+
 hs.openPreferences=function() app.openSettings("generalSection") end
 
 if app.general.sleepShortcut then local success,result=app.saveGeneral(app.general);if not success then hs.alert.show(result) end end
 
--- The installer can fail after the previous application process has exited.
+
 function app.showUpdateRecovery()
     if hs.nivletTakeUpdateRecovery and hs.nivletTakeUpdateRecovery() then
         hs.timer.doAfter(0,function()

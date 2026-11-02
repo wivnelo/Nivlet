@@ -73,7 +73,7 @@ assert(not launcher.save({enabled=true,rules={{bundleID="com.example.probe",shor
 assert(callbacks["J"] and launcher.config.rules[1].shortcut.key=="J")
 print("Bidirectional launcher, window and clipboard shortcut conflicts passed")
 
--- Import must release all three shortcut owners before moving a binding.
+
 hs.application={pathForBundleID=function() return "/Applications/Test.app" end}
 local manager=desktopToolkit.configuration
 local function document(modules) return {format="Nivlet",version=1,modules=modules} end
@@ -149,7 +149,7 @@ assert(table.concat(desktopToolkit.general.tabOrder,",")=="browserSection,window
 assert(manager.prepare(document({general={showMenu=true,appearance="system",tabOrder={"windowSection","aboutSection","browserSection"}}})))
 print("Legacy About position normalizes without changing movable module order")
 
--- Sleep reservation participates in all shortcuts and JSON owner transfers.
+
 hs.caffeinate={systemSleep=function() error("Tests must not sleep the machine") end}
 assert(desktopToolkit.save({enabled=false,shortcuts={}}))
 assert(launcher.save({enabled=false,rules={}}))
@@ -184,5 +184,5 @@ hs.shutdownCallback()
 assert(stopCalls==1 and inheritedShutdownCalls==1 and clip.stopped)
 assert(not clip.timer and not clip.expiryTimer)
 clip.stop=oldStop
-clip.configure(clip.config) -- Leave this shared fixture usable by downstream runtime regressions.
+clip.configure(clip.config)
 print("Application shutdown stops clipboard timers and preserves the prior shutdown callback")

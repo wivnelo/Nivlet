@@ -1,4 +1,4 @@
--- No real browser, file association, user configuration or file content is touched.
+
 package.path='Toolkit/?.lua;'..package.path
 local opened, alerts, checks, reads = {}, {}, {}, {}
 local files={
@@ -88,7 +88,7 @@ for _,url in ipairs({
     assert(not localHTML.normalize(url))
     assert(#checks==count,'Dot-segment URL must be rejected before filesystem access')
 end
--- No re-interpretation of a file path as a web hostname or app rule.
+
 assert(b.resolve('https://example.com/example','com.apple.mail')=='com.apple.Safari')
 assert(b.resolve('https://other.example/example','com.apple.mail')=='com.apple.Safari')
 assert(b.resolve('https://other.example/example','com.other.app')=='com.google.Chrome')
@@ -107,7 +107,7 @@ hs.urlevent.openURLWithBundle=function() return false end
 assert(not b.open('file:///previews/A.html'))
 hs.urlevent.openURLWithBundle=function(url,bundle) opened[#opened+1]={url,bundle};return true end
 
--- Cold-start file events are delivered only after the callback is installed.
+
 hs.settings.get=function(key)
     if key=='desktoptoolkit.browser.v1' then return b.config end
 end

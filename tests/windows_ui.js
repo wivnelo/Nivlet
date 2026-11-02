@@ -1,4 +1,4 @@
-// Run in the actual settings WebView with its current backend payload.
+
 window.runWindowsRegression=function(data){
     const check=(ok,message)=>{if(!ok)throw new Error(message)};
     const group=document.getElementById('windowGroup'),oldGroup=group.value,originalSend=send;
@@ -16,7 +16,7 @@ window.runWindowsRegression=function(data){
             group.value=name;group.dispatchEvent(new Event('change'));
             check([...document.querySelectorAll('#rows tr')].filter(row=>!row.hidden).length===expected,'Wrong visible group: '+name);
         }
-        // Isolate the capture fixture from existing user shortcuts (e.g. Ctrl+Option+Down).
+
         for(const input of document.querySelectorAll('[data-shortcut-key]'))input.value='';
         left.value='Z';group.value='grid';group.dispatchEvent(new Event('change'));
         grid.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowDown',ctrlKey:true,altKey:true,bubbles:true,cancelable:true}));

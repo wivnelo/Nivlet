@@ -1,4 +1,4 @@
-// Verify public media references and play the actual encoded GIFs in isolation.
+
 const fs=require('node:fs');
 const path=require('node:path');
 const crypto=require('node:crypto');

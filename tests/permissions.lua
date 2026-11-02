@@ -29,8 +29,8 @@ hs.urlevent.openURLWithBundle=function(url,bundle) assert(url=="x-apple.systempr
 assert(p.openLoginSettings());hs.urlevent.openURLWithBundle=function() return false end;assert(not p.openLoginSettings())
 print("Login Items opener preserves system launch success/failure")
 
--- Reauthorization: a successful live AXWindows request must override a stale
--- false trust Boolean. An empty window list is a successful response too.
+
+
 hs.accessibilityState=function() return false end
 windows={};message=nil
 local state=p.snapshot()

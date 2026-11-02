@@ -1,4 +1,4 @@
-// Synthetic settings only. Exercise the same dirty/global-save/cancel path as the real switch.
+
 window.runPopupToggleRegression=async function(data){
  const check=(ok,message)=>{if(!ok)throw new Error(message)},oldSend=send;
  const fixed={key:'V',mods:['cmd','shift']},custom={key:'K',mods:['ctrl']};
@@ -42,7 +42,7 @@ window.runPopupToggleRegression=async function(data){
   check(request?.action==='saveAllSettings'&&request.pages.windowSection&&JSON.stringify(request.pages.clipSection.popupShortcut)===JSON.stringify(fixed),'Cross-page conflict resolution not saved together');
   window.receive({...data,ok:true,action:'saveAllSettings',requestID:request.requestID,config:request.pages.windowSection.config,popupShortcut:fixed,saveBatch:{ok:true,results:[{page:'windowSection',status:'saved'},{page:'clipSection',status:'saved'}]}});
   check(!saveAllCoordinator.saving,'Successful cross-page save remained busy');
-  // A startup conflict is visible without pretending a binding was installed.
+
   window.receive({...data,ok:true,action:'load',popupShortcut:false,popupShortcutDefault:fixed,popupShortcutError:t('剪贴板快捷键被系统占用或无法注册')});
   check(!control.checked&&!document.getElementById('popupRuntimeError').hidden,'Startup conflict warning absent');
   window.showSection('clipSection');if(window.capturePopupState)await window.capturePopupState('startup-error');

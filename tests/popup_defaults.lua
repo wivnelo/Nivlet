@@ -1,4 +1,4 @@
--- Real backend against an in-memory runtime; no OS bindings or user settings.
+
 dofile('tests/runtime.lua')
 local popupKey='desktoptoolkit.clipboard.shortcut.v1'
 local windowKey='desktoptoolkit.preferences.v1'
@@ -24,7 +24,7 @@ local function boot(value,extra)
         function token:delete()if occupied[sig]==self then occupied[sig]=nil end end
         occupied[sig]=token;return token
     end
-    -- A restart reloads launcher state before installing bindings.
+
     package.loaded['modules.launcher']=nil
     dofile('Toolkit/init.lua')
     return desktopToolkit
@@ -68,7 +68,7 @@ end
 app=boot('invalid')
 assert(not app.popupShortcut and app.popupShortcutError and next(occupied)==nil and hs.settings.get(popupKey)=='invalid')
 
--- Importing off must release bindings without temporarily installing the new default.
+
 app=boot(false,{systemDefault=true})
 local function document(modules)return {format='Nivlet',version=1,modules=modules} end
 assert(app.configuration.apply(document({popupShortcut=false})))
@@ -77,7 +77,7 @@ assert(app.configuration.apply(document({popupShortcut=legacy})))
 assert(occupied['ctrl+K']==app.popupBinding and signature(hs.settings.get(popupKey))=='ctrl+K')
 assert(not app.configuration.apply(document({popupShortcut=default})))
 assert(occupied['ctrl+K']==app.popupBinding and signature(hs.settings.get(popupKey))=='ctrl+K')
--- Clipboard failure restores the existing legacy binding and preference.
+
 local save=clipboard.save
 clipboard.save=function()return false,'Simulated clipboard failure' end
 assert(not app.saveClipboardPage(clipboard.config,false))
@@ -85,7 +85,7 @@ clipboard.save=save
 assert(occupied['ctrl+K']==app.popupBinding and signature(hs.settings.get(popupKey))=='ctrl+K')
 print('Popup default-on/off persistence, legacy preservation, startup conflicts, fixed enable, import release and failure recovery passed')
 
--- The inactive UI value false must not conflate unset-on-first-start with explicit off.
+
 local function copy(v)
     if type(v)~='table' then return v end
     local result={};for k,item in pairs(v) do result[k]=copy(item) end;return result
@@ -113,7 +113,7 @@ for _,scenario in ipairs(scenarios) do
     app=boot(scenario.value,scenario.extra)
     local before={value=copy(hs.settings.get(popupKey)),error=app.popupShortcutError,shortcut=copy(app.popupShortcut)}
     local config=copy(clipboard.config)
-    -- An unchanged intent ignores a stale/mismatched payload and does not migrate it.
+
     assert(app.saveClipboardPage(config,false,false))
     untouched(before,scenario.name..' unrelated direct save')
     local result=app.saveAllSettings({clipSection={config=config,popupShortcut={key='Z',mods={'ctrl'}},popupShortcutChanged=false}})
@@ -142,7 +142,7 @@ app=boot(nil,{windows=windows})
 local failedDefault={value=nil,error=app.popupShortcutError,shortcut=nil}
 local originalSave=clipboard.save
 clipboard.save=function()return false,'Simulated clipboard failure' end
--- Even an explicit off action must not survive a failed save of its page.
+
 assert(not app.saveClipboardPage(clipboard.config,false,true))
 clipboard.save=originalSave
 untouched(failedDefault,'Failed explicit off')
@@ -155,7 +155,7 @@ local result=app.saveAllSettings({clipSection={config=copy(clipboard.config),pop
 clipboard.save=originalSave
 assert(not result.ok and not result.recoveryIncomplete)
 untouched(failedDefault,'Failed global explicit off')
--- Successful explicit off is distinct, and is the only UI action that clears this error.
+
 assert(app.saveClipboardPage(clipboard.config,false,true))
 assert(hs.settings.get(popupKey)==false and app.popupShortcutError==nil)
 
@@ -169,8 +169,8 @@ result=app.saveAllSettings({clipSection={config=copy(clipboard.config),popupShor
 assert(not result.ok and not result.recoveryAttempted)
 untouched(before,'Invalid intent type')
 
--- Import failures restore both raw preference and the diagnostic, and importing
--- another hotkey module does not make its temporary popup release permanent.
+
+
 calls=0
 clipboard.save=function(value)
     calls=calls+1;if calls==1 then return false,'Simulated import failure' end

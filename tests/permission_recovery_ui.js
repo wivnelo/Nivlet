@@ -1,4 +1,4 @@
-// Run only in an isolated real settings WebView with synthetic backend data.
+
 window.runPermissionRecoveryRegression=function(data){
  const check=(ok,message)=>{if(!ok)throw Error(message)},original=send;
  const dialog=document.getElementById('leaveDialog'),field=document.getElementById('showMenu');

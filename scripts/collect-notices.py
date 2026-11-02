@@ -12,7 +12,7 @@ licenses = sorted(path for path in upstream.rglob('*') if path.is_file() and (pa
 for path in licenses:
     if not path.is_symlink():
         parts.append('## ' + path.relative_to(upstream).as_posix() + '\n\n' + path.read_text(errors='replace'))
-# Lua embeds its copyright/license in the README.
+
 lua_readme = upstream / 'LuaSkin/lua-5.4.7/README'
 if not lua_readme.is_file():
     raise SystemExit('Missing Lua license README')

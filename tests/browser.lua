@@ -34,7 +34,7 @@ print('Startup URLs drain only after HTTP callback is installed')
 
 local caseDuplicate=b.defaults();caseDuplicate.appRules={{bundleID='com.example.app',name='App',browser='com.apple.Safari'},{bundleID='COM.EXAMPLE.APP',name='App',browser='com.apple.Safari'}};assert(not b.validate(caseDuplicate))
 
--- FinalShell 等应用的 Bundle ID 没有点号，来源应用规则必须接受。
+
 local dotless=b.defaults();dotless.appRules={{bundleID='st',name='FinalShell',browser='com.apple.Safari'}}
 assert(b.validate(dotless).appRules[1].bundleID=='st')
 dotless.appRules[1].bundleID='not a bundle id';assert(not b.validate(dotless))
@@ -56,7 +56,7 @@ b.requestDefault();assert(requested[1]=='https' and requested[2]=='dev.local.Des
 assert(b.openDefaultSettings());assert(opened[1]=='x-apple.systempreferences:com.apple.Desktop-Settings.extension' and opened[2]=='com.apple.systempreferences')
 print('Explicit default browser request and system settings fallback passed')
 
--- Launch Services may retain an application path after the app is removed.
+
 hs.fs={attributes=function(path,field) assert(field=='mode');return path=='/installed.app' and 'directory' or nil end}
 hs.application.pathForBundleID=function(id)
     if id=='com.apple.Safari' then return '/installed.app' end
@@ -66,7 +66,7 @@ local installed=b.installed()
 assert(#installed==1 and installed[1].id=='com.apple.Safari','Removed Chrome must not appear in installed browsers')
 print('Installed browser list excludes stale application paths')
 
--- Localhost, single-label LAN names and IPv6 literals are real navigation targets.
+
 for _,url in ipairs({
     'http://localhost:3000/',
     'http://localhost./',

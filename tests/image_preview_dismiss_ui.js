@@ -1,5 +1,5 @@
-// Synthetic image and inert bridge only. Hit-testing is exercised in the real DOM;
-// the cancel event below represents Escape semantics, not an OS keyboard test.
+
+
 window.runImagePreviewDismissRegression=async function(data){
  const check=(ok,message)=>{if(!ok)throw new Error(message)};
  const settle=()=>new Promise(resolve=>setTimeout(resolve,0));
@@ -53,8 +53,8 @@ window.runImagePreviewDismissRegression=async function(data){
   copy.addEventListener('click',onUnderlying);save.addEventListener('click',onUnderlying);
 
   let rect=await open();
-  // The full element rectangle counts as the image, including transparent pixels
-  // and the letterboxed portion of an object-fit:contain image.
+
+
   for(const point of [[rect.left+rect.width/2,rect.top+rect.height/2],[rect.left+2,rect.top+2],[rect.right-2,rect.bottom-2]]){
    clickAt(point,true);check(dialog.open,'An image-interior click dismissed the preview');
   }
@@ -62,14 +62,14 @@ window.runImagePreviewDismissRegression=async function(data){
   check(outside(padding,rect),'Padding fixture lies inside image');
   clickAt(padding,false);await checkClosed();
 
-  // A point over the underlying Save control must still hit the modal backdrop.
+
   rect=await open();
   const saveRect=save.getBoundingClientRect();
   let backdrop=[saveRect.left+saveRect.width/2,saveRect.top+saveRect.height/2];
   if(!outside(backdrop,rect))backdrop=[2,2];
   clickAt(backdrop,false);await checkClosed();
 
-  // Geometry is read at click time, not cached when the preview first opened.
+
   rect=await open();
   const oldLeft=rect.left;
   image.style.width='260px';image.style.height='96px';
@@ -79,15 +79,15 @@ window.runImagePreviewDismissRegression=async function(data){
   clickAt([rect.left+2,rect.top+2],true);check(dialog.open,'Resized image bounds were stale');
   clickAt([rect.right+2,rect.top+rect.height/2],false);await checkClosed();
 
-  // Exercise repeated landscape/portrait cycles to catch stale handlers/focus.
+
   for(const [width,height] of [[120,220],[240,100],[180,120]]){
    rect=await open(width,height);
    clickAt([rect.left+rect.width/2,rect.top+rect.height/2],true);
    clickAt([rect.left+rect.width/2,rect.bottom+2],false);await checkClosed();
   }
 
-  // Closing queues a native close event. Reopening in the same turn must not let
-  // that old event clear the new image or move focus out of the new dialog.
+
+
   rect=await open();
   clickAt([rect.right+2,rect.top+rect.height/2],false);
   check(!image.hasAttribute('src'),'Close did not release image synchronously');
@@ -99,8 +99,8 @@ window.runImagePreviewDismissRegression=async function(data){
   await open();
   const cancel=new Event('cancel',{cancelable:true});
   dialog.dispatchEvent(cancel);
-  // HTML dialog's user-agent Escape action closes it unless cancel is prevented.
-  // Synthetic dispatch does not run that UA default, so model that default only.
+
+
   if(!cancel.defaultPrevented&&dialog.open)dialog.close();
   await checkClosed();
   return 'Transparent image hit box, inside/outside edges, dialog padding/backdrop, current resize geometry, repeated cycles, cancel semantics, focus restoration and event containment passed';

@@ -51,7 +51,7 @@
  
 +static int core_nivletQuit(lua_State *L) {
 +    [[LuaSkin sharedWithState:L] checkArgs:LS_TBREAK];
-+    // Do not destroy the Lua state while a Lua callback is still on its stack.
++
 +    dispatch_async(dispatch_get_main_queue(), ^{ [NSApp terminate:nil]; });
 +    return 0;
 +}

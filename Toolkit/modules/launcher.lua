@@ -39,7 +39,7 @@ local function clearBindings()
     for _,binding in ipairs(M.bindings) do binding:delete() end
     M.bindings={}
 end
--- Batch saves may release only this module's bindings without persisting defaults.
+
 M.releaseBindings=clearBindings
 local feedback
 local function notify(message)

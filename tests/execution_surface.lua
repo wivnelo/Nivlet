@@ -1,4 +1,4 @@
--- Packaged Info.plist / sdef must not advertise arbitrary Lua execution.
+
 local handle=assert(io.open('patches/runtime-isolation.patch','r'))
 local text=assert(handle:read('a'))
 handle:close()

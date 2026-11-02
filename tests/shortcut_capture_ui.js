@@ -1,4 +1,4 @@
-// Real DOM events; synthetic settings only. No production bridge writes.
+
 window.runShortcutCaptureRegression=async function(data){
  const check=(ok,message)=>{if(!ok)throw new Error(message)},oldSend=send;
  const press=async(input,key,flags={})=>{input.dispatchEvent(new KeyboardEvent('keydown',{key,bubbles:true,cancelable:true,...flags}));await Promise.resolve()};

@@ -1,4 +1,4 @@
-// Isolated document tests only. Never connects to a Nivlet backend or user profile.
+
 const fs = require('node:fs');
 const path = require('node:path');
 const {execFileSync} = require('node:child_process');
@@ -19,7 +19,7 @@ function loadFixture() {
   const pairs=execFileSync('lua',['-e',`for k,v in pairs(dofile(${JSON.stringify('Toolkit/modules/'+file)})) do io.write(k,"\\0",v,"\\0") end`],{cwd:root}).toString().split('\0');
   const dictionary={};for(let i=0;i<pairs.length-1;i+=2)dictionary[pairs[i]]=pairs[i+1];return dictionary;
  };
- // Synthetic test metadata only. The production bridge sends one active dictionary.
+
  const testTranslations={'zh-Hans':{},en:readDictionary('translations.lua'),'zh-Hant':readDictionary('translations_zh_hant.lua'),ja:readDictionary('translations_ja.lua')};
  const translations=testTranslations[language];
  const names=({'zh-Hans':['灵感笔记','项目看板','阅读清单'],'zh-Hant':['靈感筆記','專案看板','閱讀清單'],en:['Studio Notes','Project Board','Reading List'],ja:['アイデアノート','プロジェクトボード','読書リスト']})[language];

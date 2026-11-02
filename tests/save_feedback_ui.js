@@ -1,4 +1,4 @@
-// Isolated settings WebView only: synthetic backend responses, no user configuration.
+
 window.runSaveFeedbackRegression=function(data){
  const check=(ok,message)=>{if(!ok)throw new Error(message)},oldSend=send,oldTimeout=window.setTimeout,oldClear=window.clearTimeout;
  const timers=new Map();let serial=0,requests=[];

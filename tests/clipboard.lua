@@ -23,7 +23,7 @@ for i=1,12 do copy('item'..i) end;assert(#m.entries==10 and m.entries[1].text=='
 now=now+60;assert(#m.snapshot().entries==0 and not m.copy(id))
 copy('<script>test</script>');assert(#m.entries==1)
 local bad=m.defaults();bad.limit=101;assert(not m.save(bad) and m.config.enabled)
--- 排除列表同样要接受没有点号的 Bundle ID，例如 FinalShell 的 "st"。
+
 local dotless=m.defaults();dotless.excluded={'st'};assert(m.validate(dotless).excluded[1]=='st')
 dotless.excluded={'not a bundle id'};assert(not m.validate(dotless))
 dotless.excluded={''};assert(not m.validate(dotless))
@@ -63,7 +63,7 @@ hs.menubar={new=function(visible) return {
 m.startMenu(function() end);assert(iconCalls==1)
 print('Clipboard menu uses the document.on.clipboard template icon at 18 points')
 
--- Permanent retention bypasses age expiry, not capacity or user actions.
+
 config.enabled=true;config.minutes=0;config.limit=10;assert(m.save(config))
 for i=1,12 do copy('permanent-'..i) end
 now=now+60*60*48;m.prune();assert(#m.entries==10)

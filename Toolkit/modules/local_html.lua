@@ -1,5 +1,5 @@
--- Narrow file-URL support for HTML documents handed to Nivlet by macOS.
--- Do not pass a file URL through hostname rules or the system default opener.
+
+
 local i18n = require("modules.i18n")
 local M = {}
 
@@ -14,8 +14,8 @@ local function pathEncoded(value)
     return (value:gsub("[^A-Za-z0-9%-%._~/]", function(byte) return string.format("%%%02X", byte:byte()) end))
 end
 
--- Preserve percent-escaped delimiters in query/fragment components: decoding
--- %26 into & would change query semantics. Encode only raw non-URI bytes.
+
+
 local function suffixEncoded(value)
     if not decoded(value) then return nil end
     local parts, at = {}, 1
@@ -43,8 +43,8 @@ function M.normalize(url)
     local pathPart, suffix = rest:match("^([^?#]*)(.*)$")
     local path = decoded(pathPart)
     if not path or path:sub(1, 1) ~= "/" or path:sub(1, 2) == "//" then return nil, invalid end
-    -- Browser URL normalization and filesystem symlink traversal can disagree
-    -- on dot segments. Refuse them before checking or opening any path.
+
+
     for segment in path:gmatch("[^/]+") do
         if segment == "." or segment == ".." then return nil, invalid end
     end
@@ -72,8 +72,8 @@ function M.normalize(url)
         normalizedSuffix = normalizedSuffix .. "#" .. fragment
     end
 
-    -- stat follows ordinary symlinks, but directories/devices/FIFOs are refused.
-    -- Preserve the selected path so relative HTML assets keep their base URL.
+
+
     if not hs.fs or hs.fs.attributes(path, "mode") ~= "file" then
         return nil, i18n.t("本地 HTML 文件不存在或不是普通文件")
     end

@@ -8,7 +8,7 @@ derived_data=${NIVLET_DERIVED_DATA_PATH:-"$project_dir/build/DerivedData"}
 case "$configuration" in Debug|Release) ;; *) echo "Unsupported build configuration: $configuration" >&2; exit 1 ;; esac
 sh "$project_dir/scripts/preflight.sh"
 upstream_dir="$project_dir/vendor/hammerspoon"
-# Release xcconfig signs Hammerspoon/Hammerspoon.entitlements. Use the audited file.
+
 cp "$project_dir/Native/Nivlet.entitlements" "$upstream_dir/Hammerspoon/Hammerspoon.entitlements"
 python3 "$project_dir/scripts/prepare-icon.py"
 cd "$upstream_dir"
@@ -33,7 +33,7 @@ python3 "$project_dir/scripts/optimize-app.py" "$app_path" "$configuration" "$ar
 if [ "$configuration" = Release ]; then
     python3 "$project_dir/scripts/trim-distribution.py" "$app_path"
 fi
-# Ad-hoc signing is only for this local probe, not a distribution signature.
+
 python3 "$project_dir/scripts/configure-url-types.py" "$app_path/Contents/Info.plist"
 python3 "$project_dir/scripts/localize-native-menu.py" "$app_path"
 if [ "$configuration" = Release ]; then
@@ -41,7 +41,7 @@ if [ "$configuration" = Release ]; then
 fi
 codesign --force --deep --sign - "$app_path"
 if [ "$configuration" = Release ]; then
-    # Main bundle only. Nested components keep the signatures from --deep.
+
     codesign --force --sign - --entitlements "$project_dir/Native/Nivlet.entitlements" "$app_path"
 fi
 codesign --verify --deep --strict "$app_path"

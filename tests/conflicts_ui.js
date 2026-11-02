@@ -1,4 +1,4 @@
-// Run only in an isolated WebView; never saves user settings.
+
 window.runConflictsRegression=function(data){
     const oldSend=send,check=(value,message)=>{if(!value)throw new Error(message)};
     let captured;
@@ -13,7 +13,7 @@ window.runConflictsRegression=function(data){
             check(host.children.length===count,'Duplicate application inserted in '+hostID);check(row.innerHTML===original&&JSON.stringify([...row.querySelectorAll('input,select')].map(field=>[field.value,field.checked]))===values,'Duplicate overwrote original rule');
             check(!footerErrors.has(host.closest('.panel').id),'Duplicate app incorrectly persisted as an error');row.remove();
         }
-        // The same application can be used by different modules.
+
         const shared={bundleID:'com.example.shared',name:'Shared fixture',sourceID:data.sources[0].id,shortcut:{key:'',mods:[]}};
         window.addInputRule(shared);window.addLauncherRule(shared);
         check(document.querySelector('#inputRows [data-bundle="com.example.shared"]')&&document.querySelector('#launcherRules [data-bundle="com.example.shared"]'),'Different modules wrongly exclude each other');

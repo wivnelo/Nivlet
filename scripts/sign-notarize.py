@@ -84,7 +84,7 @@ def main():
         log_path = release / ('notary-' + tag + '-log.json')
         command = ['xcrun', 'notarytool', 'submit', path, '--keychain-profile',
                    args.notary_profile, '--wait', '--output-format', 'json']
-        # A failed submission still needs its response and diagnostic log saved.
+
         print('+ ' + shlex.join(list(map(str, command))), flush=True)
         print('  save response to ' + str(report) + '; require Accepted')
         if args.dry_run:
@@ -105,7 +105,7 @@ def main():
                     args.notary_profile, log_path)
             raise ValueError('Notarization not Accepted for ' + tag)
 
-    # Check every output before making any changes, including diagnostics and staging.
+
     for arch in archs:
         work = release / arch
         base = f'Nivlet-{version}-build{args.build}-{arch}'

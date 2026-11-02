@@ -1,6 +1,6 @@
 package.path = "Toolkit/?.lua;" .. package.path
 local bundleIDs = require("modules.bundle_id")
--- CFBundleIdentifier 不强制反向域名；FinalShell 用的就是 "st"。
+
 for _,id in ipairs({"st","com.apple.Safari","dev.local.DesktopToolkit","Chrome","a-b_c","app.2","x"}) do
     assert(bundleIDs.valid(id),id)
 end

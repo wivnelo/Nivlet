@@ -27,12 +27,12 @@ assert(desktopToolkit.savePopup({key='',mods={}}));assert(next(bindings)==nil an
 assert(desktopToolkit.save({enabled=true,shortcuts={left={key='1',mods={'ctrl'}}}}))
 assert(not desktopToolkit.savePopup({key='1',mods={'ctrl'}}));assert(bindings['ctrl+1'])
 assert(desktopToolkit.savePopup(ctrl));assert(stored['desktoptoolkit.clipboard.shortcut.v1'].key=='K')
--- A fresh process has no runtime bindings, while settings persist.
+
 bindings={};dofile('Toolkit/init.lua');assert(bindings['ctrl+cmd+K'])
 assert(desktopToolkit.savePopup({key='',mods={}}));assert(bindings['ctrl+1'])
 print('Popup defaults, normalization, cross-module conflicts, rollback, dispatch, removal and cold-start restoration passed')
 
--- Native menu callbacks supply metadata as their second argument, not a focus ID.
+
 require('modules.input_method').sources=function() return {} end
 require('modules.browser').status=function() return {active=true} end
 require('modules.browser').installed=function() return {} end

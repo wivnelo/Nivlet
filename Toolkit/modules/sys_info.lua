@@ -18,8 +18,8 @@ M.config=M.defaults()
 function M.save(value)
     local config,message=M.validate(value);if not config then return false,message end
     M.config=config;hs.settings.set(settingsKey,config)
-    -- A reused NSMenu can retain the smaller layout after fields are restored.
-    -- Clear it first so AppKit measures a fresh menu on the next opening.
+
+
     M.menu:setMenu(nil):setMenu(M.menuItems)
     M.draw()
     return true,i18n.t("系统信息设置已保存")
@@ -107,8 +107,8 @@ function M.menuItems()
         local prefix,value=item.title:match("^(%w+): (.*)$")
         local field=prefixes[prefix]
         if field and M.config[field] then
-            -- Keep readings/snapshot's stable machine prefixes and copy values.
-            -- Only the menu presentation is localized.
+
+
             if field=="cpu" then value=value:gsub("(%d+) Core",function(count)return count.." "..i18n.t("核心")end) end
             item.title=i18n.t(labels[field])..": "..value
             table.insert(filtered,item)

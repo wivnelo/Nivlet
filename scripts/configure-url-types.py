@@ -13,8 +13,8 @@ if not re.fullmatch(r'\d+\.\d+\.\d+', version) or not re.fullmatch(r'[1-9]\d*', 
     raise SystemExit('Invalid Nivlet version or NIVLET_BUILD_NUMBER')
 info['CFBundleShortVersionString'] = version
 info['CFBundleVersion'] = build
-# Frameworks such as Sparkle choose their localization from the host's
-# supported languages, even though our settings UI is localized in Lua/HTML.
+
+
 info['CFBundleLocalizations'] = ['en', 'zh-Hans', 'zh-Hant', 'ja']
 info['SUFeedURL'] = 'https://wivnelo.github.io/Nivlet/appcast.xml'
 info['SUPublicEDKey'] = 'BZOLe5gdPobi3DhB5l13XFopkGgkPP/V6I/kzY3YXKg='

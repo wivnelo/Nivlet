@@ -6,8 +6,8 @@
      if ([openUrl hasPrefix:@"/"]) {
 -        openUrl = [NSString stringWithFormat:@"file://%@", openUrl];
 -        openUrl = [openUrl stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
-+        // A document path is not a URL: preserve literal #, ?, %, spaces and Unicode.
-+        // The Lua browser router decides which local documents may be forwarded.
++
++
 +        openUrl = [[NSURL fileURLWithPath:openUrl isDirectory:NO] absoluteString];
      }
  
@@ -16,8 +16,8 @@
          NSString *key = [[bits objectAtIndex:0] stringByRemovingPercentEncoding];
          NSString *value = [[bits objectAtIndex:1] stringByRemovingPercentEncoding];
  
-+        // Invalid UTF-8 escapes can decode to nil. Keep the full URL intact and
-+        // omit only the undecodable entry from this auxiliary query dictionary.
++
++
 +        if (!key || !value) { continue; }
 +
          [pairs setObject:value forKey:key];
@@ -29,7 +29,7 @@
      }
  
      NSString *fileExtension = [fileAndPath pathExtension];
-+    // HTML documents should reach the URL router regardless of extension case.
++
 +    if ([@[@"html", @"htm"] containsObject:fileExtension.lowercaseString]) {
 +        fileExtension = fileExtension.lowercaseString;
 +    }

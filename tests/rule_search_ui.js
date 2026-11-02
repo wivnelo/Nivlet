@@ -1,4 +1,4 @@
-// Isolated DOM tests with synthetic rules and no backend writes.
+
 window.runRuleSearchRegression=async function(data){
  const check=(value,message)=>{if(!value)throw new Error(message)},oldSend=send;let request;
  const search=(id,value)=>{const input=document.getElementById(id+'-search');input.focus();input.value=value;input.dispatchEvent(new Event('input',{bubbles:true}));return input};

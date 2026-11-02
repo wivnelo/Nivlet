@@ -32,7 +32,7 @@
  // ----------------------- C ---------------------
  
  // Rather than manage complex callback state from C, we just have one path into Lua for all events, and events are directed to their callbacks from there
-+// Called after the downstream HTTP callback is installed, without changing defaults.
++
 +static int urleventProcessStartupEvents(lua_State *L) {
 +    (void)L;
 +    [eventHandler handleStartupEvents];

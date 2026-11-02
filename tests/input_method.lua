@@ -26,7 +26,7 @@ m.configure({enabled=false,rules={}})
 print("Input rules validation, activation matching, no-op, lifecycle and persistence passed")
 
 assert(not m.validate({enabled=false,rules={rule,{bundleID='ORG.TEST.EDITOR',sourceID='source.a'}}}))
--- FinalShell 的 Bundle ID 是 "st"，没有点号；校验不能因此拒绝保存。
+
 assert(m.save({enabled=true,rules={{bundleID='st',sourceID='source.b',name='FinalShell'}}}))
 assert(m.config.rules[1].bundleID=='st')
 callback(nil,5,{bundleID=function() return 'st' end});assert(current=='source.b')

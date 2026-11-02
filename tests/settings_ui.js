@@ -1,4 +1,4 @@
-// Run in the real settings WebView with its current reply payload.
+
 window.runSettingsRegression=function(data){
     const key=document.getElementById('left-key');
     const limit=document.getElementById('clipLimit');

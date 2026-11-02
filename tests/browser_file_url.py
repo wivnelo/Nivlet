@@ -29,7 +29,7 @@ with tempfile.TemporaryDirectory(prefix='nivlet-file-url-test-') as directory:
     if check.returncode == 0:
         subprocess.run(['git', 'apply', str(patch)], cwd=work, check=True)
     else:
-        # A normal freshly fetched runtime already includes the patch.
+
         reverse = subprocess.run(['git', 'apply', '--reverse', '--check', str(patch)],
                                  cwd=work, capture_output=True, text=True)
         if reverse.returncode:

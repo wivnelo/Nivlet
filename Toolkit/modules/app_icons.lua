@@ -1,4 +1,4 @@
--- Display-only metadata; never persisted in user configuration.
+
 local M,cache={},{}
 function M.clear() cache={} end
 function M.get(bundleID,refresh)

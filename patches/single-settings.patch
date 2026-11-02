@@ -8,7 +8,7 @@
 -        [[self window] center];
 -    [super showWindow: sender];
 -    [self reflectDefaults];
-+    // Nivlet has a single settings surface, including keyboard and startup entry points.
++
 +    MJLuaRunString(@"if desktopToolkit then desktopToolkit.openSettings('generalSection') end");
  }
  

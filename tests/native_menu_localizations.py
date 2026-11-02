@@ -98,8 +98,8 @@ class NativeMenuTests(unittest.TestCase):
             content = (self.resources / (language + '.lproj/MainMenu.nib')).read_bytes()
             self.assertGreater(len(content), 1000)
             self.assertNotEqual(content, (self.resources / 'en.lproj/MainMenu.nib').read_bytes())
-        # Foundation resource lookup is read-only: no NSApplication, Nivlet
-        # executable, nib instantiation, preferences write or UI is involved.
+
+
         probe_source = self.directory / 'bundle-language-probe.m'
         probe_source.write_text(r'''
 #import <Foundation/Foundation.h>

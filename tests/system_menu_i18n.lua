@@ -10,7 +10,7 @@ local i18n=require('modules.i18n')
 local sys=require('modules.sys_info')
 sys.mac='02:12:34:56:78:9a';sys.lunar='fixture-lunar';sys.openSettings=function()end
 local labels={'CPU 使用率','内存使用率','磁盘使用率','局域网 IPv4','IPv6 地址','MAC 地址','公历与星期','农历'}
-sys.snapshot() -- Prime CPU deltas without opening any native menu.
+sys.snapshot()
 for _,language in ipairs({'zh-Hans','en','zh-Hant','ja'}) do
  i18n.configure(language)
  local menu=sys.menuItems()

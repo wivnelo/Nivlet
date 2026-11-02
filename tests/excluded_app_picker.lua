@@ -1,4 +1,4 @@
--- Execute the production picker dispatch branch with controlled native dependencies.
+
 local f=assert(io.open('Toolkit/init.lua'));local source=f:read('*a');f:close()
 local first=assert(source:find('        if body.action == "chooseApp"',1,true))
 local last=assert(source:find('\n    end)\n    local file',first,true))

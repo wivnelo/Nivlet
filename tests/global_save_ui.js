@@ -1,4 +1,4 @@
-// Run in an isolated settings document with synthetic state and an inert bridge.
+
 window.runGlobalSaveUIRegression=function(data){
  const check=(ok,message)=>{if(!ok)throw new Error(message)},original=send;
  let requests=[];

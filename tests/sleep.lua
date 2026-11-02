@@ -5,7 +5,7 @@ local s=require("modules.sleep")
 assert(not s.enabled and not s.conflicts({key="L",mods={"cmd"}}))
 assert(s.configure(true) and callback and not asleep)
 assert(s.conflicts({key="L",mods={"cmd"}}) and not s.conflicts({key="L",mods={"cmd","shift"}}))
-callback();assert(asleep) -- Mock only: this test never sleeps the machine.
+callback();assert(asleep)
 assert(s.configure(false) and deleted and not s.enabled)
 assigned=true;assert(not s.configure(true) and not s.enabled)
 assigned=false;bindFails=true;assert(not s.configure(true) and not s.enabled)

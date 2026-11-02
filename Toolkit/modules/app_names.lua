@@ -1,4 +1,4 @@
--- Resolve display names consistently without changing application identity.
+
 local M={}
 function M.get(bundleID,fallback,path,info)
     path=path or hs.application.pathForBundleID(bundleID)

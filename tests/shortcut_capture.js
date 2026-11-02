@@ -1,4 +1,4 @@
-// Exercise the actual settings keyboard handler without a native UI session.
+
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const html=fs.readFileSync('Toolkit/settings.html','utf8');
 const script=html.slice(html.indexOf("document.addEventListener('keydown',event=>{"),html.indexOf("// Settings status controls"));

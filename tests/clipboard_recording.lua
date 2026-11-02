@@ -18,7 +18,7 @@ local function fixture(saved,failSettings)
         function timer:stop() if not self.stopped then self.stopped=true;state.active=state.active-1;state.stopped=state.stopped+1 end end
         timer.callback=function()
             if once then timer:stop() end
-            -- hs.timer's native default is continueOnError=false.
+
             local ok,message=pcall(callback)
             if not ok then timer:stop();error(message) end
         end
@@ -48,7 +48,7 @@ local function fixture(saved,failSettings)
     return module,state
 end
 
--- A persisted stop intent becomes the one durable switch without clearing history.
+
 for _,enabled in ipairs({true,false}) do
     local module,state=fixture(config(enabled,true))
     assert(not module.config.enabled and state.active==0 and state.reads==0)
@@ -78,7 +78,7 @@ assert(not fresh.config.enabled and freshState.active==0,'History collection def
 local invalid,invalidState=fixture(config(true,'invalid'))
 assert(not invalid.config.enabled and invalidState.active==0,'Malformed retired state must not start collection')
 
--- The single switch owns the only polling timer and never imports content on enable.
+
 local module,state=fixture(config(true))
 assert(state.active==1 and state.reads==0)
 for _=1,4 do assert(module.save(module.config));assert(state.active==1) end
@@ -101,7 +101,7 @@ beforeReads=state.reads;module.poll()
 assert(state.reads==beforeReads and #module.entries==2,'Application privacy exclusions remain active')
 state.bundle='org.test.editor'
 
--- Cache permission failure leaves the prior recording state and timer intact.
+
 local memory=clone(module.config);memory.persistent=false
 assert(module.save(memory));local liveTimer=module.timer
 state.allowDirectory=false
@@ -109,7 +109,7 @@ local persistent=clone(module.config);persistent.persistent=true
 local ok=module.save(persistent)
 assert(not ok and module.config.enabled and module.config.persistent==false and module.timer==liveTimer and state.active==1)
 
--- Legacy backend values also normalize to the single switch; no obsolete API returns.
+
 state.allowDirectory=true
 local legacy=clone(module.config);legacy.paused=true
 assert(module.save(legacy));assert(not module.config.enabled and not module.timer and state.active==0)
@@ -117,7 +117,7 @@ assert(state.stored[configKey].enabled==false and state.stored[configKey].paused
 assert(module.pause==nil and module.paused==nil and module.snapshot().paused==nil)
 assert(state.started-state.stopped==0)
 
--- Expiry continues while recording is disabled, using a cleanup-only timer.
+
 local expiring=config(false);expiring.minutes=1
 local stopped,expiryState=fixture(expiring)
 assert(not stopped.timer and stopped.expiryTimer and expiryState.active==1)
@@ -134,7 +134,7 @@ assert(#stopped.entries==0 and #expiryState.stored[historyKey]==0 and expiryStat
 assert(not stopped.timer and not stopped.expiryTimer and finalExpiry.stopped)
 assert(expiryState.counts==counts and expiryState.reads==reads)
 
--- Moving between recording and cleanup never leaves two live timers.
+
 local timed=config(true);timed.minutes=1
 local switching,switchState=fixture(timed)
 for _=1,3 do
@@ -146,7 +146,7 @@ end
 local off=clone(switching.config);off.enabled=false;assert(switching.save(off))
 switching.clear();assert(switchState.active==0 and not switching.expiryTimer)
 
--- Shutdown invalidates queued cleanup callbacks; restart rebuilds only one timer.
+
 local shutdown,shutdownState=fixture(expiring)
 local stale=shutdown.expiryTimer
 shutdown.stop();assert(shutdownState.active==0 and not shutdown.timer and not shutdown.expiryTimer)
@@ -166,7 +166,7 @@ durable.entries={};durable.start()
 assert(durable.entries[1].text=='last record before shutdown' and durableState.active==1)
 durable.stop()
 
--- Expiry persistence failures cannot strand later entries or the final empty index.
+
 for _,mode in ipairs({'throw','return-false','persist-false'}) do
     local retry,retryState=fixture(expiring)
     retry.entries={{id=1,kind='text',time=1000,text='first'},{id=2,kind='text',time=1030,text='second'}}
@@ -199,7 +199,7 @@ for _,mode in ipairs({'throw','return-false','persist-false'}) do
     assert(not retry.expiryTimer and retryState.active==0 and retryState.reads==0 and retryState.counts==0)
 end
 
--- Additional expiries inside a retry window coalesce, rather than bypassing its limit.
+
 local coalesced,coalescedState=fixture(expiring)
 coalesced.entries={{id=1,kind='text',time=1000,text='first'},{id=2,kind='text',time=1001,text='second'}}
 coalesced.persist();coalesced.prune()
@@ -215,7 +215,7 @@ coalesced.start()
 assert(#coalesced.entries==0 and #coalescedState.stored[historyKey]==0 and not coalesced.pendingHistoryWrite and coalescedState.active==0)
 assert(coalescedState.reads==0 and coalescedState.counts==0)
 
--- While recording is enabled, the existing polling timer handles bounded retries.
+
 local activeRetry,activeState=fixture(timed)
 activeState.failSettings=true;activeState.now=1060;activeRetry.timer.callback()
 assert(activeRetry.pendingHistoryWrite and not activeRetry.expiryTimer and activeState.active==1)
@@ -225,7 +225,7 @@ activeState.now=1065;activeRetry.timer.callback()
 assert(not activeRetry.pendingHistoryWrite and #activeState.stored[historyKey]==0 and not activeRetry.expiryTimer and activeState.active==1)
 activeRetry.stop()
 
--- A failed new-record write must not terminate the native repeating callback.
+
 for _,mode in ipairs({'throw','return-false','persist-false'}) do
     local recorder,recordState=fixture(config(true))
     local timer=recorder.timer
@@ -264,13 +264,13 @@ for _,mode in ipairs({'throw','return-false','persist-false'}) do
     assert(recorder.entries[1].text=='last durable record' and recordState.active==1)
     fail(true);capture('a later failure')
     assert(recordState.alerts==2,'A later failure after recovery may notify once again')
-    -- Explicit settings saves still surface failures to the existing caller.
+
     local ran,ok,message=pcall(recorder.save,clone(recorder.config))
     assert(not ran or ok==false and type(message)=='string','A direct settings save must not silently succeed')
     recorder.stop()
 end
 
--- A fresh process also repairs a stale index whose expired image was already removed.
+
 local previous,repairState=fixture(expiring)
 previous.stop()
 repairState.stored[historyKey]={{id=1,kind='image',time=1000,path='/isolated-fixture/clipboard-history/clip_1000000_1.png'}}
@@ -282,8 +282,8 @@ repairState.failSettings=false;repairState.now=1105;repaired.expiryTimer.callbac
 assert(#repairState.stored[historyKey]==0 and not repaired.pendingHistoryWrite and repairState.active==0)
 assert(repairState.reads==0 and repairState.counts==0)
 
--- A temporary image-read failure must not trigger an eager index repair,
--- including when it shares the saved index with an already-expired missing file.
+
+
 for _,mixed in ipairs({false,true}) do
     local previous,unknownState=fixture(expiring)
     previous.stop();unknownState.now=1100

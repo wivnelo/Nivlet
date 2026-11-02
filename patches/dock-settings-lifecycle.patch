@@ -4,7 +4,7 @@
  #import "variables.h"
  
  static void reflect_defaults(void);
-+// Nivlet only shows the Dock icon while Settings is open; never persist it.
++
 +static BOOL settingsDockVisible = NO;
  
  void MJDockIconSetup(void) {

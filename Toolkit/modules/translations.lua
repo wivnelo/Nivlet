@@ -1,4 +1,4 @@
--- Simplified Chinese source strings and English UI translations.
+
 return {
     ["启用菜单快捷键"] = "Enable menu shortcut",
     ["当前仍使用以前保存的组合。关闭后再启用并保存，将改为固定快捷键 ⌘⇧V。"] = "Your previous shortcut is still active. Turn this off, then on and save to switch to the fixed shortcut ⌘⇧V.",

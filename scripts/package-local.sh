@@ -1,5 +1,5 @@
 #!/bin/sh
-# Local validation artifacts. Developer ID signing and notarization are separate release gates.
+
 set -eu
 project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 configuration=${NIVLET_BUILD_CONFIGURATION:-Debug}

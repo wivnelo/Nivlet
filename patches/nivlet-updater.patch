@@ -4,7 +4,7 @@
      return 0;
  }
  
-+// Nivlet uses its own signed update feed, never the upstream Runtime feed.
++
 +@protocol NivletUpdaterAPI
 +- (instancetype)initWithStartingUpdater:(BOOL)start updaterDelegate:(id)delegate userDriverDelegate:(id)driver;
 +- (id<NivletUpdaterAPI>)updater;

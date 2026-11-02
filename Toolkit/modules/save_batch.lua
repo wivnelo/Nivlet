@@ -1,5 +1,5 @@
--- Saves selected settings pages. This is a coordinated batch, not a transaction:
--- independent pages already saved remain saved after a later failure.
+
+
 local i18n=require('modules.i18n')
 local M={order={'generalSection','windowSection','inputSection','clipSection','systemSection','browserSection','launcherSection'}}
 local function copy(value)
@@ -110,8 +110,8 @@ function M.new(adapters,environment)
                 entries[page].attempted=true
                 local ok,errorMessage=save(page,plan.pages[page])
                 if not ok then
-                    -- A module may throw after persistence or runtime application.
-                    -- Restore only this failed page; earlier successful pages stand.
+
+
                     result.recoveryAttempted=true
                     result.recoveryIncomplete=not restore(page)
                     current(page);fail(page,errorMessage);return result

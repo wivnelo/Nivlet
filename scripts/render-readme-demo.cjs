@@ -1,5 +1,5 @@
-// Record actual interactions in the pinned settings frontend using sample data.
-// Native preview/save replies below are explicitly simulated; no system action runs.
+
+
 const fs=require('node:fs');
 const path=require('node:path');
 const {pathToFileURL}=require('node:url');

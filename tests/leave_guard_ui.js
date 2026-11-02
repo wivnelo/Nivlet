@@ -1,4 +1,4 @@
-// Run only in an isolated settings WebView with synthetic data and an inert bridge.
+
 window.runLeaveGuardUIRegression=function(data){
  const check=(ok,message)=>{if(!ok)throw new Error(message)},original=send;
  const dialog=document.getElementById('leaveDialog'),general=document.getElementById('showMenu'),system=document.getElementById('system-cpu');

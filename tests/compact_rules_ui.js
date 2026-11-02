@@ -1,4 +1,4 @@
-// User-requested compact rules and exclusion migration; synthetic settings only.
+
 window.runCompactRulesRegression=function(data){
  const check=(ok,message)=>{if(!ok)throw new Error(message)},oldSend=send;let requests=[];
  try{

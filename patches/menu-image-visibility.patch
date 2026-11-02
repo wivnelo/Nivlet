@@ -7,7 +7,7 @@
 -                if (image) [menuItem setImage:[image copy]] ;
 +                if (image) {
 +                    [menuItem setImage:[image copy]];
-+                    // macOS 27 hides menu images by default, including clipboard thumbnails.
++
 +                    if (@available(macOS 27.0, *)) {
 +                        menuItem.preferredImageVisibility = NSMenuItemImageVisibilityVisible;
 +                    }

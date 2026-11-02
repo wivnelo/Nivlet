@@ -1,5 +1,5 @@
--- Traditional Chinese for Taiwan (zh-Hant); written for macOS terminology.
--- Source keys stay Simplified Chinese for compatibility with the existing UI.
+
+
 return {
     ["启用菜单快捷键"] = "啟用選單快速鍵",
     ["当前仍使用以前保存的组合。关闭后再启用并保存，将改为固定快捷键 ⌘⇧V。"] = "目前仍使用先前儲存的組合。關閉後重新啟用並儲存，即會改用固定快速鍵 ⌘⇧V。",

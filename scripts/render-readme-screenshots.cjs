@@ -1,5 +1,5 @@
-// Render the pinned real settings UI with synthetic data and an inert native bridge.
-// No Nivlet process, personal configuration, clipboard or application inventory is read.
+
+
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
@@ -15,7 +15,7 @@ const viewport = {width:1280,height:900};
 const pages = {windows:'windowSection',clipboard:'clipSection',general:'generalSection',input:'inputSection',browser:'browserSection',launcher:'launcherSection',system:'systemSection',about:'aboutSection'};
 const sha256 = value => crypto.createHash('sha256').update(value).digest('hex');
 function verifySource() {
-    // UI is unchanged from the pinned source; release metadata is verified separately.
+
     const files = ['Toolkit/settings.html','Toolkit/modules/translations.lua'];
     const hashes = {};
     for (const file of files) {
@@ -108,7 +108,7 @@ if (require.main === module) (async()=>{
         }
         verifySource();
         fs.writeFileSync(path.join(stage,'report.json'),JSON.stringify(report,null,2));
-        // Publish only after every staged image and source check has passed.
+
         for(const image of report.images){const target=path.join(root,'docs/assets/screenshots',image.language==='en'?'en':'',`${image.page}.jpg`);fs.mkdirSync(path.dirname(target),{recursive:true});fs.copyFileSync(path.join(root,image.file),target);}
         console.log(JSON.stringify({count:report.images.length,dimensions:'2560x1800',report:path.join(stage,'report.json')}));
     } finally {await browser.close();}

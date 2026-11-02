@@ -103,7 +103,7 @@ def main():
     ET.SubElement(item, f'{{{ns}}}version').text = build
     ET.SubElement(item, f'{{{ns}}}shortVersionString').text = version
     ET.SubElement(item, f'{{{ns}}}minimumSystemVersion').text = '13.0'
-    # Without this restriction Intel clients could be offered an unusable update.
+
     ET.SubElement(item, f'{{{ns}}}hardwareRequirements').text = 'arm64'
     ET.SubElement(item, 'link').text = f'https://github.com/wivnelo/Nivlet/releases/tag/v{version}'
     ET.SubElement(item, 'description').text = description

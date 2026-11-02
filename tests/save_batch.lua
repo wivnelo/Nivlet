@@ -1,4 +1,4 @@
--- Isolated save-coordinator tests: no App, preferences, files, hotkeys or OS APIs.
+
 package.path="Toolkit/?.lua;"..package.path
 local batch=require("modules.save_batch")
 local function copy(value)
@@ -93,8 +93,8 @@ local function noWrites(x)
     assert(#x.saved==0,"Validation failure must not mutate any module")
 end
 
--- A clean current page cannot cause other selected pages to be omitted; only dirty
--- payload entries may be written and order is deterministic, not Lua table order.
+
+
 local x=setup()
 local payload=drafts("browserSection","inputSection","generalSection")
 local original=copy(payload)
@@ -115,7 +115,7 @@ for i,event in ipairs(x.events) do
 end
 assert(preflight and firstSave and preflight<firstSave)
 
--- A prepared plan is detached from both caller input and live getter values.
+
 x=setup();payload=drafts("browserSection")
 local plan=x.manager.prepare(payload)
 assert(plan and plan.selected.browserSection and not plan.selected.generalSection)
@@ -126,7 +126,7 @@ assert(payload.browserSection.value=="new:browserSection")
 assert(x.state.generalSection.value=="old:generalSection")
 noWrites(x)
 
--- Reject malformed/unknown requests and any page validation before writing.
+
 for _,bad in ipairs({false,"bad",17,{}, {unknownPage={value="x"}}, {browserSection=false}}) do
     x=setup();result=x.manager.apply(bad);assert(not result.ok);noWrites(x)
 end
@@ -136,8 +136,8 @@ for _,options in ipairs({{invalid="browserSection"},{validateThrows="browserSect
     assert(type(result.message)=="string" and result.message~="","Failures need visible feedback")
 end
 
--- An independent page failure stops subsequent writes without claiming rollback
--- of an earlier successful page. Retry can submit only still-dirty pages.
+
+
 for _,failure in ipairs({"saveFails","saveThrows"}) do
     x=setup({[failure]="inputSection"})
     result=x.manager.apply(drafts("generalSection","inputSection","browserSection"))
@@ -157,8 +157,8 @@ x.saved[1]=nil
 assert(x.manager.apply(drafts("inputSection","browserSection")).ok)
 assert(equal(x.saved,{"inputSection","browserSection"}),"Retry rewrote a prior successful page")
 
--- Group failure must recover every released member, including members whose new
--- value was not reached. None may be acknowledged as saved afterwards.
+
+
 x=setup({group={"windowSection","launcherSection"},saveFails="windowSection"})
 result=x.manager.apply(drafts("windowSection","launcherSection","browserSection"))
 statuses=byPage(result)
@@ -176,8 +176,8 @@ assert(not result.ok and statuses.windowSection.status~="saved" and statuses.lau
 assert(x.state.windowSection.value=="old:windowSection" and x.state.launcherSection.value=="old:launcherSection")
 assert(count(x.events,"begin")==1 and count(x.events,"restore")==1 and count(x.events,"end")==1)
 
--- A page with released bindings but no attempted save can restore only those
--- bindings, avoiding unrelated persistence/history side effects.
+
+
 x=setup({group={"windowSection","clipSection"},saveFails="windowSection"})
 local restoreAttempt
 x.adapters.clipSection.restore=function(value,attempted)
@@ -191,13 +191,13 @@ assert(restoreAttempt==false and statuses.windowSection.attempted==true and not 
 assert(equal(x.saved,{"windowSection","windowSection"}))
 assert(equal(statuses.clipSection.current,x.state.clipSection))
 
--- Failed recovery still reports the actual module snapshot for draft/baseline
--- reconciliation; it does not claim the snapshot proves native state recovered.
+
+
 x=setup({saveFails="inputSection",restoreFails="inputSection"})
 result=x.manager.apply(drafts("inputSection"))
 assert(not result.ok and result.recoveryIncomplete and result.results[1].current.value=="old:inputSection")
 
--- If the key group completed, a later independent failure must not undo it.
+
 x=setup({group={"windowSection","launcherSection"},saveFails="browserSection"})
 result=x.manager.apply(drafts("windowSection","launcherSection","browserSection"))
 statuses=byPage(result)
@@ -214,8 +214,8 @@ for _,failure in ipairs({"restoreFails","restoreThrows"}) do
     assert(x.state.browserSection.value=="old:browserSection")
 end
 
--- Hooks can fail after partially releasing or finishing runtime changes; cleanup
--- must be attempted and already-applied pages cannot be called unexecuted.
+
+
 x=setup({group={"windowSection","launcherSection"},beginThrows=true})
 result=x.manager.apply(drafts("windowSection","launcherSection","browserSection"))
 assert(not result.ok and result.recoveryAttempted==true)
@@ -233,8 +233,8 @@ assert(statuses.windowSection.status~="pending" and statuses.launcherSection.sta
     "An already-applied group cannot be reported as unexecuted when cleanup fails")
 assert(statuses.browserSection.status=="pending")
 
--- A model with occupied keys demonstrates why applying final-valid swapped values
--- one page at a time is insufficient, and why beginGroup must precede both saves.
+
+
 local occupied={A="windowSection",B="launcherSection"}
 local keyState={windowSection={value="A"},launcherSection={value="B"}}
 local keyWrites={}

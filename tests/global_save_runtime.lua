@@ -1,5 +1,5 @@
--- Runs real Toolkit/module code solely against the existing in-memory hs mock.
--- Never launches an App, registers an OS hotkey, or reads/writes user settings.
+
+
 dofile('tests/runtime.lua')
 local app=desktopToolkit
 local launcher=require('modules.launcher')
@@ -34,8 +34,8 @@ local function clearKeys()
 end
 clearKeys()
 
--- Realistic assignability: a key already held by one mock binding cannot be
--- registered a second time. Token-aware deletion avoids deleting a newer owner.
+
+
 local occupied,operations={},{}
 local bindFailure
 local function signature(mods,key)return table.concat(mods,'+')..'+'..key end
@@ -78,8 +78,8 @@ local function statuses(result)
 end
 local function page(config)return {config=config}end
 
--- Window + launcher exchange must succeed against actual occupied bindings,
--- without temporary default preference writes to unrelated shortcut owners.
+
+
 assert(app.save(window('A')))
 assert(launcher.save(launch('B')))
 resetLog()
@@ -94,15 +94,15 @@ assert(#writes==2,'A two-page exchange should write just its two final page valu
 onlyWrites({[windowKey]=true,[launcherKey]=true})
 for _,write in ipairs(writes) do assert(write.value.enabled,'No temporary disabled config may be persisted during an exchange') end
 
--- Move a key from launcher to windows while clearing the former owner.
+
 resetLog()
 result=app.saveAllSettings({windowSection=page(window('A')),launcherSection=page(launch(nil))})
 assert(result.ok,result.message)
 assert(occupied['ctrl+A']==app.bindings[1] and not occupied['ctrl+B'] and #launcher.bindings==0)
 assert(#writes==2);onlyWrites({[windowKey]=true,[launcherKey]=true})
 
--- Full preflight must reject an unavailable browser before even releasing or
--- saving the otherwise valid dirty window page.
+
+
 local originalPath=hs.application.pathForBundleID
 hs.application.pathForBundleID=function(id)if id=='com.google.Chrome' then return nil end;return originalPath(id)end
 local beforeWindow=copy(app.config)
@@ -114,7 +114,7 @@ assert(#writes==0 and #operations==0,'Preflight failure changed runtime or persi
 assert(equal(app.config,beforeWindow) and occupied['ctrl+A']==app.bindings[1])
 hs.application.pathForBundleID=originalPath
 
--- A final conflicting assignment also fails without unbinding clean owners.
+
 resetLog()
 assert(launcher.save(launch('B')))
 resetLog()
@@ -122,8 +122,8 @@ result=app.saveAllSettings({windowSection=page(window('B'))})
 assert(not result.ok and #writes==0 and #operations==0)
 assert(occupied['ctrl+A']==app.bindings[1] and occupied['ctrl+B']==launcher.bindings[1])
 
--- Registration can fail after preflight. The group's earlier window save must
--- be recovered together with the launcher state, not advertised as committed.
+
+
 resetLog();bindFailure='ctrl+C'
 local priorWindow,priorLauncher=copy(app.config),copy(launcher.config)
 result=app.saveAllSettings({windowSection=page(window('B')),launcherSection=page(launch('C')),browserSection=page(browserDraft)})
@@ -136,11 +136,11 @@ assert(occupied['ctrl+A']==app.bindings[1] and occupied['ctrl+B']==launcher.bind
 assert(equal(hs.settings.get(windowKey),priorWindow) and equal(hs.settings.get(launcherKey),priorLauncher))
 onlyWrites({[windowKey]=true,[launcherKey]=true})
 
--- The conflict context must be cleared even after group recovery.
+
 assert(not app.savePopup({key='A',mods={'ctrl'}}))
 
--- After a successful key group, an independent runtime failure preserves the
--- truthful partial result; no hidden all-or-nothing promise is introduced.
+
+
 local originalBrowserSave=browser.save
 local priorBrowser=copy(browser.config)
 browser.save=function()return false,'Injected browser runtime failure'end
@@ -154,8 +154,8 @@ assert(app.config.shortcuts.left.key=='D' and equal(browser.config,priorBrowser)
 assert(#writes==1);onlyWrites({[windowKey]=true})
 browser.save=originalBrowserSave
 
--- Transfer Command-L from windows to General sleep, including the login flag,
--- then back. No real sleep callback is invoked.
+
+
 clearKeys()
 local login=false
 local loginWrites={}
@@ -178,8 +178,8 @@ assert(not login and not sleep.enabled and occupied['cmd+L']==app.bindings[1])
 assert(not app.general.sleepShortcut and not hs.settings.get(generalKey).sleepShortcut)
 assert(#writes==2);onlyWrites({[windowKey]=true,[generalKey]=true})
 
--- A failed login change is a selected-page failure and recovers the group's
--- previous key owner; no other preference domain is written as a workaround.
+
+
 local priorGeneral,priorWindow=copy(app.general),copy(app.config)
 hs.autoLaunch=function()return false end
 resetLog()
@@ -191,9 +191,9 @@ assert(equal(app.general,priorGeneral) and equal(app.config,priorWindow))
 assert(not sleep.enabled and occupied['cmd+L']==app.bindings[1])
 onlyWrites({[windowKey]=true,[generalKey]=true})
 
--- The combined clipboard page must transfer the popup key with the same final
--- candidate as windows. Default disabled/nonpersistent configuration plus empty
--- mock history exercises the real save path without any filesystem operation.
+
+
+
 clearKeys()
 local clip=require('modules.clipboard')
 assert(#clip.entries==0 and not clip.config.enabled and not clip.config.persistent)
@@ -213,10 +213,10 @@ assert(app.popupShortcut==nil and app.popupBinding==nil and occupied['ctrl+M']==
 assert(hs.settings.get(popupSettingsKey)==false)
 onlyWrites({[windowKey]=true,[clipSettingsKey]=true,[popupSettingsKey]=true,[historySettingsKey]=true})
 
--- Exercise the real system module's write-before-menu-update path. The runtime
--- fixture's captured module table is a stub, so forward its dynamic adapter to
--- the real module and synchronize config even when its save raises. Drawing is
--- an in-memory boundary; neither test creates an AppKit menu.
+
+
+
+
 local system=require('modules.sys_info')
 local realSystem=dofile('Toolkit/modules/sys_info.lua')
 local systemKey='desktoptoolkit.system.v1'
@@ -251,9 +251,9 @@ assert(#writes==2 and equal(writes[1].value,systemDraft) and equal(writes[2].val
 assert(menuCalls==3 and drawCalls==1,'Restoration must rebuild the menu and redraw after the failed update')
 onlyWrites({[systemKey]=true})
 
--- With a persistent menu exception, persistence can already have returned to
--- the prior value while runtime recovery remains incomplete. Report both facts
--- truthfully instead of treating a restored settings value as full recovery.
+
+
+
 menuCalls=0;drawCalls=0
 realSystem.menu.setMenu=function()
     menuCalls=menuCalls+1
