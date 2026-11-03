@@ -26,10 +26,11 @@ jobs:
       - name: Install Lua
         run: brew install lua
 
-      - name: Rebuild runtime from patches/series
+      - name: Fetch pinned runtime and Sparkle
         run: |
           sh scripts/fetch-runtime.sh
           sh scripts/check-runtime.sh
+          sh scripts/fetch-sparkle.sh
 
       - name: Command-line tests and privacy scan
         run: sh scripts/run-tests.sh
