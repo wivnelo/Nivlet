@@ -1,8 +1,8 @@
-> 本指南适用于 2.0.2 / Build 62，macOS 13+，仅 Apple Silicon（arm64）。1.0.8 / Build 55 是最后 Intel 版，历史下载保留。
+> 本指南适用于当前正式版（版本号见 [BASELINE](../BASELINE.md)），macOS 13+，仅 Apple Silicon（arm64）。1.0.8 / Build 55 是最后 Intel 版，历史下载保留。
 
 # Nivlet 使用指南
 
-2.0.2 改动与验证范围见[版本说明](RELEASE-v2.0.2.md)。签名与公证不代替辅助功能授权；安装和升级说明见[安装指南](INSTALLATION.md)。
+各版本改动与验证范围见[版本说明目录](README.md)。签名与公证不代替辅助功能授权；安装和升级说明见[安装指南](INSTALLATION.md)。
 
 [返回首页](../README.zh-CN.md) · [English](USAGE.en.md)
 

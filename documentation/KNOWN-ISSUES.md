@@ -1,6 +1,6 @@
 # 已知问题与观察项
 
-更新：2026-11-03。当前为 2.0.2 / Build 62，仅 arm64；[1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后 Intel 版，历史下载保留。
+更新：2026-11-03。当前正式版见 [BASELINE](../BASELINE.md)，仅 arm64；[1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后 Intel 版，历史下载保留。
 
 ## 当前验证边界
 

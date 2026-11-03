@@ -1,6 +1,6 @@
 # 安装、升级与卸载
 
-适用正式版：[2.0.2 / Build 62](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.2)，仅 Apple Silicon。
+适用于[最新正式版](https://github.com/wivnelo/Nivlet/releases/latest)，仅 Apple Silicon；当前版本号见 [BASELINE](../BASELINE.md)。
 
 ## 系统要求
 
@@ -18,7 +18,7 @@
 
 ### 签名、公证与系统提示
 
-2.0.2 / Build 62 的 App 与 DMG 已通过 Developer ID 签名、Apple 公证、附加票据和 Gatekeeper 检查。首次打开可能仍显示系统下载确认提示。公证不等于 App Store 上架，也不代替辅助功能授权。
+正式版的 App 与 DMG 均通过 Developer ID 签名、Apple 公证、附加票据和 Gatekeeper 检查。首次打开可能仍显示系统下载确认提示。公证不等于 App Store 上架，也不代替辅助功能授权。
 
 无需全局关闭 Gatekeeper，也无需运行解除隔离命令。若出现“无法验证开发者”、应用损坏或恶意软件警告，请先核对版本、下载来源与 SHA-256，并通过 Issue 提供完整提示；不要按旧版未签名安装方法绕过。受管理设备还可能有组织限制。
 
@@ -35,7 +35,7 @@
 把 ZIP、DMG 及同版本的 .sha256 文件放在同一文件夹，在该文件夹运行：
 
 ```sh
-shasum -a 256 -c Nivlet-2.0.2-build62-arm64.sha256
+shasum -a 256 -c Nivlet-*-arm64.sha256
 ```
 
 两个安装包都在时应各显示 OK；缺少其中一个会报该文件不存在，不代表另一个损坏。校验文件检测传输一致性，不替代 Apple 签名公证。
@@ -61,9 +61,9 @@ shasum -a 256 -c Nivlet-2.0.2-build62-arm64.sha256
 
 ## 已知限制与反馈
 
-- 2.0.2 的签名、公证及测试范围见[版本说明](RELEASE-v2.0.2.md)，不能引用旧包通过结果；签名、公证和辅助功能授权是不同机制。
+- 各版本的签名、公证及测试范围见[版本说明目录](README.md)，不能引用旧包通过结果；签名、公证和辅助功能授权是不同机制。
 - 同机新用户配置使用已由用户反馈暂无明显重大问题；登录启动按反馈转观察，暂不继续排查。
-- 关于页已接入官网和手动更新通道；捐赠尚未接入。当前公开下载为 2.0.2 / Build 62；2.0.0 起更新通道仅提供明确限制为 arm64 的新包，Intel 不再获得新版本。
+- 关于页已接入官网和手动更新通道；捐赠尚未接入。当前公开下载见 [Latest Release](https://github.com/wivnelo/Nivlet/releases/latest)；2.0.0 起更新通道仅提供明确限制为 arm64 的新包，Intel 不再获得新版本。
 - 报告问题请提供应用版本/Build、macOS、芯片、操作步骤与提示；不要上传敏感剪贴板内容、完整私人配置或凭据。
 
 现有模块使用方式见 [README](../README.md)，当前验证状态见 [BASELINE](../BASELINE.md)，工程验收见 [DISTRIBUTION](DISTRIBUTION.md)。

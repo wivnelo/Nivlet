@@ -92,7 +92,7 @@ Nivlet 是一款免费开源的 macOS 菜单栏工具，将常用操作放在一
 
 ## 发行状态与架构支持
 
-**[2.0.2 / Build 62](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.2) 已正式发布，要求 Apple Silicon（arm64）与 macOS 13.0+。** 最终安装包已使用 Developer ID 签名并通过 Apple 公证。见[版本说明](documentation/RELEASE-v2.0.2.md)。
+**[下载最新正式版](https://github.com/wivnelo/Nivlet/releases/latest)，要求 Apple Silicon（arm64）与 macOS 13.0+。** 正式安装包均使用 Developer ID 签名并通过 Apple 公证。当前版本及验证范围见 [BASELINE](BASELINE.md)，各版本改动见[版本说明目录](documentation/README.md)。
 
 **[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后一个 Intel（x86_64）版本。** 其已有正式签名与 Apple 公证安装包继续保留；后续版本不再构建或支持 Intel，2.0.0 不宣称通过 Intel 真机验证。
 
@@ -122,4 +122,4 @@ Nivlet 使用 [MIT License](LICENSE)。内置 Runtime 基于 [Hammerspoon](https
 
 2.0.0 统一八页侧边栏，增加本地 `.html`/`.htm` 转交与跨页保存。剪贴板记录改为单一启用开关，菜单快捷键使用固定 ⌘⇧V 的启用开关；已有自定义快捷键在实际切换该开关并保存前保留。点击缩略图或聚焦后按 Enter / Space 打开预览，点击 Nivlet 窗口内图片外部或按 Esc 关闭。详见[完整改动、迁移规则、包体与发布门槛](documentation/RELEASE-v2.0.0.md)。
 
-2.0.2 减少后台开销：菜单栏网速图标只在变化时重绘，关闭网速显示后改为每分钟采集一次，剪贴板轮询减少重复工作；功能和设置不变。[查看版本说明](documentation/RELEASE-v2.0.2.md)。2.0.1 新增保持唤醒、屏幕长亮并统一浏览器资料（[版本说明](documentation/RELEASE-v2.0.1.md)）。
+之后各版本的改动见[版本说明目录](documentation/README.md)。
