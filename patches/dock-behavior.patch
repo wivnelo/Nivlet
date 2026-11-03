@@ -1,7 +1,30 @@
 diff --git a/Hammerspoon/MJDockIcon.m b/Hammerspoon/MJDockIcon.m
+index 9fefb91..0202e49 100644
 --- a/Hammerspoon/MJDockIcon.m
 +++ b/Hammerspoon/MJDockIcon.m
-@@ -34,8 +34,11 @@
+@@ -3,17 +3,18 @@
+ 
+ static void reflect_defaults(void);
+ 
++static BOOL settingsDockVisible = NO;
++
+ void MJDockIconSetup(void) {
+     reflect_defaults();
+ }
+ 
+ BOOL MJDockIconVisible(void) {
+-    return [[NSUserDefaults standardUserDefaults] boolForKey:MJShowDockIconKey];
++    return settingsDockVisible;
+ }
+ 
+ void MJDockIconSetVisible(BOOL visible) {
+-    [[NSUserDefaults standardUserDefaults] setBool:visible
+-                                            forKey:MJShowDockIconKey];
++    settingsDockVisible = visible;
+     reflect_defaults();
+ }
+ 
+@@ -34,8 +35,11 @@ static void reflect_defaults(void) {
  
      [app setActivationPolicy:targetPolicy];
      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{

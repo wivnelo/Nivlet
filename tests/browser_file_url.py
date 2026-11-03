@@ -14,9 +14,9 @@ root = Path(__file__).resolve().parents[1]
 runtime = Path(os.environ.get('NIVLET_RUNTIME_SOURCE', root / 'vendor/hammerspoon'))
 relative = Path('extensions/urlevent/liburlevent.m')
 delegate_relative = Path('Hammerspoon/MJAppDelegate.m')
-patch = root / 'patches/browser-file-url.patch'
+patch = root / 'patches/browser-routing.patch'
 series = (root / 'patches/series').read_text().split()
-assert series.index('browser-file-url.patch') > series.index('browser-url-only.patch')
+assert series.index('browser-routing.patch') > series.index('nivlet-core-api.patch')
 
 with tempfile.TemporaryDirectory(prefix='nivlet-file-url-test-') as directory:
     work = Path(directory)

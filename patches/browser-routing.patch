@@ -1,0 +1,137 @@
+diff --git a/Hammerspoon/MJAppDelegate.m b/Hammerspoon/MJAppDelegate.m
+index 21d500e..226806a 100644
+--- a/Hammerspoon/MJAppDelegate.m
++++ b/Hammerspoon/MJAppDelegate.m
+@@ -102,6 +102,10 @@
+     }
+ 
+     NSString *fileExtension = [fileAndPath pathExtension];
++
++    if ([@[@"html", @"htm"] containsObject:fileExtension.lowercaseString]) {
++        fileExtension = fileExtension.lowercaseString;
++    }
+     NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
+     NSArray *supportedExtensions = [infoDict valueForKeyPath:@"CFBundleDocumentTypes.CFBundleTypeExtensions"];
+     NSArray *flatSupportedExtensions = [supportedExtensions valueForKeyPath:@"@unionOfArrays.self"];
+diff --git a/extensions/urlevent/liburlevent.m b/extensions/urlevent/liburlevent.m
+index b2bc9b4..fa59b0a 100644
+--- a/extensions/urlevent/liburlevent.m
++++ b/extensions/urlevent/liburlevent.m
+@@ -40,6 +40,7 @@ static HSURLEventHandler *eventHandler;
+                                 andEventID:kAEGetURL];
+ 
+         MJAppDelegate *delegate = (MJAppDelegate *)[[NSApplication sharedApplication] delegate];
++        self.appDelegate = delegate;
+         delegate.openFileDelegate = self;
+     }
+     return self;
+@@ -77,8 +78,9 @@ static HSURLEventHandler *eventHandler;
+ 
+ - (void)handleStartupEvents {
+     if (_appDelegate.startupEvent) {
+-        [self handleAppleEvent:_appDelegate.startupEvent withReplyEvent:nil];
++        NSAppleEventDescriptor *event = _appDelegate.startupEvent;
+         _appDelegate.startupEvent = nil;
++        [self handleAppleEvent:event withReplyEvent:nil];
+     }
+ 
+     if (_appDelegate.startupFile) {
+@@ -92,17 +94,8 @@ static HSURLEventHandler *eventHandler;
+     MJDockIconSetVisible(MJDockIconVisible());
+ 
+     // get the process id for the application that sent the current Apple Event
+-    NSAppleEventDescriptor *appleEventDescriptor = [[NSAppleEventManager sharedAppleEventManager] currentAppleEvent];
+-    NSAppleEventDescriptor* processSerialDescriptor = [appleEventDescriptor attributeDescriptorForKeyword:keyAddressAttr];
+-    NSAppleEventDescriptor* pidDescriptor = [processSerialDescriptor coerceToDescriptorType:typeKernelProcessID];
+-
+-    pid_t pid;
+-
+-    if (pidDescriptor) {
+-        pid = *(pid_t *)[[pidDescriptor data] bytes];
+-    } else {
+-        pid = -1;
+-    }
++    NSAppleEventDescriptor *pidDescriptor = [event attributeDescriptorForKeyword:keySenderPIDAttr];
++    pid_t pid = pidDescriptor ? (pid_t)[pidDescriptor int32Value] : -1;
+ 
+     [self callbackWithURL:[[event paramDescriptorForKeyword:keyDirectObject] stringValue] senderPID:pid];
+ }
+@@ -119,8 +112,9 @@ static HSURLEventHandler *eventHandler;
+     }
+ 
+     if ([openUrl hasPrefix:@"/"]) {
+-        openUrl = [NSString stringWithFormat:@"file://%@", openUrl];
+-        openUrl = [openUrl stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
++
++
++        openUrl = [[NSURL fileURLWithPath:openUrl isDirectory:NO] absoluteString];
+     }
+ 
+     // Split the URL into its components
+@@ -143,6 +137,10 @@ static HSURLEventHandler *eventHandler;
+         NSString *key = [[bits objectAtIndex:0] stringByRemovingPercentEncoding];
+         NSString *value = [[bits objectAtIndex:1] stringByRemovingPercentEncoding];
+ 
++
++
++        if (!key || !value) { continue; }
++
+         [pairs setObject:value forKey:key];
+     }
+ 
+@@ -160,6 +158,13 @@ static HSURLEventHandler *eventHandler;
+ // ----------------------- C ---------------------
+ 
+ // Rather than manage complex callback state from C, we just have one path into Lua for all events, and events are directed to their callbacks from there
++
++static int urleventProcessStartupEvents(lua_State *L) {
++    (void)L;
++    [eventHandler handleStartupEvents];
++    return 0;
++}
++
+ static int urleventSetCallback(lua_State *L) {
+     LuaSkin *skin = [LuaSkin sharedWithState:L];
+ 
+@@ -193,13 +198,14 @@ static int urleventsetRestoreHandler(lua_State *L) {
+     return 0;
+ }
+ 
+-/// hs.urlevent.setDefaultHandler(scheme[, bundleID])
++/// hs.urlevent.setDefaultHandler(scheme[, bundleID[, urlOnly]])
+ /// Function
+ /// Sets the default system handler for URLs of a given scheme
+ ///
+ /// Parameters:
+ ///  * scheme - A string containing the URL scheme to change. This must be 'http' or 'https' (although entering either will change the handler for both)
+ ///  * bundleID - An optional string containing an application bundle identifier for the application to set as the default handler. Defaults to `org.hammerspoon.Hammerspoon`.
++///  * urlOnly - Optional boolean; when true, leave all content-type associations unchanged. Defaults to false.
+ ///
+ /// Returns:
+ ///  * None
+@@ -208,7 +214,7 @@ static int urleventsetRestoreHandler(lua_State *L) {
+ ///  * Changing the default handler for http/https URLs will display a system prompt asking the user to confirm the change
+ static int urleventsetDefaultHandler(lua_State *L) {
+     LuaSkin *skin = [LuaSkin sharedWithState:L];
+-    [skin checkArgs:LS_TSTRING, LS_TSTRING|LS_TOPTIONAL, LS_TBREAK];
++    [skin checkArgs:LS_TSTRING, LS_TSTRING|LS_TOPTIONAL, LS_TBOOLEAN|LS_TOPTIONAL, LS_TBREAK];
+ 
+     OSStatus status;
+     NSString *scheme = [[NSString stringWithUTF8String:lua_tostring(L, 1)] lowercaseString];
+@@ -227,7 +233,7 @@ static int urleventsetDefaultHandler(lua_State *L) {
+ 
+     if ([scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"]) {
+         // If we're dealing with http/https, also register ourselves for various filetypes that are relevant
+-        for (NSString *type in defaultContentTypes) {
++        for (NSString *type in (lua_toboolean(L, 3) ? @[] : defaultContentTypes)) {
+             status = LSSetDefaultRoleHandlerForContentType((__bridge CFStringRef)type, kLSRolesViewer, (__bridge CFStringRef)bundleID);
+             if (status != noErr) {
+                 [skin logWarn:[NSString stringWithFormat:@"Unable to set role handler for %@: %@", type, [[NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil] localizedDescription]]];
+@@ -349,6 +355,7 @@ static int urlevent_gc(lua_State* L) {
+ 
+ static const luaL_Reg urleventlib[] = {
+     {"setCallback", urleventSetCallback},
++    {"processStartupEvents", urleventProcessStartupEvents},
+     {"setRestoreHandler", urleventsetRestoreHandler},
+     {"setDefaultHandler", urleventsetDefaultHandler},
+     {"getDefaultHandler", urleventgetDefaultHandler},

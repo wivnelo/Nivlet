@@ -7,7 +7,7 @@ cleanup() { git -C "$upstream_dir" worktree remove --force "$expected/runtime" >
 trap cleanup EXIT
 git -C "$upstream_dir" worktree add -q --detach "$expected/runtime" 1469832361b4c3687ec7d589c1b4efe4d3b742ee
 sh "$project_dir/scripts/apply-runtime-patches.sh" "$expected/runtime" >/dev/null
-drift=$(diff -rq -x .git -x build -x xcuserdata -x '*.xcuserstate' -x .DS_Store "$upstream_dir" "$expected/runtime" 2>&1 | grep -v 'Directory loop detected' | sed "s|$expected/runtime|<expected>|g" || true)
+drift=$(diff -rq -x .git -x build -x xcuserdata -x '*.xcuserstate' -x .DS_Store -x .claude "$upstream_dir" "$expected/runtime" 2>&1 | grep -v 'Directory loop detected' | sed "s|$expected/runtime|<expected>|g" || true)
 if [ -n "$drift" ]; then
     echo "$drift" >&2
     echo "vendor/hammerspoon does not match patches/series; rebuild it with scripts/fetch-runtime.sh." >&2

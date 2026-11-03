@@ -1,0 +1,175 @@
+diff --git a/Hammerspoon/MJAppDelegate.m b/Hammerspoon/MJAppDelegate.m
+index 39b112b..21d500e 100644
+--- a/Hammerspoon/MJAppDelegate.m
++++ b/Hammerspoon/MJAppDelegate.m
+@@ -327,6 +327,21 @@
+ }
+ 
+ - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
++    LuaSkin *skin = [LuaSkin sharedWithState:NULL];
++    lua_State *L = skin.L;
++    if (!L) return NSTerminateNow;
++    int top = lua_gettop(L);
++    lua_getglobal(L, "hs");
++    if (lua_istable(L, -1)) {
++        lua_getfield(L, -1, "nivletShouldTerminate");
++        if (lua_isfunction(L, -1)) {
++            BOOL ok = [skin protectedCallAndError:@"Nivlet termination guard" nargs:0 nresults:1];
++            BOOL allow = ok && lua_toboolean(L, -1);
++            lua_settop(L, top);
++            if (!allow) return NSTerminateCancel;
++        }
++    }
++    lua_settop(L, top);
+     MJLuaDestroy();
+     return NSTerminateNow;
+ }
+@@ -335,7 +350,7 @@
+     [[NSUserDefaults standardUserDefaults]
+      registerDefaults: @{@"NSApplicationCrashOnExceptions": @YES,
+                          MJShowDockIconKey: @NO,
+-                         MJShowMenuIconKey: @YES,
++                         MJShowMenuIconKey: @NO,
+                          HSAutoLoadExtensions: @YES,
+                          HSUploadCrashDataKey: @NO,
+                          HSAppleScriptEnabledKey: @NO,
+diff --git a/Hammerspoon/MJLua.m b/Hammerspoon/MJLua.m
+index 19806bb..98af109 100644
+--- a/Hammerspoon/MJLua.m
++++ b/Hammerspoon/MJLua.m
+@@ -810,7 +810,104 @@ static int core_notify(lua_State* L) {
+     return 0;
+ }
+ 
++
++static int core_nivletAppearance(lua_State *L) {
++    const char *mode = luaL_checkstring(L, 1);
++    NSString *name = nil;
++    if (strcmp(mode, "dark") == 0) name = NSAppearanceNameDarkAqua;
++    else if (strcmp(mode, "light") == 0) name = NSAppearanceNameAqua;
++    else if (strcmp(mode, "system") != 0) return luaL_error(L, "Invalid appearance");
++    NSApp.appearance = name ? [NSAppearance appearanceNamed:name] : nil;
++    return 0;
++}
++
++
++@protocol NivletUpdaterAPI
++- (instancetype)initWithStartingUpdater:(BOOL)start updaterDelegate:(id)delegate userDriverDelegate:(id)driver;
++- (id<NivletUpdaterAPI>)updater;
++- (BOOL)startUpdater:(NSError **)error;
++- (BOOL)canCheckForUpdates;
++- (void)checkForUpdates:(id)sender;
++@end
++static NSString * const NivletPendingUpdateBuildKey = @"NivletPendingUpdateBuild";
++@interface NivletUpdateRecoveryDelegate : NSObject
++@end
++@implementation NivletUpdateRecoveryDelegate
++- (void)updaterWillRelaunchApplication:(id)updater {
++    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
++    [defaults setObject:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"] forKey:NivletPendingUpdateBuildKey];
++    [defaults synchronize];
++}
++- (void)updater:(id)updater didAbortWithError:(NSError *)error {
++    [[NSUserDefaults standardUserDefaults] removeObjectForKey:NivletPendingUpdateBuildKey];
++}
++@end
++static NivletUpdateRecoveryDelegate *nivletUpdateRecoveryDelegate;
++static id<NivletUpdaterAPI> nivletUpdaterController;
++static int core_nivletTakeUpdateRecovery(lua_State *L) {
++    LuaSkin *skin = [LuaSkin sharedWithState:L];
++    [skin checkArgs:LS_TBREAK];
++    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
++    NSString *previous = [defaults stringForKey:NivletPendingUpdateBuildKey];
++    BOOL incomplete = previous && [previous isEqualToString:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]];
++    [defaults removeObjectForKey:NivletPendingUpdateBuildKey];
++    [defaults synchronize];
++    lua_pushboolean(L, incomplete);
++    return 1;
++}
++static int core_nivletCheckForUpdates(lua_State *L) {
++    LuaSkin *skin = [LuaSkin sharedWithState:L];
++    [skin checkArgs:LS_TBREAK];
++    if (!nivletUpdaterController) {
++        NSString *path = [[[NSBundle mainBundle] privateFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
++        NSError *error = nil;
++        if (![[NSBundle bundleWithPath:path] loadAndReturnError:&error]) {
++            lua_pushboolean(L, NO); return 1;
++        }
++        Class controllerClass = NSClassFromString(@"SPUStandardUpdaterController");
++        if (!controllerClass) { lua_pushboolean(L, NO); return 1; }
++        nivletUpdateRecoveryDelegate = [NivletUpdateRecoveryDelegate new];
++        nivletUpdaterController = [(id<NivletUpdaterAPI>)[controllerClass alloc] initWithStartingUpdater:NO updaterDelegate:nivletUpdateRecoveryDelegate userDriverDelegate:nil];
++        if (![[nivletUpdaterController updater] startUpdater:&error]) {
++            nivletUpdaterController = nil;
++            [skin logError:[NSString stringWithFormat:@"Nivlet updater failed to start: %@", error.localizedDescription]];
++            lua_pushboolean(L, NO); return 1;
++        }
++    }
++    if (![[nivletUpdaterController updater] canCheckForUpdates]) { lua_pushboolean(L, NO); return 1; }
++    [nivletUpdaterController checkForUpdates:nil];
++    lua_pushboolean(L, YES);
++    return 1;
++}
++
++static int core_nivletQuit(lua_State *L) {
++    [[LuaSkin sharedWithState:L] checkArgs:LS_TBREAK];
++
++    dispatch_async(dispatch_get_main_queue(), ^{ [NSApp terminate:nil]; });
++    return 0;
++}
++
++static int core_nivletCurrentKeyEvent(lua_State *L) {
++    LuaSkin *skin = [LuaSkin sharedWithState:L];
++    [skin checkArgs:LS_TBREAK];
++    NSEvent *event = [NSApp currentEvent];
++    if (event.type != NSEventTypeKeyDown || !(event.modifierFlags & NSEventModifierFlagCommand)) {
++        lua_pushnil(L);
++        return 1;
++    }
++    [skin pushNSObject:@{@"key": event.charactersIgnoringModifiers ?: @"",
++                         @"metaKey": @YES,
++                         @"ctrlKey": @((event.modifierFlags & NSEventModifierFlagControl) != 0),
++                         @"altKey": @((event.modifierFlags & NSEventModifierFlagOption) != 0),
++                         @"shiftKey": @((event.modifierFlags & NSEventModifierFlagShift) != 0)}];
++    return 1;
++}
++
+ static luaL_Reg corelib[] = {
++    {"nivletCurrentKeyEvent", core_nivletCurrentKeyEvent},
++    {"nivletTakeUpdateRecovery", core_nivletTakeUpdateRecovery},
++    {"nivletQuit", core_nivletQuit},
++    {"nivletCheckForUpdates", core_nivletCheckForUpdates},
+     {"preferencesDarkMode", preferencesDarkMode},
+     {"openConsoleOnDockClick", core_openConsoleOnDockClick},
+     {"openConsole", core_openconsole},
+@@ -818,6 +915,7 @@ static luaL_Reg corelib[] = {
+     {"consoleOnTop", core_consoleontop},
+     {"openAbout", core_openabout},
+     {"menuIcon", core_menuicon},
++    {"nivletAppearance", core_nivletAppearance},
+     {"openPreferences", core_openpreferences},
+     {"closePreferences", core_closepreferences},
+     {"open", core_open},
+diff --git a/extensions/webview/libwebview.m b/extensions/webview/libwebview.m
+index d4ac24e..969e77f 100644
+--- a/extensions/webview/libwebview.m
++++ b/extensions/webview/libwebview.m
+@@ -124,6 +124,18 @@ void delayUntilViewStopsLoading(HSWebViewView *theView, dispatch_block_t block)
+ 
+ - (BOOL)windowShouldClose:(id __unused)sender {
+     if ((self.styleMask & NSWindowStyleMaskClosable) != 0) {
++        LuaSkin *skin = [LuaSkin sharedWithState:NULL];
++        lua_State *L = skin.L;
++        if ([skin checkGCCanary:self.lsCanary] && _windowCallback != LUA_NOREF) {
++            int top = lua_gettop(L);
++            [skin pushLuaRef:refTable ref:_windowCallback];
++            [skin pushNSObject:@"shouldClose"];
++            [skin pushNSObject:self];
++            BOOL ok = [skin protectedCallAndError:@"hs.webview:windowCallback:shouldClose" nargs:2 nresults:1];
++            BOOL allow = ok && (!lua_isboolean(L, -1) || lua_toboolean(L, -1));
++            lua_settop(L, top);
++            return allow;
++        }
+         return YES ;
+     } else {
+         return NO ;
