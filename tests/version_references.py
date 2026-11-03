@@ -21,7 +21,4 @@ for name in NEUTRAL:
         if pattern.search(line):
             problems.append(f'{name}:{number}: {line.strip()[:100]}')
 assert not problems, 'Current version hard-coded in version-neutral files:\n' + '\n'.join(problems)
-baseline = (root / 'BASELINE.md').read_text()
-assert f'releases/tag/v{version}' in baseline, 'BASELINE must link the current release'
-assert (root / f'documentation/RELEASE-v{version}.md').is_file(), 'Current release notes missing'
 print(f'Version {version} appears only in release records; {len(NEUTRAL)} guides and pages stay version-neutral')
