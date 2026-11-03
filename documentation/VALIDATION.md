@@ -1,4 +1,8 @@
-# 当前验收：2.0.2 / Build 62
+# 当前验收：2.0.3 / Build 63
+
+58 项命令行回归（Lua、Python、非 UI JS、隐私扫描、运行时补丁一致性、运行时裁剪、版本中性）本地与 CI 通过；CI 另跑四语言 × 深浅色设置页 UI 回归。合并后的 10 个补丁生成的运行时与原 18 个补丁逐文件一致。候选包：Toolkit 与源码一致，66 个 Mach-O 均为 arm64，无个人路径；隔离 WKWebView UI 回归 350/350；本机 Developer ID 签名副本实机启动，Toolkit 用到的模块及 network/window 子模块、spaces.watcher 共 32 项检查通过、无 Lua 错误。首次实机测试曾因删除 `docs.json` 导致启动失败，已改为清空并补回 window 子模块依赖后复测通过。最终 App/DMG 公证 Accepted、票据与 Gatekeeper 通过；appcast 版本、SHA-256、EdDSA 签名与篡改拒绝通过。见 [2.0.3 版本说明](RELEASE-v2.0.3.md)。
+
+## 历史验收：2.0.2 / Build 62
 
 36 个 Lua 回归、命令行 JS/Python 检查、`release_architecture`/`signing_preflight` 及隐私扫描通过。35 组设置页 UI 测试在隔离 WKWebView 中以简中、繁中、英文、日文 × 浅色/深色及 620 点窄窗口运行，共 350 项通过；测试数据取自 `scripts/test-settings-ui.cjs` 的夹具，原生桥不执行操作。同一产品改动的本机 Developer ID 签名测试版替换 2.0.1 运行，日志无错误。最终 App/DMG 签名、公证 Accepted、票据、Gatekeeper 及 101 个 arm64 Mach-O 检查通过；appcast 版本、SHA-256、EdDSA 签名与篡改拒绝通过。菜单栏重绘、采集间隔与剪贴板轮询由 Lua 单元测试覆盖，非原生端到端测量。见 [2.0.2 版本说明](RELEASE-v2.0.2.md)。
 

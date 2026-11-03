@@ -2,13 +2,13 @@
 
 更新日期：2026-11-03。
 
-当前正式版本为 [2.0.2 / Build 62](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.2)，macOS 13+、Apple Silicon（arm64）。产品源码 `b9db87155ddff5425a45dd00e43f8a98feb45e28`；发行 tag 在该提交上增加公开说明，不把文档变动计为产品差异。
+当前正式版本为 [2.0.3 / Build 63](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.3)，macOS 13+、Apple Silicon（arm64）。产品源码 `bc139047501518faea736f53825295759cf36beb`；发行 tag 在该提交上增加公开说明，不把文档变动计为产品差异。
 
-2.0.2 只做性能优化：菜单栏网速图标按需重绘；关闭网速显示时后台采集改为每 60 秒；剪贴板轮询减少重复工作。设置项、界面、配置格式和权限不变。正式 tag `v2.0.2` 指向 `756c38f22e328b07e547dee749dce077521b9b11`；三份公开附件已匿名下载并与已验收产物逐字节比对，下载 App 的签名、票据及 Gatekeeper 检查通过，arm64 appcast 已发布。
+2.0.3 缩小运行时：移除 Nivlet 无法访问的 Hammerspoon 扩展与 `hs` 命令行，API 文档清空为 `[]`；安装后约 24.8 MB（2.0.2 为 40.5 MB），ZIP 8.65 MB、DMG 9.21 MB。功能、设置、界面、配置格式与权限不变。同版还统一快捷键校验、合并运行时补丁（18 → 10），并加入 CI。公开附件回核结果见[版本说明](documentation/RELEASE-v2.0.3.md)。
 
-上一版 [2.0.1 / Build 61](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.1) 增加保持唤醒与屏幕长亮、统一浏览器资料并移除 MAC 地址项，记录见 [2.0.1 版本说明](documentation/RELEASE-v2.0.1.md)。
+上一版 [2.0.2 / Build 62](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.2) 为后台性能优化，记录见 [2.0.2 版本说明](documentation/RELEASE-v2.0.2.md)。
 
-36 个 Lua 回归、命令行 JS/Python 检查、隐私扫描及 350 项隔离 WKWebView UI 检查（四语言 × 深浅色，含 620 点窄窗口）通过；同一产品改动的本机签名测试版替换 2.0.1 运行无错误。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper。未测试边界见[版本说明](documentation/RELEASE-v2.0.2.md)。
+58 项命令行回归（含运行时补丁、裁剪与版本中性检查）本地及 CI 通过；候选包 350 项隔离 WKWebView UI 检查（四语言 × 深浅色，含 620 点窄窗口）通过；本机签名候选包实机启动并加载 Toolkit 全部模块及 network/window 子模块，32 项检查无错误。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper。未测试边界见[版本说明](documentation/RELEASE-v2.0.3.md)。
 
 官网来源为 `docs/`，中英文媒体使用真实前端与合成数据，不代表原生录像。知识库由独立同步流程维护，不包含私人配置、凭据或安装包。历史 GitHub 发行保留；1.0.8 / Build 55 为最后 Intel 版。
 

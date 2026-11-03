@@ -1,6 +1,10 @@
-# Nivlet 会话交接 · 2026-11-02
+# Nivlet 会话交接 · 2026-11-03
 
-## 当前状态 · 2.0.2 / Build 62
+## 当前状态 · 2.0.3 / Build 63
+
+运行时瘦身版，功能不变。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.0.3 版本说明](documentation/RELEASE-v2.0.3.md)。产品源码 `bc13904`，仅 Apple Silicon。补丁顺序只在 `patches/series`（10 个）；`scripts/check-runtime.sh` 在构建前比对 vendor，`scripts/trim-runtime.py` 按明确清单裁剪，`docs.json` 必须保留为 `[]`。发版流程见本机 skill `nivlet-release`，CI 为 `.github/workflows/tests.yml`。P2（常驻采集进程）实测总 CPU 未降低，已放弃，代码保留在 `backup/p2-streaming-probe` 分支。
+
+## 历史 · 2.0.2 / Build 62
 
 性能优化版，无新功能。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.0.2 版本说明](documentation/RELEASE-v2.0.2.md)。产品源码 `b9db871`，仅 Apple Silicon。本地 `vendor/hammerspoon` 曾落后于当前补丁，本次正式包在中性临时目录按 `fetch-runtime.sh` 重建运行时后构建；下次构建前先核对或重建 vendor。
 
