@@ -95,12 +95,18 @@ function M.prune()
     for i=#M.entries,1,-1 do
         if M.config.minutes>0 and M.entries[i].time<=cutoff then remove(M.entries[i]);table.remove(M.entries,i);changed=true end
     end
-    local keep={}
     for _,entry in ipairs(M.entries) do
         if entry.kind=="image" then imageCount=imageCount+1 else textCount=textCount+1 end
-        if entry.kind=="image" and imageCount>10 or entry.kind~="image" and textCount>M.config.limit then remove(entry);changed=true else table.insert(keep,entry) end
     end
-    M.entries=keep
+    if imageCount>10 or textCount>M.config.limit then
+        local keep={}
+        imageCount,textCount=0,0
+        for _,entry in ipairs(M.entries) do
+            if entry.kind=="image" then imageCount=imageCount+1 else textCount=textCount+1 end
+            if entry.kind=="image" and imageCount>10 or entry.kind~="image" and textCount>M.config.limit then remove(entry);changed=true else table.insert(keep,entry) end
+        end
+        M.entries=keep
+    end
     if changed then M.pendingHistoryWrite=true end
     if M.pendingHistoryWrite and (not M.historyRetryAt or now>=M.historyRetryAt) then
         local ran,ok,message=pcall(M.persist)
@@ -118,6 +124,10 @@ function M.prune()
     end
     maintainExpiryTimer()
     return not M.pendingHistoryWrite,M.historyPersistError
+end
+local function pngBytes(encoded)
+    local base64=encoded and encoded:match("base64,(.*)")
+    return base64 and math.floor(#base64*3/4)-(base64:match("==$") and 2 or base64:match("=$") and 1 or 0) or 0
 end
 local function thumbnail(image)
     local size=image:size()
@@ -140,7 +150,8 @@ function M.load()
                 local attr=hs.fs.symlinkAttributes(entry.path)
                 if attr and attr.mode=="file" and attr.size<=10485760 then
                     local image=hs.image.imageFromPath(entry.path)
-                    if image then item={id=entry.id,time=entry.time,kind="image",image=image,path=entry.path,thumb=thumbnail(image),fingerprint=hs.hash.SHA256(image:encodeAsURLString(true,"PNG"))} end
+                    local encoded=image and image:encodeAsURLString(true,"PNG")
+                    if image then item={id=entry.id,time=entry.time,kind="image",image=image,path=entry.path,thumb=thumbnail(image),fingerprint=hs.hash.SHA256(encoded),menuBytes=pngBytes(encoded)} end
                 end
             end
         end
@@ -167,13 +178,14 @@ function M.poll()
     for _,id in ipairs(M.config.excluded) do if bundle==id then return end end
     for _,kind in ipairs(hs.pasteboard.contentTypes() or {}) do if ignored[kind] then return end end
     local image=M.config.images and hs.pasteboard.readImage() or nil
-    local value,thumb,fingerprint
+    local value,thumb,fingerprint,bytes
     if image then
         local size=image:size()
         if size.w<=0 or size.h<=0 or size.w*size.h>25000000 then return end
         local encoded=image:encodeAsURLString(true,"PNG")
         if not encoded or #encoded>13981070 then return end
         fingerprint=hs.hash.SHA256(encoded)
+        bytes=pngBytes(encoded)
         thumb=thumbnail(image)
     else
         value=hs.pasteboard.getContents()
@@ -185,7 +197,7 @@ function M.poll()
         if value and entry.text==value or fingerprint and entry.fingerprint==fingerprint then remove(entry);table.remove(M.entries,i) end
     end
     M.nextID=M.nextID+1
-    table.insert(M.entries,1,{id=M.nextID,kind=image and "image" or "text",text=value,image=image,thumb=thumb,fingerprint=fingerprint,time=hs.timer.secondsSinceEpoch()})
+    table.insert(M.entries,1,{id=M.nextID,kind=image and "image" or "text",text=value,image=image,thumb=thumb,fingerprint=fingerprint,menuBytes=bytes,time=hs.timer.secondsSinceEpoch()})
 
 
     M.pendingHistoryWrite=true
@@ -253,11 +265,15 @@ function M.preview(id)
     end
     return nil,i18n.t("图片已过期或被清除")
 end
+function M.thumbURL(entry)
+    if entry.thumb and not entry.thumbURL then entry.thumbURL=entry.thumb:encodeAsURLString(false,"PNG") end
+    return entry.thumbURL
+end
 function M.snapshot()
     M.prune()
     local entries={}
     for _,entry in ipairs(M.entries) do
-        table.insert(entries,{id=entry.id,kind=entry.kind,time=entry.time,text=entry.text or i18n.t("图片"),preview=entry.thumb and entry.thumb:encodeAsURLString(false,"PNG") or nil})
+        table.insert(entries,{id=entry.id,kind=entry.kind,time=entry.time,text=entry.text or i18n.t("图片"),preview=M.thumbURL(entry)})
     end
     return {config=M.config,entries=entries}
 end
@@ -302,11 +318,7 @@ function M.menuItems()
         local text=entry.text and menuLabel(entry.text) or i18n.t("图片 ")..os.date("%H:%M:%S",math.floor(entry.time))
         if isImage and entry.image then
             local size=entry.image:size()
-            if not entry.menuBytes then
-                local encoded=entry.image:encodeAsURLString(true,"PNG")
-                local base64=encoded and encoded:match("base64,(.*)")
-                entry.menuBytes=base64 and math.floor(#base64*3/4)-(base64:match("==$") and 2 or base64:match("=$") and 1 or 0) or 0
-            end
+            entry.menuBytes=entry.menuBytes or pngBytes(entry.image:encodeAsURLString(true,"PNG"))
             local bytes=entry.menuBytes
             local amount=bytes<1048576 and string.format("%.0f KB",bytes/1024) or string.format("%.1f MB",bytes/1048576)
             text=string.format("%s %.0f×%.0f · %s · %s",i18n.t("图片"),size.w,size.h,amount,os.date("%m-%d %H:%M",math.floor(entry.time)))

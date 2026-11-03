@@ -436,9 +436,9 @@ local function configuredAppIcons()
     for _,id in ipairs(requestedApps) do icons[id]=appIcons.get(id) or false end
     return icons
 end
-local function applicationStates()
+local function applicationStates(icons)
     local states={}
-    for id in pairs(configuredAppIcons()) do
+    for id in pairs(icons) do
         local path=hs.application.pathForBundleID(id)
         states[id]={installed=path and hs.fs.attributes(path,"mode")=="directory" or false,name=appNames.get(id)}
     end
@@ -454,7 +454,8 @@ end
 local function reply(ok, message, action, requestID, saveBatch)
     if action=="refreshApplications" or action=="refreshBrowserStatus" or action=="refreshPermissionsSilent" or action=="prepareBrowserData" or action==nil then appIcons.clear() end
     local permission=permissionState()
-    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.translations(),general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),excludedAppNames=excludedAppNames(),appIcons=configuredAppIcons(),applicationStates=applicationStates(),popupShortcut=app.popupShortcut or false,popupShortcutDefault=defaultPopup(),popupShortcutError=app.popupShortcutError and i18n.t(app.popupShortcutError) or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}) .. ")") end
+    local icons=app.settings and configuredAppIcons()
+    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.translations(),general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),excludedAppNames=excludedAppNames(),appIcons=icons,applicationStates=applicationStates(icons),popupShortcut=app.popupShortcut or false,popupShortcutDefault=defaultPopup(),popupShortcutError=app.popupShortcutError and i18n.t(app.popupShortcutError) or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}) .. ")") end
 end
 local function showSettingsWindow(view)
     hs.dockicon.show()
@@ -552,6 +553,7 @@ function app.openSettings(section, focus)
             reply(opened,opened and i18n.t("已打开系统设置，请选择 Nivlet 并开启辅助功能权限") or i18n.t("无法打开系统设置，请手动前往隐私与安全性 → 辅助功能"),body.action)
         end
         if body.action=="refreshSystemValues" then
+            if not system.config.network then system.scan() end
             local ok,values=pcall(system.snapshot)
             app.settings:evaluateJavaScript("window.receiveSystemValues("..hs.json.encode({ok=ok,values=ok and values or {}})..")")
         end
@@ -699,7 +701,7 @@ function app.arrangeMenus()
         :setIcon(assert(hs.image.imageFromPath(root.."assets/document.on.clipboard.png")):size({w=18,h=18}),true)
         :setTooltip(i18n.t("Nivlet 剪贴板历史"))
     system.menu:removeFromMenuBar():returnToMenuBar()
-    if system.draw then system.draw() end
+    if system.draw then system.draw(true) end
 end
 if app.general.showMenu then app.arrangeMenus() end
 hs.dockIconClickCallback = function()

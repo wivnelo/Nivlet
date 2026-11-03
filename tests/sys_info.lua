@@ -12,3 +12,9 @@ M.menu={setTitle=function(self,v) title=v;return self end,setIcon=function(self,
 hs={canvas={new=function() return {appendElements=function() end,minimumTextSize=function() return {w=41.2,h=22} end,size=function(_,v) width=v.w end,elementAttribute=function(_,i,k,v) assert(i==1 and k=='frame');frame=v end,imageFromCanvas=function() return 'icon' end,delete=function() deleted=true end} end}}
 M.draw();assert(title=='' and icon=='icon' and deleted and width==44 and frame.w==44)
 print('Menu icon replaces placeholder title and releases canvas passed')
+local created=0;local new=hs.canvas.new;hs.canvas.new=function(...) created=created+1;return new(...) end
+M.draw();assert(created==0,'Unchanged speed text must not re-render the menu icon')
+M.draw(true);assert(created==1,'Forced draw re-renders after the status item is recreated')
+M.rx=2048;M.draw();assert(created==2,'Changed speed text re-renders')
+M.config.network=false;M.draw();assert(title=='ⓘ' and M.drawn==nil);M.config.network=true;M.draw();assert(created==3)
+print('Menu icon redraws only when the speed text changes or is forced passed')

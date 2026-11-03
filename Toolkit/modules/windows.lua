@@ -34,7 +34,7 @@ local function remember(window,screen)
     end
 end
 function M.run(action, window)
-    if require("modules.permissions").snapshot().accessibility~="granted" then return false, i18n.t("请在通用设置中检查并开启辅助功能权限") end
+    if not require("modules.permissions").isGranted() then return false, i18n.t("请在通用设置中检查并开启辅助功能权限") end
     local w = window or hs.window.focusedWindow()
     if not w or not w:isStandard() or w:isFullScreen() then return false, i18n.t("请选择可调整的普通窗口") end
     local screen=w:screen()

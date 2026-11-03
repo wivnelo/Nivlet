@@ -21,7 +21,7 @@ function M.save(value)
 
 
     M.menu:setMenu(nil):setMenu(M.menuItems)
-    M.draw()
+    M.draw();if M.timer then M.schedule() end
     return true,i18n.t("系统信息设置已保存")
 end
 function M.speed(bytes)
@@ -80,9 +80,9 @@ local function readings()
     table.insert(menu,copyItem("Lunar",M.lunar))
     return menu
 end
+local prefixes={CPU="cpu",MEM="memory",Disk="disk",LAN="ipv4",IPv6="ipv6",Date="date",Lunar="lunar"}
 function M.snapshot()
     local values={}
-    local prefixes={CPU="cpu",MEM="memory",Disk="disk",LAN="ipv4",IPv6="ipv6",Date="date",Lunar="lunar"}
     for _,item in ipairs(readings()) do
         local prefix,value=item.title:match("^(%w+): (.*)$")
         local field=prefixes[prefix]
@@ -95,7 +95,6 @@ function M.snapshot()
 end
 function M.menuItems()
     local menu=readings()
-    local prefixes={CPU="cpu",MEM="memory",Disk="disk",LAN="ipv4",IPv6="ipv6",Date="date",Lunar="lunar"}
     local labels={cpu="CPU 使用率",memory="内存使用率",disk="磁盘使用率",ipv4="局域网 IPv4",ipv6="IPv6 地址",date="公历与星期",lunar="农历"}
     local filtered={}
     for _,item in ipairs(menu) do
@@ -114,9 +113,11 @@ function M.menuItems()
     table.insert(filtered,{title=i18n.t("系统信息设置…"),fn=M.openSettings})
     return filtered
 end
-function M.draw()
-    if not M.config.network then M.menu:setIcon(nil):setTitle("ⓘ");return end
+function M.draw(force)
+    if not M.config.network then M.drawn=nil;M.menu:setIcon(nil):setTitle("ⓘ");return end
     local text="▲ "..M.speed(M.tx).."\n▼ "..M.speed(M.rx)
+    if text==M.drawn and not force then return end
+    M.drawn=text
     local canvas=hs.canvas.new({x=0,y=0,w=90,h=22})
     canvas:appendElements({type="text",text=text,textSize=9,textColor={white=0},frame={x=0,y=0,w=90,h=22}})
     local width=math.ceil(canvas:minimumTextSize(1,text).w)+2
@@ -137,6 +138,12 @@ function M.scan()
     end)
     if M.task then M.task:start() end
 end
+function M.schedule()
+    local interval=M.config.network and 2 or 60
+    if M.timer and M.interval==interval then return end
+    if M.timer then M.timer:stop() end
+    M.interval=interval;M.timer=hs.timer.doEvery(interval,M.scan)
+end
 function M.start(openSettings)
     M.openSettings=openSettings
     M.config=M.validate(hs.settings.get(settingsKey)) or M.defaults()
@@ -147,6 +154,6 @@ function M.start(openSettings)
     end
     M.menu=hs.menubar.new(true,"NivletSystemInfo"):setTitle("▲ — / ▼ —"):setTooltip(i18n.t("Nivlet 系统信息"))
     M.menu:setMenu(M.menuItems)
-    M.draw();M.scan();M.timer=hs.timer.doEvery(2,M.scan)
+    M.draw();M.scan();M.schedule()
 end
 return M

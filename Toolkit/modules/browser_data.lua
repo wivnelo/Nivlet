@@ -16,7 +16,7 @@ function M.open(id,done)
     local browser=catalog.get(id)
     local path=browser and hs.application.pathForBundleID(id)
     if not browser or not browser.clearDataAdapter or not path or hs.fs.attributes(path,"mode")~="directory" then done(false,i18n.t("浏览器未安装或暂不支持"));return end
-    if permissions.snapshot().accessibility~="granted" then done(false,i18n.t("请在通用设置中检查并开启辅助功能权限"));return end
+    if not permissions.isGranted() then done(false,i18n.t("请在通用设置中检查并开启辅助功能权限"));return end
     if not hs.application.launchOrFocusByBundleID(id) then done(false,i18n.t("无法启动浏览器"));return end
     local attempts=0
     pending=hs.timer.doEvery(0.2,function()
