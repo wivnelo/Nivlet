@@ -4,7 +4,7 @@
 
 当前正式版本为 [2.0.2 / Build 62](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.2)，macOS 13+、Apple Silicon（arm64）。产品源码 `b9db87155ddff5425a45dd00e43f8a98feb45e28`；发行 tag 在该提交上增加公开说明，不把文档变动计为产品差异。
 
-2.0.2 只做性能优化：菜单栏网速图标按需重绘；关闭网速显示时后台采集改为每 60 秒；剪贴板轮询减少重复工作。设置项、界面、配置格式和权限不变。公开附件回核结果见[版本说明](documentation/RELEASE-v2.0.2.md)。
+2.0.2 只做性能优化：菜单栏网速图标按需重绘；关闭网速显示时后台采集改为每 60 秒；剪贴板轮询减少重复工作。设置项、界面、配置格式和权限不变。正式 tag `v2.0.2` 指向 `756c38f22e328b07e547dee749dce077521b9b11`；三份公开附件已匿名下载并与已验收产物逐字节比对，下载 App 的签名、票据及 Gatekeeper 检查通过，arm64 appcast 已发布。
 
 上一版 [2.0.1 / Build 61](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.1) 增加保持唤醒与屏幕长亮、统一浏览器资料并移除 MAC 地址项，记录见 [2.0.1 版本说明](documentation/RELEASE-v2.0.1.md)。
 
