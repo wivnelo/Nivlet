@@ -4,7 +4,7 @@
 
 当前正式版本为 [2.0.3 / Build 63](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.3)，macOS 13+、Apple Silicon（arm64）。产品源码 `bc139047501518faea736f53825295759cf36beb`；发行 tag 在该提交上增加公开说明，不把文档变动计为产品差异。
 
-2.0.3 缩小运行时：移除 Nivlet 无法访问的 Hammerspoon 扩展与 `hs` 命令行，API 文档清空为 `[]`；安装后约 24.8 MB（2.0.2 为 40.5 MB），ZIP 8.65 MB、DMG 9.21 MB。功能、设置、界面、配置格式与权限不变。同版还统一快捷键校验、合并运行时补丁（18 → 10），并加入 CI。公开附件回核结果见[版本说明](documentation/RELEASE-v2.0.3.md)。
+2.0.3 缩小运行时：移除 Nivlet 无法访问的 Hammerspoon 扩展与 `hs` 命令行，API 文档清空为 `[]`；安装后约 24.8 MB（2.0.2 为 40.5 MB），ZIP 8.65 MB、DMG 9.21 MB。功能、设置、界面、配置格式与权限不变。同版还统一快捷键校验、合并运行时补丁（18 → 10），并加入 CI。正式 tag `v2.0.3` 指向 `29d63129d9cfe7856f5fff3a6f1c71c15e1b8923`；三份公开附件已匿名下载并与已验收产物逐字节比对，下载 App 的签名、票据及 Gatekeeper 检查通过，arm64 appcast 已发布。
 
 上一版 [2.0.2 / Build 62](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.2) 为后台性能优化，记录见 [2.0.2 版本说明](documentation/RELEASE-v2.0.2.md)。
 
