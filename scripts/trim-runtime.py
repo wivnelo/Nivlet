@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Remove Hammerspoon extensions, the IPC tool and API docs that Nivlet cannot reach.
+"""Remove Hammerspoon extensions and the IPC tool that Nivlet cannot reach; empty the API docs.
 
 Run before signing. Only the listed paths are removed; every one must exist, and no
-remaining Mach-O may link a removed dylib. Unlisted modules are always kept, so a
+remaining Mach-O may link a removed dylib. The core passes docs.json's path to Lua at
+launch, so the API docs become empty JSON arrays instead of being deleted. Unlisted
+modules are always kept, so a
 runtime update cannot silently widen the removal. tests/runtime_trim.py checks that
 Toolkit never references a removed module.
 """
@@ -21,9 +23,9 @@ LIBRARIES = (
     'libdistributednotifications.dylib', 'libhid.dylib', 'libhints.dylib',
     'libhttpserver.dylib', 'libipc.dylib', 'liblocation.dylib', 'liblsqlite3.dylib',
     'libmarkdown.dylib', 'libmidi.dylib', 'libmilight.dylib', 'libnoises.dylib',
-    'libnotify.dylib', 'libpathwatcher.dylib', 'libplist.dylib', 'librazer.dylib',
+    'libnotify.dylib', 'libpathwatcher.dylib', 'librazer.dylib',
     'libserial.dylib', 'libshortcuts.dylib', 'libsocket.dylib', 'libsocketudp.dylib',
-    'libspaces.dylib', 'libspaces_watcher.dylib', 'libspeech.dylib', 'libspeechlistener.dylib',
+    'libspeech.dylib', 'libspeechlistener.dylib',
     'libstreamdeck.dylib', 'libusb.dylib', 'libusbwatcher.dylib', 'libwifi.dylib',
     'libwifiwatcher.dylib',
 )
@@ -34,19 +36,22 @@ EXTENSIONS = (
     'hints.lua', 'hsdocs', 'httpserver.lua', 'httpserver_hsminweb.lua', 'ipc.lua',
     'itunes.lua', 'javascript.lua', 'layout.lua', 'location.lua', 'location_geocoder.lua',
     'messages.lua', 'midi.lua', 'milight.lua', 'mjomatic.lua', 'noises.lua', 'notify.lua',
-    'pathwatcher.lua', 'plist.lua', 'razer.lua', 'redshift.lua', 'serial.lua', 'shortcuts.lua',
-    'socket.lua', 'spaces.lua', 'speech.lua', 'spoons.lua', 'spotify.lua', 'sqlite3.lua',
+    'pathwatcher.lua', 'razer.lua', 'serial.lua', 'shortcuts.lua',
+    'socket.lua', 'speech.lua', 'spoons.lua', 'spotify.lua', 'sqlite3.lua',
     'streamdeck.lua', 'tabs.lua', 'tangent.lua', 'usb.lua', 'vox.lua', 'wifi.lua',
 )
-RESOURCES = ('docs.json', 'lua.json')
+EMPTIED = ('docs.json', 'lua.json')
 TOOLS = ('hs',)
 
 
 def planned_paths(app):
     contents = app / 'Contents'
     return ([contents / 'Frameworks/hs' / name for name in LIBRARIES + TOOLS]
-            + [contents / 'Resources/extensions/hs' / name for name in EXTENSIONS]
-            + [contents / 'Resources' / name for name in RESOURCES])
+            + [contents / 'Resources/extensions/hs' / name for name in EXTENSIONS])
+
+
+def emptied_paths(app):
+    return [app / 'Contents/Resources' / name for name in EMPTIED]
 
 
 def size(path):
@@ -63,13 +68,16 @@ def trim(app):
     if plistlib.loads(info.read_bytes()).get('CFBundleIdentifier') != 'dev.local.DesktopToolkit':
         raise ValueError('Expected the Nivlet app bundle')
     planned = planned_paths(app)
-    missing = [str(path.relative_to(app)) for path in planned if not path.exists() or path.is_symlink()]
+    emptied = emptied_paths(app)
+    missing = [str(path.relative_to(app)) for path in planned + emptied if not path.exists() or path.is_symlink()]
     if missing:
         raise ValueError('Expected runtime paths are missing: ' + ', '.join(missing))
     removed = {path.name for path in planned if path.suffix == '.dylib'}
-    removed_bytes = sum(size(path) for path in planned)
+    removed_bytes = sum(size(path) for path in planned) + sum(size(path) - 3 for path in emptied)
     for path in planned:
         shutil.rmtree(path) if path.is_dir() else path.unlink()
+    for path in emptied:
+        path.write_bytes(b'[]\n')
     for path in app.rglob('*'):
         if path.is_symlink() or not path.is_file() or path.suffix not in {'.dylib', ''}:
             continue
@@ -80,7 +88,7 @@ def trim(app):
         broken = sorted(name for name in removed if '/' + name + ' ' in linked)
         if broken:
             raise ValueError(str(path.relative_to(app)) + ' links removed ' + ', '.join(broken))
-    return {'removedPaths': len(planned), 'removedBytes': removed_bytes}
+    return {'removedPaths': len(planned), 'emptiedPaths': len(emptied), 'removedBytes': removed_bytes}
 
 
 if __name__ == '__main__':

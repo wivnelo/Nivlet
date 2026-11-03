@@ -19,14 +19,15 @@ for path in list((root / 'Toolkit').rglob('*.lua')) + [root / 'Toolkit/settings.
     used |= {match.split('.')[0] for match in re.findall(r'\bhs\.([A-Za-z_][\w.]*)', source)}
 conflicts = sorted(used & removed)
 assert not conflicts, 'Toolkit references removed runtime modules: ' + ', '.join(conflicts)
-for required in ('network', 'network_configuration', 'window', 'webview', 'pasteboard', 'axuielement', 'doc'):
+for required in ('network', 'network_configuration', 'window', 'window_filter', 'spaces', 'spaces_watcher', 'plist', 'redshift',
+                 'webview', 'pasteboard', 'axuielement', 'doc'):
     assert required not in removed, required + ' must stay bundled'
 
 with tempfile.TemporaryDirectory(prefix='nivlet-trim-test-') as directory:
     app = Path(directory) / 'Nivlet.app'
     (app / 'Contents').mkdir(parents=True)
     (app / 'Contents/Info.plist').write_bytes(plistlib.dumps({'CFBundleIdentifier': 'dev.local.DesktopToolkit'}))
-    for path in trim.planned_paths(app):
+    for path in trim.planned_paths(app) + trim.emptied_paths(app):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.mkdir() if path.suffix == '' and path.parent.name == 'hs' and path.name != 'hs' else path.write_bytes(b'x')
     kept = app / 'Contents/Frameworks/hs/libwindow.dylib'
@@ -44,4 +45,5 @@ with tempfile.TemporaryDirectory(prefix='nivlet-trim-test-') as directory:
     result = trim.trim(app)
     assert result['removedPaths'] == len(trim.planned_paths(app))
     assert not any(path.exists() for path in trim.planned_paths(app)) and kept.read_bytes() == b'kept'
-print('Runtime trim keeps Toolkit modules, refuses missing paths without partial removal and removes only listed paths')
+    assert all(path.read_bytes() == b'[]\n' for path in trim.emptied_paths(app)), 'API docs must stay as empty JSON'
+print('Runtime trim keeps Toolkit modules, refuses missing paths without partial removal, removes only listed paths and keeps empty API docs')
