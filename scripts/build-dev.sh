@@ -34,6 +34,7 @@ sh "$project_dir/scripts/prepare-updater.sh" "$app_path"
 python3 "$project_dir/scripts/collect-notices.py" "$app_path/Contents/Resources/Toolkit/THIRD-PARTY-NOTICES.md"
 xcrun clang -fobjc-arc -Wall -Wextra -Werror -arch "$architecture" -mmacosx-version-min=13.0 -framework Foundation "$project_dir/Native/system_probe.m" -o "$app_path/Contents/Resources/Toolkit/system-probe"
 python3 "$project_dir/scripts/optimize-app.py" "$app_path" "$configuration" "$architecture"
+python3 "$project_dir/scripts/trim-runtime.py" "$app_path"
 if [ "$configuration" = Release ]; then
     python3 "$project_dir/scripts/trim-distribution.py" "$app_path"
 fi

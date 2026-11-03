@@ -27,9 +27,9 @@ class PrivacyTests(unittest.TestCase):
 
     def test_runtime_examples_only_in_known_resources(self):
         value = b"/" + b"Users/username/Documents"
-        self.assertEqual(privacy.inspect(value, "Contents/Resources/docs.json", bundle=True), [])
+        self.assertEqual(privacy.inspect(value, "Contents/Resources/extensions/hs/spotlight.lua", bundle=True), [])
         self.assertIn("personal-home-path", privacy.inspect(value, "Contents/MacOS/Nivlet", bundle=True))
-        self.assertIn("personal-home-path", privacy.inspect(b"/" + b"Users/real-person/a", "Contents/Resources/docs.json", bundle=True))
+        self.assertIn("personal-home-path", privacy.inspect(b"/" + b"Users/real-person/a", "Contents/Resources/extensions/hs/spotlight.lua", bundle=True))
 
     def test_credentials_and_symbol_false_positive(self):
         self.assertIn("credential", privacy.inspect(b"token=" + b"ghp_" + b"x" * 36, "settings.json"))

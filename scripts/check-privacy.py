@@ -8,7 +8,7 @@ import sys
 import zipfile
 
 HOME_PATH = re.compile(rb"(?:/" + rb"Users/|/" + rb"home/|[A-Z]:\\Users\\)([^/\\\s\x00\"'<>]+)")
-EXAMPLE_FILES = {"Contents/Resources/docs.json", "Contents/Resources/extensions/hs/spotlight.lua"}
+EXAMPLE_FILES = {"Contents/Resources/extensions/hs/spotlight.lua"}
 PATTERNS = {
     "private-key": re.compile(rb"-----BEGIN (?:[A-Z ]*PRIVATE KEY|OPENSSH PRIVATE KEY)-----"),
     "credential": re.compile(rb"(?<![A-Za-z0-9_])(?:gh[pousr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[A-Z0-9]{16}|sk-(?:proj-)?[A-Za-z0-9_-]{20,}|xox[baprs]-[A-Za-z0-9-]{15,}|[0-9]{8,12}:[A-Za-z0-9_-]{35})(?![A-Za-z0-9_])"),

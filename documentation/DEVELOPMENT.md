@@ -23,7 +23,8 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=arm64 NIVLE
 - 本次及后续正式包只构建 arm64。主程序、system-probe 和全部内嵌 Mach-O 必须具有且仅保留 arm64 切片；缺少切片时停止。
 - Release 主程序去除调试符号前，必须验证外部 dSYM 的 UUID 匹配；保留导出符号。dSYM 不进入 ZIP/DMG。
 - 发行副本在签名前裁剪明确的框架开发 Headers、PrivateHeaders、Modules 及对应顶层符号链接，保留运行库、Resources、版本链接、XPC、更新器和许可证。源码依赖保持完整。
-- 关于页 PNG 使用 160 × 160 资源；品牌图、Dock 和菜单栏资源保持原样。不为缩小体积删功能或运行模块。
+- 关于页 PNG 使用 160 × 160 资源；品牌图、Dock 和菜单栏资源保持原样。不为缩小体积删除 Nivlet 的功能。
+- `scripts/trim-runtime.py` 在签名前移除 Nivlet 无法访问的 Hammerspoon 扩展（相机、定位、语音、HID/USB/MIDI、IPC 与 `hs` 命令行、HTTP 服务器、文档浏览器等）及 API 文档 `docs.json`/`lua.json`，约 16.9 MB。只删除脚本中明确列出的路径，任一路径缺失或剩余 Mach-O 链接被删 dylib 即停止；未列出的模块一律保留。`tests/runtime_trim.py` 确保 Toolkit 不引用被删模块。新增 Toolkit 功能需用到被删模块时，先从列表移除再使用。
 - 最终体积以同架构 ZIP 与 App 实测比较为准；停止打 Intel 包与单个 ARM 包的压缩收益分别说明。
 
 ## 回归与隐私检查
