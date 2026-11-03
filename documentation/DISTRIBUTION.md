@@ -1,6 +1,6 @@
 # Nivlet for Mac 分发与验收
 
-当前发行：**2.0.1 / Build 61**，macOS 13+、仅 Apple Silicon（arm64）。[版本说明](RELEASE-v2.0.1.md)记录源码、范围、校验值和验证边界。历史 GitHub 版本及附件保留，1.0.8 / Build 55 是最后 Intel 版。
+当前发行：**2.0.2 / Build 62**，macOS 13+、仅 Apple Silicon（arm64）。[版本说明](RELEASE-v2.0.2.md)记录源码、范围、校验值和验证边界。历史 GitHub 版本及附件保留，1.0.8 / Build 55 是最后 Intel 版。
 
 ## 官方流程
 
@@ -12,16 +12,16 @@
 6. 用户授权发布后上传版本 tag 和 ZIP/DMG/SHA-256；重新下载附件核对，再将已验证 feed 与官网状态发布到 `main` 的 `docs/`，回查 GitHub Pages 和 CI。
 7. 不上传个人配置、私钥、公证凭据、内部日志或私人截图。不将静态前端测试写成原生或跨设备验证，不将停止 Intel 构建写成 ARM 包体减半。
 
-## 2.0.1 / Build 61 命令
+## 2.0.2 / Build 62 命令
 
 ```sh
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=arm64 NIVLET_BUILD_NUMBER=61 NIVLET_DERIVED_DATA_PATH="$PWD/build/release-2.0.1-build61/arm64/DerivedData" sh scripts/build-release.sh
-NIVLET_SIGN_IDENTITY=签名身份 NIVLET_TEAM_ID=团队标识 NIVLET_NOTARY_PROFILE=钥匙串配置 NIVLET_BUILD_NUMBER=61 NIVLET_RELEASE_DIR=build/release-2.0.1-build61 python3 scripts/sign-notarize.py arm64
-python3 scripts/generate-update-feed.py build/release-2.0.1-build61/dist/Nivlet-2.0.1-build61-arm64.zip --output build/release-2.0.1-build61/appcast-candidate.xml
-python3 tests/updates.py --build 61 --dist build/release-2.0.1-build61/dist --appcast build/release-2.0.1-build61/appcast-candidate.xml
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=arm64 NIVLET_BUILD_NUMBER=62 NIVLET_DERIVED_DATA_PATH="$PWD/build/release-2.0.2-build62/arm64/DerivedData" sh scripts/build-release.sh
+NIVLET_SIGN_IDENTITY=签名身份 NIVLET_TEAM_ID=团队标识 NIVLET_NOTARY_PROFILE=钥匙串配置 NIVLET_BUILD_NUMBER=62 NIVLET_RELEASE_DIR=build/release-2.0.2-build62 python3 scripts/sign-notarize.py arm64
+python3 scripts/generate-update-feed.py build/release-2.0.2-build62/dist/Nivlet-2.0.2-build62-arm64.zip --output build/release-2.0.2-build62/appcast-candidate.xml
+python3 tests/updates.py --build 62 --dist build/release-2.0.2-build62/dist --appcast build/release-2.0.2-build62/appcast-candidate.xml
 ```
 
-构建目录可自定义，已有输出拒绝覆盖。已验收的 Build 61 包不得只因文档更新而重签名或换包；发行源码的产品文件必须保持与该包一致。应用内更新仍为手动检查、用户确认安装；完整新版本 Sparkle 安装需单独证据。
+构建前确认 `vendor/hammerspoon` 与按 `scripts/fetch-runtime.sh` 重建的结果一致；不一致时在中性临时目录重建运行时后构建，不覆盖现有 vendor。构建目录可自定义，已有输出拒绝覆盖。已验收的 Build 62 包不得只因文档更新而重签名或换包；发行源码的产品文件必须保持与该包一致。应用内更新仍为手动检查、用户确认安装；完整新版本 Sparkle 安装需单独证据。
 
 ## 历史发行说明
 

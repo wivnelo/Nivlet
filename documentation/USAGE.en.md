@@ -1,8 +1,8 @@
-> This guide covers 2.0.1 / Build 61, macOS 13+, Apple Silicon (arm64). Version 1.0.8 Build 55 remains the final Intel release.
+> This guide covers 2.0.2 / Build 62, macOS 13+, Apple Silicon (arm64). Version 1.0.8 Build 55 remains the final Intel release.
 
 # Nivlet User Guide
 
-See the [release notes](RELEASE-v2.0.1.md) for changes and verification boundaries. Signing and notarization do not grant Accessibility access. See the [installation guide](INSTALLATION.en.md).
+See the [release notes](RELEASE-v2.0.2.md) for changes and verification boundaries. Signing and notarization do not grant Accessibility access. See the [installation guide](INSTALLATION.en.md).
 
 [Back to README](../README.md) · [简体中文](USAGE.md)
 

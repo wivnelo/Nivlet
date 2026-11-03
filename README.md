@@ -92,7 +92,7 @@ Enable the tools you need. Window and app shortcuts are configurable; the clipbo
 
 ## Release and architecture support
 
-**[2.0.1 / Build 61](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.1) is now available for Apple Silicon (arm64), macOS 13.0+.** The final packages are Developer ID signed and notarized by Apple. Public downloads match the verified release artifacts. See the [release notes](documentation/RELEASE-v2.0.1.md).
+**[2.0.2 / Build 62](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.2) is now available for Apple Silicon (arm64), macOS 13.0+.** The final packages are Developer ID signed and notarized by Apple. See the [release notes](documentation/RELEASE-v2.0.2.md).
 
 **[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) is the final Intel (x86_64) release.** Its existing signed and notarized downloads remain available. New releases will no longer build or support Intel; no Intel hardware validation is claimed for 2.0.0.
 
@@ -124,4 +124,4 @@ Nivlet uses the [MIT License](LICENSE). Its embedded Runtime is based on [Hammer
 
 Version 2.0.0 unifies all eight settings pages with a sidebar, adds local `.html`/`.htm` routing and saves drafts across pages together. Clipboard recording uses one enable switch; its menu shortcut uses an enable switch for ⌘⇧V, while existing custom shortcuts are preserved until that switch is changed and saved. Click a thumbnail, or focus it and press Enter or Space, to open an image preview; click outside the image within Nivlet or press Escape to close it. Existing HTTP/HTTPS routing remains in scope; see [detailed changes, migration rules, package sizes and validation gates](documentation/RELEASE-v2.0.0.md).
 
-Version 2.0.1 adds the two power switches and browser icon/Brave clear-dialog refinements, and removes the unused MAC address display. [Release details](documentation/RELEASE-v2.0.1.md).
+Version 2.0.2 reduces background work: the menu bar speed icon redraws only when it changes, sampling slows to once a minute when the speed display is off, and clipboard polling does less repeated work. No features or settings change. [Release details](documentation/RELEASE-v2.0.2.md). Version 2.0.1 added the two power switches and browser refinements ([details](documentation/RELEASE-v2.0.1.md)).

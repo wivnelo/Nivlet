@@ -1,4 +1,8 @@
-# 当前验收：2.0.1 / Build 61
+# 当前验收：2.0.2 / Build 62
+
+36 个 Lua 回归、命令行 JS/Python 检查、`release_architecture`/`signing_preflight` 及隐私扫描通过。35 组设置页 UI 测试在隔离 WKWebView 中以简中、繁中、英文、日文 × 浅色/深色及 620 点窄窗口运行，共 350 项通过；测试数据取自 `scripts/test-settings-ui.cjs` 的夹具，原生桥不执行操作。同一产品改动的本机 Developer ID 签名测试版替换 2.0.1 运行，日志无错误。最终 App/DMG 签名、公证 Accepted、票据、Gatekeeper 及 101 个 arm64 Mach-O 检查通过；appcast 版本、SHA-256、EdDSA 签名与篡改拒绝通过。菜单栏重绘、采集间隔与剪贴板轮询由 Lua 单元测试覆盖，非原生端到端测量。见 [2.0.2 版本说明](RELEASE-v2.0.2.md)。
+
+## 历史验收：2.0.1 / Build 61
 
 54 个回归文件、408 项隔离 UI/布局检查及独立代码复审通过；最终 App/DMG 签名、公证、票据、Gatekeeper 及 arm64 架构检查通过。31 个偏好键在最终安装前后语义无变化；原生与用户人工验收范围、未测试边界、源码及附件校验值见 [2.0.1 版本说明](RELEASE-v2.0.1.md)。不上传内部日志、用户配置或原始截图。
 

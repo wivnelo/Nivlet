@@ -1,14 +1,14 @@
 # Nivlet 当前基准
 
-更新日期：2026-11-02。
+更新日期：2026-11-03。
 
-当前正式版本为 [2.0.1 / Build 61](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.1)，macOS 13+、Apple Silicon（arm64）。产品源码 `9ddcbf9dd6ac951463a9c0c8ed929357c44996c9` 与已安装验收包的产品文件一致；发行 tag 在该提交上增加公开说明和媒体，不把文档变动计为产品差异。
+当前正式版本为 [2.0.2 / Build 62](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.2)，macOS 13+、Apple Silicon（arm64）。产品源码 `b9db87155ddff5425a45dd00e43f8a98feb45e28`；发行 tag 在该提交上增加公开说明，不把文档变动计为产品差异。
 
-正式 tag `v2.0.1` 指向 `5cbdbbf98c154d55cc2120c5f2ceac1bf5372469`；三份公开附件已匿名下载并与已验收产物逐字节比对，通过下载 App 的签名、票据及 Gatekeeper 检查。10 个既有历史 Release 及附件元数据保持不变。
+2.0.2 只做性能优化：菜单栏网速图标按需重绘；关闭网速显示时后台采集改为每 60 秒；剪贴板轮询减少重复工作。设置项、界面、配置格式和权限不变。公开附件回核结果见[版本说明](documentation/RELEASE-v2.0.2.md)。
 
-本次范围：保持唤醒与保持屏幕长亮两个默认关闭的开关；统一五款已知浏览器的资料和图标、增加 Brave 原生清理确认入口；移除 MAC 地址行及对应设置。保持 2.0.0 已确认的其他功能和设计。没有亮度调节。
+上一版 [2.0.1 / Build 61](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.1) 增加保持唤醒与屏幕长亮、统一浏览器资料并移除 MAC 地址项，记录见 [2.0.1 版本说明](documentation/RELEASE-v2.0.1.md)。
 
-54 个回归文件、408 项隔离 UI/布局检查、独立审阅和本机安装核验通过。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper。31 个偏好键在最终升级前后语义无变化；未测试的物理时序、其他设备和完整更新安装路径如实列于[版本说明](documentation/RELEASE-v2.0.1.md)。
+36 个 Lua 回归、命令行 JS/Python 检查、隐私扫描及 350 项隔离 WKWebView UI 检查（四语言 × 深浅色，含 620 点窄窗口）通过；同一产品改动的本机签名测试版替换 2.0.1 运行无错误。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper。未测试边界见[版本说明](documentation/RELEASE-v2.0.2.md)。
 
 官网来源为 `docs/`，中英文媒体使用真实前端与合成数据，不代表原生录像。知识库由独立同步流程维护，不包含私人配置、凭据或安装包。历史 GitHub 发行保留；1.0.8 / Build 55 为最后 Intel 版。
 

@@ -1,6 +1,10 @@
 # Nivlet 会话交接 · 2026-11-02
 
-## 当前状态 · 2.0.1 / Build 61
+## 当前状态 · 2.0.2 / Build 62
+
+性能优化版，无新功能。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.0.2 版本说明](documentation/RELEASE-v2.0.2.md)。产品源码 `b9db871`，仅 Apple Silicon。本地 `vendor/hammerspoon` 曾落后于当前补丁，本次正式包在中性临时目录按 `fetch-runtime.sh` 重建运行时后构建；下次构建前先核对或重建 vendor。
+
+## 历史 · 2.0.1 / Build 61
 
 当前范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.0.1 版本说明](documentation/RELEASE-v2.0.1.md)。产品源码 `9ddcbf9`，仅 Apple Silicon；本次不改变 2.0.0 已确认的其他功能。知识库另行同步，不复制内部测试记录或用户数据。
 

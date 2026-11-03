@@ -1,12 +1,12 @@
 # Nivlet 发布与推广用语
 
-适用正式版本：2.0.1 / Build 61。
+适用正式版本：2.0.2 / Build 62。
 
 ## 简短介绍
 
 Nivlet 是免费开源的 macOS 桌面工具箱，提供窗口布局、文字与图片剪贴板历史、应用快捷启动、按应用切换输入法、浏览器分流和菜单栏系统信息。无需账号，核心功能在本机运行。
 
-2.0.1 增加保持唤醒与保持屏幕长亮、统一浏览器图标并支持打开 Brave 清理确认框，移除 MAC 地址展示；保留八页设置及四语言。新版本仅支持 Apple Silicon（arm64）与 macOS 13+；[1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后 Intel 版，历史下载保留。
+2.0.2 减少菜单栏和剪贴板的后台开销，功能不变。2.0.1 增加保持唤醒与保持屏幕长亮、统一浏览器图标并支持打开 Brave 清理确认框，移除 MAC 地址展示；保留八页设置及四语言。新版本仅支持 Apple Silicon（arm64）与 macOS 13+；[1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后 Intel 版，历史下载保留。
 
 - 官网：https://wivnelo.github.io/Nivlet/
 - 源码：https://github.com/wivnelo/Nivlet
