@@ -33,12 +33,10 @@ jobs:
           sh scripts/fetch-sparkle.sh
 
       - name: Command-line tests and privacy scan
-        env:
-          GIT_AUTHOR_NAME: wivnelo
-          GIT_AUTHOR_EMAIL: 29271004+wivnelo@users.noreply.github.com
-          GIT_COMMITTER_NAME: wivnelo
-          GIT_COMMITTER_EMAIL: 29271004+wivnelo@users.noreply.github.com
-        run: sh scripts/run-tests.sh
+        run: |
+          git config --global user.name wivnelo
+          git config --global user.email 29271004+wivnelo@users.noreply.github.com
+          sh scripts/run-tests.sh
 
       - name: Settings UI regression
         run: |
