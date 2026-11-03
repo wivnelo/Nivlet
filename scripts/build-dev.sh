@@ -7,6 +7,7 @@ case "$architecture" in arm64) ;; *) echo "New Nivlet builds require Apple Silic
 derived_data=${NIVLET_DERIVED_DATA_PATH:-"$project_dir/build/DerivedData"}
 case "$configuration" in Debug|Release) ;; *) echo "Unsupported build configuration: $configuration" >&2; exit 1 ;; esac
 sh "$project_dir/scripts/preflight.sh"
+sh "$project_dir/scripts/check-runtime.sh"
 upstream_dir="$project_dir/vendor/hammerspoon"
 # Refuse an older prepared Runtime rather than silently omitting the power bridge.
 git -C "$upstream_dir" apply --reverse --check "$project_dir/patches/nivlet-keep-awake.patch"

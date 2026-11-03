@@ -15,8 +15,8 @@ runtime = Path(os.environ.get('NIVLET_RUNTIME_SOURCE', root / 'vendor/hammerspoo
 relative = Path('extensions/urlevent/liburlevent.m')
 delegate_relative = Path('Hammerspoon/MJAppDelegate.m')
 patch = root / 'patches/browser-file-url.patch'
-fetch = (root / 'scripts/fetch-runtime.sh').read_text()
-assert fetch.index('patches/browser-file-url.patch') > fetch.index('patches/browser-url-only.patch')
+series = (root / 'patches/series').read_text().split()
+assert series.index('browser-file-url.patch') > series.index('browser-url-only.patch')
 
 with tempfile.TemporaryDirectory(prefix='nivlet-file-url-test-') as directory:
     work = Path(directory)

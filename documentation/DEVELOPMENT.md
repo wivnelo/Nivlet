@@ -29,12 +29,12 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=arm64 NIVLE
 ## 回归与隐私检查
 
 ```sh
-for test_file in tests/*.lua; do lua "$test_file" || exit 1; done
-python3 tests/browser_file_url.py
-python3 tests/privacy.py
-node tests/launcher_replace.js
+sh scripts/check-runtime.sh
+sh scripts/run-tests.sh
 git diff --check
 ```
+
+`run-tests.sh` 运行全部 Lua、Python（`updates.py` 需发行产物，单独运行）、非 UI 的 JS 测试和隐私扫描。`check-runtime.sh` 按 `patches/series` 在临时工作树重建运行时并与 `vendor/hammerspoon` 比对；不一致时 `build-dev.sh` 停止，需移走旧目录后重新运行 `scripts/fetch-runtime.sh`。补丁顺序只在 `patches/series` 维护。GitHub Actions（`.github/workflows/tests.yml`）在每次推送和 PR 时重建运行时并运行上述测试及四语言 × 深浅色设置页 UI 回归。
 
 原生文件路径探针只处理隔离测试文件，不打开用户文件或修改默认应用。UI 回归应使用合成配置，实机测试不得覆盖用户草稿。完整验收状态按最终候选记录，不能把旧包或其他架构的结果用于本次。
 

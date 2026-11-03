@@ -21,7 +21,7 @@ if set(parsed) != {apple_events} or parsed[apple_events] is not True:
     sys.exit("Unexpected entitlements: " + repr(parsed))
 
 runtime = "Hammerspoon/Hammerspoon.entitlements"
-for name in ["scripts/fetch-runtime.sh", "scripts/build-dev.sh"]:
+for name in ["scripts/apply-runtime-patches.sh", "scripts/build-dev.sh"]:
     installed = False
     for line in (root / name).read_text(encoding="utf-8").splitlines():
         if (
