@@ -1,4 +1,5 @@
 local i18n=require("modules.i18n")
+local preferences=require("modules.preferences")
 local M={version=1,names={"general","windows","input","clipboard","popupShortcut","system","browser","launcher"}}
 local function copy(value)
     if type(value)~="table" then return value end
@@ -79,7 +80,7 @@ function M.new(adapters,environment)
         local signatures={}
         local function check(item,active)
             if not item or item==false then return true end
-            local signature=table.concat(item.mods,"+").."+"..item.key
+            local signature=preferences.signature(item)
             if signatures[signature] then return false,i18n.t("配置中存在跨模块快捷键冲突：")..signature end
             signatures[signature]=true
             if active and environment.systemAssigned(item) then return false,i18n.t("快捷键被系统占用：")..signature end

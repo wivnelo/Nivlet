@@ -4,6 +4,13 @@ function M.systemAssigned(mods,key)
     local assigned=hs.hotkey.systemAssigned(mods,key)
     return assigned==true or type(assigned)=="table" and assigned.enabled==true
 end
+function M.bindable(mods,key)
+    return not M.systemAssigned(mods,key) and hs.hotkey.assignable(mods,key)
+end
+function M.signature(item) return table.concat(item.mods,"+").."+"..item.key end
+function M.same(a,b)
+    return a and b and a.key==b.key and table.concat(a.mods,"+")==table.concat(b.mods,"+")
+end
 local actions = require("modules.windows").actions
 function M.defaults() return {enabled=false, shortcuts={}} end
 function M.validate(value)
@@ -35,5 +42,10 @@ function M.validate(value)
         end
     end
     return result
+end
+function M.normalize(value)
+    local config,message=M.validate({enabled=false,shortcuts={left=value}})
+    if not config then return nil,message end
+    return config.shortcuts.left
 end
 return M

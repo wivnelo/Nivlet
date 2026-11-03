@@ -9,11 +9,10 @@ function M.validate(value)
     for _,rule in ipairs(value.rules) do
         if type(rule)~='table' or not bundleIDs.valid(rule.bundleID) then return nil,i18n.t('请选择要启动的应用') end
         if apps[rule.bundleID:lower()] then return nil,i18n.t('同一应用只能配置一个启动快捷键') end
-        local config,message=preferences.validate({enabled=false,shortcuts={left=rule.shortcut}})
-        if not config then return nil,message end
-        local shortcut=config.shortcuts.left
+        local shortcut,message=preferences.normalize(rule.shortcut)
+        if message then return nil,message end
         if shortcut then
-            local signature=table.concat(shortcut.mods,'+')..'+'..shortcut.key
+            local signature=preferences.signature(shortcut)
             if shortcuts[signature] then return nil,i18n.t('不同应用不能使用相同快捷键') end
             shortcuts[signature]=true
         end
@@ -25,8 +24,7 @@ end
 function M.conflicts(shortcut)
     if not shortcut then return false end
     for _,rule in ipairs(M.config.rules) do
-        local other=rule.shortcut
-        if other and shortcut.key==other.key and table.concat(shortcut.mods,'+')==table.concat(other.mods,'+') then return true end
+        if preferences.same(shortcut,rule.shortcut) then return true end
     end
     return false
 end
@@ -59,7 +57,7 @@ local function install(config)
         local shortcut=rule.shortcut
         if shortcut then
             if M.externalConflict(shortcut) then clearBindings();return false,i18n.t('应用快捷键与窗口管理或剪贴板菜单重复') end
-            if preferences.systemAssigned(shortcut.mods,shortcut.key) or not hs.hotkey.assignable(shortcut.mods,shortcut.key) then clearBindings();return false,i18n.t('快捷键被系统占用或无法注册：')..shortcut.key end
+            if not preferences.bindable(shortcut.mods,shortcut.key) then clearBindings();return false,i18n.t('快捷键被系统占用或无法注册：')..shortcut.key end
             local bundleID=rule.bundleID
             local binding=hs.hotkey.bind(shortcut.mods,shortcut.key,function()
                 local running=#hs.application.applicationsForBundleID(bundleID)>0

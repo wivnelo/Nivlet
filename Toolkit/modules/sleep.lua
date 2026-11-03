@@ -11,7 +11,7 @@ function M.configure(enabled)
         if M.binding then M.binding:delete();M.binding=nil end
         M.enabled=false;return true
     end
-    if preferences.systemAssigned({"cmd"},"L") or not hs.hotkey.assignable({"cmd"},"L") then return false,i18n.t("Command + L 无法注册，请检查系统快捷键") end
+    if not preferences.bindable({"cmd"},"L") then return false,i18n.t("Command + L 无法注册，请检查系统快捷键") end
     local binding=hs.hotkey.bind({"cmd"},"L",function() hs.caffeinate.systemSleep() end)
     if not binding then return false,i18n.t("Command + L 无法注册，请检查系统快捷键") end
     M.binding=binding;M.enabled=true;return true

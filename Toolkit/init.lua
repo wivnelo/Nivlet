@@ -128,14 +128,8 @@ local key = "desktoptoolkit.preferences.v1"
 app.config = preferences.validate(hs.settings.get(key)) or preferences.defaults()
 local popupKey = "desktoptoolkit.clipboard.shortcut.v1"
 local function defaultPopup() return {key="V",mods={"cmd","shift"}} end
-local function normalizePopup(value)
-    local config, message = preferences.validate({enabled=false,shortcuts={left=value}})
-    if not config then return nil, message end
-    return config.shortcuts.left
-end
-local function sameShortcut(a, b)
-    return a and b and a.key==b.key and table.concat(a.mods,"+")==table.concat(b.mods,"+")
-end
+local normalizePopup=preferences.normalize
+local sameShortcut=preferences.same
 local function shortcutEntries(pages)
     local entries={}
     local function add(page,item,active) if item and item~=false then entries[#entries+1]={page=page,item=item,active=active} end end
@@ -165,7 +159,7 @@ if popupLoadError then app.popupShortcutError="快捷键格式无效" end
 local function installPopup(shortcut)
     if app.popupBinding then app.popupBinding:delete();app.popupBinding=nil end
     if not shortcut then return true end
-    if preferences.systemAssigned(shortcut.mods,shortcut.key) or not hs.hotkey.assignable(shortcut.mods,shortcut.key) then return false,i18n.t("剪贴板快捷键被系统占用或无法注册") end
+    if not preferences.bindable(shortcut.mods,shortcut.key) then return false,i18n.t("剪贴板快捷键被系统占用或无法注册") end
     app.popupBinding = hs.hotkey.bind(shortcut.mods,shortcut.key,clipboard.showPopup)
     if not app.popupBinding then return false,i18n.t("剪贴板快捷键注册失败") end
     return true
@@ -253,7 +247,7 @@ local function install(config)
     for _, action in ipairs(windows.actions) do
         local item = config.shortcuts[action]
         if item then
-            if not hs.hotkey.assignable(item.mods, item.key) or preferences.systemAssigned(item.mods, item.key) then clearBindings(); return false, i18n.t("快捷键被系统占用：") .. item.key end
+            if not preferences.bindable(item.mods, item.key) then clearBindings(); return false, i18n.t("快捷键被系统占用：") .. item.key end
             local binding = hs.hotkey.bind(item.mods, item.key, function()
                 local ok, message = windows.run(action)
                 if not ok then hs.alert.show(message) end
@@ -373,9 +367,9 @@ local saveBatch=require("modules.save_batch").new(pageAdapters,{
     validate=function(plan)
         local seen,owned={},{}
         local current={};for page,adapter in pairs(pageAdapters) do current[page]=adapter.get() end
-        for _,entry in ipairs(shortcutEntries(current)) do if entry.active then owned[table.concat(entry.item.mods,"+").."+"..entry.item.key]=true end end
+        for _,entry in ipairs(shortcutEntries(current)) do if entry.active then owned[preferences.signature(entry.item)]=true end end
         for _,entry in ipairs(shortcutEntries(plan.pages)) do
-            local item=entry.item;local signature=table.concat(item.mods,"+").."+"..item.key
+            local item=entry.item;local signature=preferences.signature(item)
             local previous=seen[signature]
             if previous and (plan.selected[entry.page] or plan.selected[previous]) then return false,i18n.t("配置中存在跨模块快捷键冲突：")..signature,plan.selected[entry.page] and entry.page or previous end
             seen[signature]=entry.page
@@ -608,11 +602,8 @@ function app.openSettings(section, focus)
         if body.action == "saveLauncher" then local success,result=launcher.save(body.config);reply(success,result,body.action) end
         if body.action == "setShowMenu" then local success,result=app.setShowMenu(body.enabled); reply(success,result,body.action) end
         if body.action == "saveGeneral" then local success,result=app.saveGeneralPage(body.config,body.autoLaunch);reply(success,result,body.action) end
-        if body.action == "save" then local success, result = app.save(body.config); reply(success, result, body.action) end
-        if body.action == "savePopup" then local success, result = app.savePopup(body.config); reply(success, result, body.action) end
-        if body.action == "saveBrowser" then local success, result = browser.save(body.config); reply(success, result, body.action) end
-        if body.action == "saveSystem" then local success, result = system.save(body.config); reply(success, result, body.action) end
-        if body.action == "saveInput" then local success, result = input.save(body.config); reply(success, result, body.action) end
+        local save=({save=app.save,savePopup=app.savePopup,saveBrowser=browser.save,saveSystem=system.save,saveInput=input.save})[body.action]
+        if save then local success, result = save(body.config); reply(success, result, body.action) end
         if body.action == "saveClipboard" then local success,result=app.saveClipboardPage(body.config,body.popupShortcut,body.popupShortcutChanged);reply(success,result,body.action) end
         if body.action == "refreshClipboard" then reply(true, "", body.action) end
         if body.action == "previewClipboard" then
