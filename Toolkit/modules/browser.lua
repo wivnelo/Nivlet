@@ -137,8 +137,19 @@ function M.resolve(url,sourceBundle)
     end
     return M.config.defaultBrowser
 end
+-- 规则解析拒绝的 HTTP / HTTPS 链接（登录信息、异常端口、非 punycode 域名、超长）不参与规则匹配，
+-- 原样交给默认打开浏览器，避免作为系统默认浏览器时丢链接。其他协议与含空白/控制字符的链接仍拒绝。
+function M.passthrough(url)
+    if type(url)~="string" or #url>1048576 or url:find("[%s%c]") then return false end
+    local scheme,authority=url:match("^([%a]+)://([^/?#]+)")
+    if not scheme or authority=="" then return false end
+    scheme=scheme:lower()
+    return scheme=="http" or scheme=="https"
+end
 function M.open(url,sourceBundle)
-    local browser,message,normalized=M.resolve(url,sourceBundle);if not browser then return false,message end
+    local browser,message,normalized=M.resolve(url,sourceBundle)
+    if not browser and M.passthrough(url) then browser=M.config.defaultBrowser end
+    if not browser then return false,message end
     if not known(browser) then return false,i18n.t("目标浏览器无效，请调整规则") end
     local browserPath=hs.application.pathForBundleID(browser)
     if not browserPath or normalized and hs.fs.attributes(browserPath,"mode")~="directory" then return false,i18n.t("目标浏览器未安装，请调整规则") end

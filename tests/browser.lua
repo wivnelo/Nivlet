@@ -100,3 +100,25 @@ assert(b.resolve('https://[::ffff:127.0.0.1]/')=='com.apple.Safari')
 assert(b.resolve('http://localhost:3000/')=='com.apple.Safari')
 b.config=previous
 print('Localhost, single-label and IPv6 hosts resolve; malicious URLs stay rejected')
+local fallback=b.defaults(); fallback.enabled=true; fallback.defaultBrowser='com.apple.Safari'
+fallback.rules={{domain='example.com',browser='com.google.Chrome',subdomains=true}}
+b.config=assert(b.validate(fallback))
+for _,url in ipairs({
+    'https://user@example.com/x','https://user:pass@example.com/','https://example.com:99999/','http://localhost:0/',
+    'https://例子.测试/a','https://[gggg::1]/','https://example.com/'..string.rep('a',20000),
+}) do
+    opened=nil
+    assert(not b.resolve(url), url)
+    assert(b.open(url,'com.apple.mail'), url)
+    assert(opened and opened[1]==url and opened[2]=='com.apple.Safari', url)
+end
+for _,url in ipairs({
+    'javascript:alert(1)','ftp://example.com/x','file:///x','https://example.com/a b','https://example.com\n',
+    'https:///x','https://','example.com',42,'https://example.com/'..string.rep('a',1048576),
+}) do
+    opened=nil
+    assert(not b.open(url), tostring(url):sub(1,60))
+    assert(opened==nil, tostring(url):sub(1,60))
+end
+b.config=previous
+print('Unparseable HTTP(S) links pass through to the default browser; other schemes stay rejected')
