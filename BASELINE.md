@@ -6,7 +6,7 @@
 
 2.0.6 为安装体验更新：DMG 打开后是定制安装窗口（660 × 400，青蓝中间调背景，左侧 Nivlet、右侧“应用程序”，箭头与中英拖拽提示，隐藏工具栏与侧栏）。App 与 2.0.5 相同，只更新版本元数据；DMG 改由 `scripts/make-dmg.py`（dmgbuild 1.6.5，资源在 `assets/dmg/`）生成并在只读挂载上复验。ZIP 7.93 MB、DMG 9.08 MB（背景图约 0.6 MB）。
 
-58 项命令行回归本地及 CI 通过；候选包 Toolkit 与源码一致、66 个 Mach-O 均为 arm64、无个人路径、`docs.json` 为 `[]`。本机 Developer ID 签名副本替换安装后启动，屏幕截图确认无报错对话框、网速与剪贴板菜单栏项出现，随后恢复原版本。DMG 的布局文件、背景、`Applications` 链接与内含 App 严格签名在只读挂载上通过；安装窗口的屏幕观感由用户在试做 DMG 上确认。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper；appcast 候选的版本、SHA-256、EdDSA 签名与篡改拒绝通过。未测试边界见[版本说明](documentation/RELEASE-v2.0.6.md)。
+58 项命令行回归本地及 CI 通过；候选包 Toolkit 与源码一致、66 个 Mach-O 均为 arm64、无个人路径、`docs.json` 为 `[]`。本机 Developer ID 签名副本替换安装后启动，屏幕截图确认无报错对话框、网速与剪贴板菜单栏项出现，随后恢复原版本。DMG 的布局文件、背景、`Applications` 链接与内含 App 严格签名在只读挂载上通过；安装窗口的屏幕观感由用户在试做 DMG 上确认。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper；appcast 候选的版本、SHA-256、EdDSA 签名与篡改拒绝通过。正式 tag `v2.0.6` 指向 `f1b42b1cdaa8c178f5b26f595abdb11edff9d617`；三份公开附件已匿名下载并与已验收产物逐字节比对，下载 App 的签名、票据及 Gatekeeper 检查通过，arm64 appcast 已发布。未测试边界见[版本说明](documentation/RELEASE-v2.0.6.md)。
 
 上一版 [2.0.5 / Build 65](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.5) 更换应用与菜单栏图标并重做官网和 README，记录见 [2.0.5 版本说明](documentation/RELEASE-v2.0.5.md)。
 
