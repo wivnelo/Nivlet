@@ -1,4 +1,8 @@
-# 当前验收：2.0.4 / Build 64
+# 当前验收：2.0.5 / Build 65
+
+58 项命令行回归（Lua、Python、非 UI JS、隐私扫描、运行时补丁一致性、运行时裁剪、版本中性）本地与 CI 通过；CI 另跑四语言 × 深浅色设置页 UI 回归。本版只改图标资源，未重复隔离 WKWebView 的 350 项检查。候选包：Toolkit 与源码一致，66 个 Mach-O 均为 arm64，无个人路径，`docs.json` 为 `[]`；打包的 160 px 应用图标与菜单栏图标与源文件逐字节一致。本机 Developer ID 签名副本替换安装后启动，屏幕截图确认无报错对话框、网速与剪贴板菜单栏项出现，随后恢复原版本；该机设置隐藏了 N 主图标，新菜单栏字形未在屏幕上目视。README 与官网媒体经 `scripts/verify-readme-media.cjs` 校验 54 处引用与 GIF 播放。最终 App/DMG 公证 Accepted、票据与 Gatekeeper 通过；appcast 版本、SHA-256、EdDSA 签名与篡改拒绝通过。见 [2.0.5 版本说明](RELEASE-v2.0.5.md)。
+
+## 历史验收：2.0.4 / Build 64
 
 58 项命令行回归（Lua、Python、非 UI JS、隐私扫描、运行时补丁一致性、运行时裁剪、版本中性）本地与 CI 通过，其中 `tests/browser.lua` 新增分流兜底用例：7 类解析被拒的 HTTP / HTTPS 链接原样交给默认打开浏览器，10 类其他输入仍拒绝且不触发打开。CI 另跑四语言 × 深浅色设置页 UI 回归；本版未改动设置页，未重复隔离 WKWebView 的 350 项检查。候选包：Toolkit 与源码一致，66 个 Mach-O 均为 arm64，无个人路径，`docs.json` 为 `[]`。本机 Developer ID 签名副本由用户替换安装，确认无初始化失败对话框、菜单栏项目出现后恢复原版本。最终 App/DMG 公证 Accepted、票据与 Gatekeeper 通过；appcast 版本、SHA-256、EdDSA 签名与篡改拒绝通过。分流兜底未在运行中的应用里以真实链接验证。见 [2.0.4 版本说明](RELEASE-v2.0.4.md)。
 

@@ -28,6 +28,14 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=arm64 NIVLE
 - `scripts/trim-runtime.py` 在签名前移除 Nivlet 无法访问的 Hammerspoon 扩展（相机、定位、语音、HID/USB/MIDI、IPC 与 `hs` 命令行、HTTP 服务器、文档浏览器等），并把 API 文档 `docs.json`/`lua.json` 清空为 `[]`（核心启动时会把 `docs.json` 路径传给 Lua，文件必须存在），共约 16.3 MB。动态加载的 network、window 子模块及其依赖（spaces、spaces.watcher、plist、redshift）保留。只删除脚本中明确列出的路径，任一路径缺失或剩余 Mach-O 链接被删 dylib 即停止；未列出的模块一律保留。`tests/runtime_trim.py` 确保 Toolkit 不引用被删模块。新增 Toolkit 功能需用到被删模块时，先从列表移除再使用。
 - 最终体积以同架构 ZIP 与 App 实测比较为准；停止打 Intel 包与单个 ARM 包的压缩收益分别说明。
 
+## 应用与菜单栏图标
+
+- 应用图标源文件为 `assets/nivlet-icon.png`（1254 × 1254，带透明通道）。构建时 `scripts/prepare-icon.py` 用 `sips` 生成 AppIcon 各尺寸，`scripts/build-dev.sh` 另生成 160 px 的 `Toolkit/nivlet-icon.png` 供设置窗口与“关于”页使用。
+- 当前图标为石墨灰底板配柔和青蓝色的折带 N：由此前蓝色图标（`b90166a` 中的同名文件）经色调映射生成，底板转为石墨灰，N 保留约 45% 饱和度的原色。
+- 官网图标 `docs/assets/nivlet-icon.webp`（512 px）与 `docs/assets/favicon.png`（64 px）均从同一源文件缩放；README 直接引用源文件。
+- 菜单栏图标 `Toolkit/assets/nivlet-menu.svg` / `.png`（18 pt，72 px 模板图，纯黑加透明）与应用图标同为折带造型，斜带与竖笔间留细缝表现折叠；由系统按深浅色着色，不随应用图标换色。
+- 更换图标后需重新生成截图与 GIF（见[公开截图](SCREENSHOTS.md)），以免媒体中仍显示旧图标。
+
 ## 回归与隐私检查
 
 ```sh

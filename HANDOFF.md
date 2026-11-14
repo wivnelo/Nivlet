@@ -1,6 +1,10 @@
 # Nivlet 会话交接 · 2026-11-14
 
-## 当前状态 · 2.0.4 / Build 64
+## 当前状态 · 2.0.5 / Build 65
+
+图标更新版，功能不变。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.0.5 版本说明](documentation/RELEASE-v2.0.5.md)。产品源码 `2a60c55`，仅 Apple Silicon。应用图标为石墨灰底板配柔和青蓝色折带 N，由旧蓝色图标色调映射生成；菜单栏模板图标重绘为同款折带。图标来源与更换步骤见 [开发与构建](documentation/DEVELOPMENT.md) 的“应用与菜单栏图标”，截图与 GIF 重新生成方式见 [公开截图](documentation/SCREENSHOTS.md)。官网 `docs/` 重做为简洁风格，首屏按语言嵌入演示 GIF，样式与脚本带内容哈希避免缓存错配。发版流程见本机 skill `nivlet-release`。
+
+## 历史 · 2.0.4 / Build 64
 
 分流兜底修复版，功能不变。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.0.4 版本说明](documentation/RELEASE-v2.0.4.md)。产品源码 `b0c64e7`，仅 Apple Silicon。`browser.resolve()` 保持严格解析，兜底只在 `browser.open()`：解析被拒的 HTTP / HTTPS 链接不匹配规则，直接交给默认打开浏览器。运行时、补丁（10 个）与裁剪清单同 2.0.3。发版流程见本机 skill `nivlet-release`，CI 为 `.github/workflows/tests.yml`。同次审阅提出但未实施的建议（剪贴板文字与图片并存时的取舍、系统探针常驻化、设置页回传瘦身等）未进入代码；其中“文字优先”的剪贴板改动已按用户决定回滚。
 

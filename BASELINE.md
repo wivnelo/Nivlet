@@ -2,13 +2,15 @@
 
 更新日期：2026-11-14。
 
-当前正式版本为 [2.0.4 / Build 64](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.4)，macOS 13+、Apple Silicon（arm64）。产品源码 `b0c64e7c6bbc968439f2e3c652373fe10f959331`；发行 tag 在该提交上增加公开说明，不把文档变动计为产品差异。
+当前正式版本为 [2.0.5 / Build 65](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.5)，macOS 13+、Apple Silicon（arm64）。产品源码 `2a60c5568e6d3c98e8073e6d20ace8015caffc2a`；发行 tag 在该提交上增加公开说明，不把文档变动计为产品差异。
 
-2.0.4 修复浏览器分流丢链接：规则解析拒绝的 HTTP / HTTPS 链接（带登录信息、端口异常、域名不规范或未用 punycode、超过 16 KB）原样交给“默认打开浏览器”，不参与域名与来源应用规则；其他协议、含空白或控制字符、缺少主机名及超过 1 MB 的链接仍拒绝。产品改动仅 `Toolkit/modules/browser.lua`，运行时、补丁与裁剪清单同 2.0.3；功能、设置、界面、配置格式与权限不变。ZIP 8.65 MB、DMG 9.21 MB，安装后约 24.8 MB。
+2.0.5 为图标更新版：应用图标改为石墨灰底板配柔和青蓝色的折带 N，菜单栏 N 模板图标同步重绘为折带造型。产品改动仅 `assets/nivlet-icon.png` 与 `Toolkit/assets/nivlet-menu.png` / `.svg`；运行时、补丁、裁剪清单与 Lua 代码同 2.0.4，功能、设置、配置格式与权限不变。同期 README 与官网重做（官网首屏改为演示 GIF），16 张截图与 2 个 GIF 用新图标重新生成。ZIP 7.93 MB、DMG 8.49 MB，App 磁盘占用 24,632 KiB。
 
-58 项命令行回归（含新增的分流兜底用例）本地及 CI 通过；CI 另跑四语言 × 深浅色设置页 UI 回归，本版未改动设置页。候选包 Toolkit 与源码一致、66 个 Mach-O 均为 arm64、无个人路径；本机 Developer ID 签名副本由用户替换安装后确认启动正常、菜单栏项目出现，随后恢复原版本。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper；appcast 候选的版本、SHA-256、EdDSA 签名与篡改拒绝通过。分流兜底由 Lua 单元测试覆盖，未在运行中的应用里点击此类链接验证。正式 tag `v2.0.4` 指向 `b8710b22c8c77a5486c89bee618bce7c335dff61`；三份公开附件已匿名下载并与已验收产物逐字节比对，下载 App 的签名、票据及 Gatekeeper 检查通过，arm64 appcast 已发布。未测试边界见[版本说明](documentation/RELEASE-v2.0.4.md)。
+58 项命令行回归本地及 CI 通过；候选包 Toolkit 与源码一致、66 个 Mach-O 均为 arm64、无个人路径、`docs.json` 为 `[]`，打包的 160 px 图标与菜单栏图标与源文件一致。本机 Developer ID 签名副本替换安装后启动，无报错对话框，网速与剪贴板菜单栏项出现，随后恢复原版本；该机已在设置中隐藏 N 主图标，新菜单栏字形只核对了打包文件，未在屏幕上目视。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper；appcast 候选的版本、SHA-256、EdDSA 签名与篡改拒绝通过。未测试边界见[版本说明](documentation/RELEASE-v2.0.5.md)。
 
-上一版 [2.0.3 / Build 63](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.3) 为运行时瘦身（安装后 40.5 → 24.8 MB），并统一快捷键校验、合并运行时补丁、加入 CI，记录见 [2.0.3 版本说明](documentation/RELEASE-v2.0.3.md)。更早的 [2.0.2 / Build 62](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.2) 为后台性能优化，记录见 [2.0.2 版本说明](documentation/RELEASE-v2.0.2.md)。
+上一版 [2.0.4 / Build 64](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.4) 修复浏览器分流丢链接，记录见 [2.0.4 版本说明](documentation/RELEASE-v2.0.4.md)。
+
+更早的 [2.0.3 / Build 63](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.3) 为运行时瘦身（安装后 40.5 → 24.8 MB），并统一快捷键校验、合并运行时补丁、加入 CI，记录见 [2.0.3 版本说明](documentation/RELEASE-v2.0.3.md)。更早的 [2.0.2 / Build 62](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.2) 为后台性能优化，记录见 [2.0.2 版本说明](documentation/RELEASE-v2.0.2.md)。
 
 官网来源为 `docs/`，中英文媒体使用真实前端与合成数据，不代表原生录像。知识库由独立同步流程维护，不包含私人配置、凭据或安装包。历史 GitHub 发行保留；1.0.8 / Build 55 为最后 Intel 版。
 
