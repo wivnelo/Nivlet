@@ -1,14 +1,14 @@
 # Nivlet 当前基准
 
-更新日期：2026-11-03。
+更新日期：2026-11-14。
 
-当前正式版本为 [2.0.3 / Build 63](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.3)，macOS 13+、Apple Silicon（arm64）。产品源码 `bc139047501518faea736f53825295759cf36beb`；发行 tag 在该提交上增加公开说明，不把文档变动计为产品差异。
+当前正式版本为 [2.0.4 / Build 64](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.4)，macOS 13+、Apple Silicon（arm64）。产品源码 `b0c64e7c6bbc968439f2e3c652373fe10f959331`；发行 tag 在该提交上增加公开说明，不把文档变动计为产品差异。
 
-2.0.3 缩小运行时：移除 Nivlet 无法访问的 Hammerspoon 扩展与 `hs` 命令行，API 文档清空为 `[]`；安装后约 24.8 MB（2.0.2 为 40.5 MB），ZIP 8.65 MB、DMG 9.21 MB。功能、设置、界面、配置格式与权限不变。同版还统一快捷键校验、合并运行时补丁（18 → 10），并加入 CI。正式 tag `v2.0.3` 指向 `29d63129d9cfe7856f5fff3a6f1c71c15e1b8923`；三份公开附件已匿名下载并与已验收产物逐字节比对，下载 App 的签名、票据及 Gatekeeper 检查通过，arm64 appcast 已发布。
+2.0.4 修复浏览器分流丢链接：规则解析拒绝的 HTTP / HTTPS 链接（带登录信息、端口异常、域名不规范或未用 punycode、超过 16 KB）原样交给“默认打开浏览器”，不参与域名与来源应用规则；其他协议、含空白或控制字符、缺少主机名及超过 1 MB 的链接仍拒绝。产品改动仅 `Toolkit/modules/browser.lua`，运行时、补丁与裁剪清单同 2.0.3；功能、设置、界面、配置格式与权限不变。ZIP 8.65 MB、DMG 9.21 MB，安装后约 24.8 MB。
 
-上一版 [2.0.2 / Build 62](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.2) 为后台性能优化，记录见 [2.0.2 版本说明](documentation/RELEASE-v2.0.2.md)。
+58 项命令行回归（含新增的分流兜底用例）本地及 CI 通过；CI 另跑四语言 × 深浅色设置页 UI 回归，本版未改动设置页。候选包 Toolkit 与源码一致、66 个 Mach-O 均为 arm64、无个人路径；本机 Developer ID 签名副本由用户替换安装后确认启动正常、菜单栏项目出现，随后恢复原版本。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper；appcast 候选的版本、SHA-256、EdDSA 签名与篡改拒绝通过。分流兜底由 Lua 单元测试覆盖，未在运行中的应用里点击此类链接验证。未测试边界见[版本说明](documentation/RELEASE-v2.0.4.md)。
 
-58 项命令行回归（含运行时补丁、裁剪与版本中性检查）本地及 CI 通过；候选包 350 项隔离 WKWebView UI 检查（四语言 × 深浅色，含 620 点窄窗口）通过；本机签名候选包实机启动并加载 Toolkit 全部模块及 network/window 子模块，32 项检查无错误。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper。未测试边界见[版本说明](documentation/RELEASE-v2.0.3.md)。
+上一版 [2.0.3 / Build 63](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.3) 为运行时瘦身（安装后 40.5 → 24.8 MB），并统一快捷键校验、合并运行时补丁、加入 CI，记录见 [2.0.3 版本说明](documentation/RELEASE-v2.0.3.md)。更早的 [2.0.2 / Build 62](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.2) 为后台性能优化，记录见 [2.0.2 版本说明](documentation/RELEASE-v2.0.2.md)。
 
 官网来源为 `docs/`，中英文媒体使用真实前端与合成数据，不代表原生录像。知识库由独立同步流程维护，不包含私人配置、凭据或安装包。历史 GitHub 发行保留；1.0.8 / Build 55 为最后 Intel 版。
 

@@ -1,4 +1,8 @@
-# 当前验收：2.0.3 / Build 63
+# 当前验收：2.0.4 / Build 64
+
+58 项命令行回归（Lua、Python、非 UI JS、隐私扫描、运行时补丁一致性、运行时裁剪、版本中性）本地与 CI 通过，其中 `tests/browser.lua` 新增分流兜底用例：7 类解析被拒的 HTTP / HTTPS 链接原样交给默认打开浏览器，10 类其他输入仍拒绝且不触发打开。CI 另跑四语言 × 深浅色设置页 UI 回归；本版未改动设置页，未重复隔离 WKWebView 的 350 项检查。候选包：Toolkit 与源码一致，66 个 Mach-O 均为 arm64，无个人路径，`docs.json` 为 `[]`。本机 Developer ID 签名副本由用户替换安装，确认无初始化失败对话框、菜单栏项目出现后恢复原版本。最终 App/DMG 公证 Accepted、票据与 Gatekeeper 通过；appcast 版本、SHA-256、EdDSA 签名与篡改拒绝通过。分流兜底未在运行中的应用里以真实链接验证。见 [2.0.4 版本说明](RELEASE-v2.0.4.md)。
+
+## 历史验收：2.0.3 / Build 63
 
 58 项命令行回归（Lua、Python、非 UI JS、隐私扫描、运行时补丁一致性、运行时裁剪、版本中性）本地与 CI 通过；CI 另跑四语言 × 深浅色设置页 UI 回归。合并后的 10 个补丁生成的运行时与原 18 个补丁逐文件一致。候选包：Toolkit 与源码一致，66 个 Mach-O 均为 arm64，无个人路径；隔离 WKWebView UI 回归 350/350；本机 Developer ID 签名副本实机启动，Toolkit 用到的模块及 network/window 子模块、spaces.watcher 共 32 项检查通过、无 Lua 错误。首次实机测试曾因删除 `docs.json` 导致启动失败，已改为清空并补回 window 子模块依赖后复测通过。最终 App/DMG 公证 Accepted、票据与 Gatekeeper 通过；appcast 版本、SHA-256、EdDSA 签名与篡改拒绝通过。见 [2.0.3 版本说明](RELEASE-v2.0.3.md)。
 

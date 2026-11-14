@@ -1,6 +1,10 @@
-# Nivlet 会话交接 · 2026-11-03
+# Nivlet 会话交接 · 2026-11-14
 
-## 当前状态 · 2.0.3 / Build 63
+## 当前状态 · 2.0.4 / Build 64
+
+分流兜底修复版，功能不变。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.0.4 版本说明](documentation/RELEASE-v2.0.4.md)。产品源码 `b0c64e7`，仅 Apple Silicon。`browser.resolve()` 保持严格解析，兜底只在 `browser.open()`：解析被拒的 HTTP / HTTPS 链接不匹配规则，直接交给默认打开浏览器。运行时、补丁（10 个）与裁剪清单同 2.0.3。发版流程见本机 skill `nivlet-release`，CI 为 `.github/workflows/tests.yml`。同次审阅提出但未实施的建议（剪贴板文字与图片并存时的取舍、系统探针常驻化、设置页回传瘦身等）未进入代码；其中“文字优先”的剪贴板改动已按用户决定回滚。
+
+## 历史 · 2.0.3 / Build 63
 
 运行时瘦身版，功能不变。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.0.3 版本说明](documentation/RELEASE-v2.0.3.md)。产品源码 `bc13904`，仅 Apple Silicon。补丁顺序只在 `patches/series`（10 个）；`scripts/check-runtime.sh` 在构建前比对 vendor，`scripts/trim-runtime.py` 按明确清单裁剪，`docs.json` 必须保留为 `[]`。发版流程见本机 skill `nivlet-release`，CI 为 `.github/workflows/tests.yml`。P2（常驻采集进程）实测总 CPU 未降低，已放弃，代码保留在 `backup/p2-streaming-probe` 分支。
 

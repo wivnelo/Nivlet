@@ -1,10 +1,10 @@
 # 已知问题与观察项
 
-更新：2026-11-03。当前正式版见 [BASELINE](../BASELINE.md)，仅 arm64；[1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后 Intel 版，历史下载保留。
+更新：2026-11-14。当前正式版见 [BASELINE](../BASELINE.md)，仅 arm64；[1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) 是最后 Intel 版，历史下载保留。
 
 ## 当前验证边界
 
-- 2.0.3 / Build 63 已完成签名、公证、票据/Gatekeeper、最终包与本机启动核验；不再内置 Hammerspoon API 文档与 `hs` 命令行，Nivlet 本身不使用这两项。2.0.2 / Build 62 已完成签名、公证、票据/Gatekeeper 和最终包核验；关闭网速显示时，菜单中的农历日期最多延迟一分钟更新。2.0.1 / Build 61 已完成签名、公证、票据/Gatekeeper、最终包及本机安装核验。物理休眠/熄屏/锁屏时序、其他设备及完整 Sparkle 升级仍是未验证边界；见 [BASELINE](../BASELINE.md) 与 [版本说明](RELEASE-v2.0.1.md)。
+- 2.0.4 / Build 64 已完成签名、公证、票据/Gatekeeper、最终包核验，以及用户替换安装后的启动确认；分流兜底（解析被拒的 HTTP / HTTPS 链接交给默认打开浏览器）由单元测试覆盖，未以真实链接在运行中的应用验证。2.0.3 / Build 63 已完成签名、公证、票据/Gatekeeper、最终包与本机启动核验；不再内置 Hammerspoon API 文档与 `hs` 命令行，Nivlet 本身不使用这两项。2.0.2 / Build 62 已完成签名、公证、票据/Gatekeeper 和最终包核验；关闭网速显示时，菜单中的农历日期最多延迟一分钟更新。2.0.1 / Build 61 已完成签名、公证、票据/Gatekeeper、最终包及本机安装核验。物理休眠/熄屏/锁屏时序、其他设备及完整 Sparkle 升级仍是未验证边界；见 [BASELINE](../BASELINE.md) 与 [版本说明](RELEASE-v2.0.1.md)。
 
 ## 2.0.0 历史范围与兼容性边界
 
