@@ -6,7 +6,7 @@
 
 2.0.5 为图标更新版：应用图标改为石墨灰底板配柔和青蓝色的折带 N，菜单栏 N 模板图标同步重绘为折带造型。产品改动仅 `assets/nivlet-icon.png` 与 `Toolkit/assets/nivlet-menu.png` / `.svg`；运行时、补丁、裁剪清单与 Lua 代码同 2.0.4，功能、设置、配置格式与权限不变。同期 README 与官网重做（官网首屏改为演示 GIF），16 张截图与 2 个 GIF 用新图标重新生成。ZIP 7.93 MB、DMG 8.49 MB，App 磁盘占用 24,632 KiB。
 
-58 项命令行回归本地及 CI 通过；候选包 Toolkit 与源码一致、66 个 Mach-O 均为 arm64、无个人路径、`docs.json` 为 `[]`，打包的 160 px 图标与菜单栏图标与源文件一致。本机 Developer ID 签名副本替换安装后启动，无报错对话框，网速与剪贴板菜单栏项出现，随后恢复原版本；该机已在设置中隐藏 N 主图标，新菜单栏字形只核对了打包文件，未在屏幕上目视。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper；appcast 候选的版本、SHA-256、EdDSA 签名与篡改拒绝通过。未测试边界见[版本说明](documentation/RELEASE-v2.0.5.md)。
+58 项命令行回归本地及 CI 通过；候选包 Toolkit 与源码一致、66 个 Mach-O 均为 arm64、无个人路径、`docs.json` 为 `[]`，打包的 160 px 图标与菜单栏图标与源文件一致。本机 Developer ID 签名副本替换安装后启动，无报错对话框，网速与剪贴板菜单栏项出现，随后恢复原版本；该机已在设置中隐藏 N 主图标，新菜单栏字形只核对了打包文件，未在屏幕上目视。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper；appcast 候选的版本、SHA-256、EdDSA 签名与篡改拒绝通过。正式 tag `v2.0.5` 指向 `ef7fab246daf0a2923266e7604721721639f3d83`；三份公开附件已匿名下载并与已验收产物逐字节比对，下载 App 的签名、票据及 Gatekeeper 检查通过，arm64 appcast 已发布。未测试边界见[版本说明](documentation/RELEASE-v2.0.5.md)。
 
 上一版 [2.0.4 / Build 64](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.4) 修复浏览器分流丢链接，记录见 [2.0.4 版本说明](documentation/RELEASE-v2.0.4.md)。
 
