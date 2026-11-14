@@ -1,1 +1,28 @@
-(()=>{const nodes=[...document.querySelectorAll('[data-zh]')],en=nodes.map(el=>el.innerHTML),button=document.getElementById('language'),guide=document.getElementById('installGuide'),ui={en:['en','简体中文','切换为简体中文','.en'],zh:['zh-CN','English','Switch to English','']};let language='en';button.addEventListener('click',()=>{language=language==='zh'?'en':'zh';const[lang,label,aria,guideSuffix]=ui[language];document.documentElement.lang=lang;nodes.forEach((el,i)=>el.innerHTML=language==='zh'?el.dataset.zh:en[i]);guide.href=`https://github.com/wivnelo/Nivlet/blob/main/documentation/INSTALLATION${guideSuffix}.md`;button.textContent=label;button.setAttribute('aria-label',aria)})})();
+(()=>{
+  const nodes=[...document.querySelectorAll('[data-zh]')];
+  const english=nodes.map(el=>el.innerHTML);
+  const button=document.getElementById('language');
+  const guide=document.getElementById('installGuide');
+  const ui={
+    en:{lang:'en',label:'中文',aria:'切换为简体中文',guide:'.en'},
+    zh:{lang:'zh-CN',label:'English',aria:'Switch to English',guide:''}
+  };
+  let language='en';
+  const apply=next=>{
+    language=next;
+    const t=ui[language];
+    document.documentElement.lang=t.lang;
+    nodes.forEach((el,i)=>{el.innerHTML=language==='zh'?el.dataset.zh:english[i];});
+    if(guide)guide.href=`https://github.com/wivnelo/Nivlet/blob/main/documentation/INSTALLATION${t.guide}.md`;
+    button.textContent=t.label;
+    button.setAttribute('aria-label',t.aria);
+  };
+  let saved=null;
+  try{saved=localStorage.getItem('nivlet-language');}catch(e){}
+  const preferred=saved||((navigator.language||'').toLowerCase().startsWith('zh')?'zh':'en');
+  if(preferred==='zh')apply('zh');
+  button.addEventListener('click',()=>{
+    apply(language==='zh'?'en':'zh');
+    try{localStorage.setItem('nivlet-language',language);}catch(e){}
+  });
+})();

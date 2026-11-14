@@ -1,127 +1,99 @@
 <p align="center">
-  <img src="assets/nivlet-icon.png" alt="Nivlet app icon" width="112">
+  <img src="assets/nivlet-icon.png" alt="Nivlet app icon" width="128">
 </p>
 
 <h1 align="center">Nivlet for Mac</h1>
 
 <p align="center">
-  <strong>Make everyday desktop tasks feel easier.</strong><br>
-  Clipboard history, window management, app shortcuts and browser routing in your Mac menu bar.
+  <strong>Everyday tools. Right in your menu bar.</strong><br>
+  Clipboard history, window management, app shortcuts and browser routing — all in one small app.
 </p>
 
 <p align="center">
-  <a href="README.zh-CN.md">简体中文</a> · <strong>English</strong>
-</p>
-
-<p align="center">
+  <a href="https://github.com/wivnelo/Nivlet/releases/latest"><strong>Download</strong></a> ·
   <a href="https://wivnelo.github.io/Nivlet/">Website</a> ·
-  <a href="https://github.com/wivnelo/Nivlet/releases/latest">Download</a> ·
   <a href="documentation/USAGE.en.md">User guide</a> ·
-  <a href="https://github.com/wivnelo/Nivlet/issues">Report an issue</a>
-</p>
-
----
-
-Nivlet is a free, open-source macOS menu bar utility that brings everyday desktop actions together. Enable the tools you need and choose your own shortcuts. No coding or separate Hammerspoon installation required.
-
-## See it in action
-
-<p align="center">
-  <a href="docs/assets/demos/overview-en.gif"><img src="docs/assets/demos/overview-en.gif" alt="Nivlet demo: window layouts, clipboard search, browser routing and app shortcuts" width="720"></a>
+  <a href="README.zh-CN.md">简体中文</a>
 </p>
 
 <p align="center">
-  <sub>28-second settings UI demo · Synthetic data and simulated native responses · No sound</sub><br>
-  <a href="docs/assets/demos/overview-en.gif">View full size</a> · <a href="#screenshots">Still screenshots</a>
+  <sub>Free and open source · macOS 13.0+ · Apple Silicon · Developer ID signed and notarized</sub>
 </p>
+
+<br>
+
+<p align="center">
+  <a href="docs/assets/demos/overview-en.gif"><img src="docs/assets/demos/overview-en.gif" alt="Nivlet demo: window layouts, clipboard search, browser routing and app shortcuts" width="720"></a><br>
+  <sub>Settings UI demo with synthetic data and simulated native responses.</sub>
+</p>
+
+## Features
+
+| | |
+| --- | --- |
+| **Clipboard history** | Text and images with search, thumbnails, previews and Option-click paste. Set retention, exclude apps or turn recording off. |
+| **Window management** | 29 actions: halves, quarters, thirds, a 3×3 grid, centering, display moves and restore. |
+| **App shortcuts** | Open or bring forward apps with your own shortcuts, with conflict checks. |
+| **Browser routing** | Pick a browser by source app or website, with a fallback for everything else. |
+| **System & input** | Network speed in the menu bar; CPU, memory, disk and addresses in its menu. Switch input sources per app. |
+| **And more** | Optional Keep Awake, four languages, light and dark appearance, JSON settings import and export. |
+
+Turn on only what you need. No coding and no separate Hammerspoon installation required.
+
+## Get started
+
+1. Download the DMG or ZIP from [Releases](https://github.com/wivnelo/Nivlet/releases/latest) and move `Nivlet.app` to Applications.
+2. Open it, click the **N** in the menu bar and choose **Settings…**.
+3. Turn on the tools you need and click **Save All Settings**.
+
+Window actions and Option-paste need **Accessibility** permission. Browser routing needs Nivlet set as the **default browser**. Never disable Gatekeeper; if macOS reports malware or damage, stop and report the exact message. See the [installation and upgrade guide](documentation/INSTALLATION.en.md).
+
+## Privacy
+
+No account. Settings, clipboard history and system information are processed on your Mac and never uploaded; core tools work offline. Clipboard history is cleared on quit by default. Optional persistence uses a **local plaintext cache**, so turn recording off before copying sensitive content. The app goes online only to check for updates or open links.
+
+## Requirements
+
+macOS 13.0 or later on Apple Silicon. Every release is Developer ID signed and notarized by Apple; updates install only after you confirm in **About → Check for Updates**. The current version is recorded in [BASELINE](BASELINE.md) and each version's changes in the [release notes](documentation/README.md).
+
+[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) is the final Intel release and remains available.
 
 ## Screenshots
 
 <details>
-<summary>View all 8 screenshots</summary>
+<summary>Show all 8 screenshots</summary>
 
-The screenshots and demos show the 2.0.1 / Build 61 settings frontend (product source `9ddcbf9`), using synthetic data and simulated native responses in an isolated environment. They illustrate the interface, not a native end-to-end test. Clipboard text, network addresses, app rules, shortcuts and permission states are examples, not default settings or live system readings. Click an image to enlarge it.
+<br>
 
-<table>
-<tr>
-<td width="50%" valign="top"><strong>Window management</strong><br><a href="docs/assets/screenshots/en/windows.jpg"><img src="docs/assets/screenshots/en/windows.jpg" alt="Window management — synthetic demonstration" width="480"></a></td>
-<td width="50%" valign="top"><strong>Clipboard history</strong><br><a href="docs/assets/screenshots/en/clipboard.jpg"><img src="docs/assets/screenshots/en/clipboard.jpg" alt="Clipboard history — synthetic demonstration" width="480"></a></td>
-</tr>
-</table>
+Rendered from the 2.0.1 / Build 61 settings frontend with synthetic data, before the current icon. They illustrate the interface, not a native end-to-end test.
 
 <table>
 <tr>
-<td width="50%" valign="top"><strong>General settings</strong><br><a href="docs/assets/screenshots/en/general.jpg"><img src="docs/assets/screenshots/en/general.jpg" alt="General settings — synthetic demonstration" width="480"></a></td>
-<td width="50%" valign="top"><strong>Input sources</strong><br><a href="docs/assets/screenshots/en/input.jpg"><img src="docs/assets/screenshots/en/input.jpg" alt="Input sources — synthetic demonstration" width="480"></a></td>
+<td width="50%"><strong>Window management</strong><br><a href="docs/assets/screenshots/en/windows.jpg"><img src="docs/assets/screenshots/en/windows.jpg" alt="Window management — synthetic demonstration" width="480"></a></td>
+<td width="50%"><strong>Clipboard history</strong><br><a href="docs/assets/screenshots/en/clipboard.jpg"><img src="docs/assets/screenshots/en/clipboard.jpg" alt="Clipboard history — synthetic demonstration" width="480"></a></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><strong>Browser routing</strong><br><a href="docs/assets/screenshots/en/browser.jpg"><img src="docs/assets/screenshots/en/browser.jpg" alt="Browser routing — synthetic demonstration" width="480"></a></td>
-<td width="50%" valign="top"><strong>App shortcuts</strong><br><a href="docs/assets/screenshots/en/launcher.jpg"><img src="docs/assets/screenshots/en/launcher.jpg" alt="App shortcuts — synthetic demonstration" width="480"></a></td>
+<td><strong>General</strong><br><a href="docs/assets/screenshots/en/general.jpg"><img src="docs/assets/screenshots/en/general.jpg" alt="General settings — synthetic demonstration" width="480"></a></td>
+<td><strong>Input sources</strong><br><a href="docs/assets/screenshots/en/input.jpg"><img src="docs/assets/screenshots/en/input.jpg" alt="Input sources — synthetic demonstration" width="480"></a></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><strong>System information</strong><br><a href="docs/assets/screenshots/en/system.jpg"><img src="docs/assets/screenshots/en/system.jpg" alt="System information — synthetic demonstration" width="480"></a></td>
-<td width="50%" valign="top"><strong>About & updates</strong><br><a href="docs/assets/screenshots/en/about.jpg"><img src="docs/assets/screenshots/en/about.jpg" alt="About & updates — synthetic demonstration" width="480"></a></td>
+<td><strong>Browser routing</strong><br><a href="docs/assets/screenshots/en/browser.jpg"><img src="docs/assets/screenshots/en/browser.jpg" alt="Browser routing — synthetic demonstration" width="480"></a></td>
+<td><strong>App shortcuts</strong><br><a href="docs/assets/screenshots/en/launcher.jpg"><img src="docs/assets/screenshots/en/launcher.jpg" alt="App shortcuts — synthetic demonstration" width="480"></a></td>
+</tr>
+<tr>
+<td><strong>System information</strong><br><a href="docs/assets/screenshots/en/system.jpg"><img src="docs/assets/screenshots/en/system.jpg" alt="System information — synthetic demonstration" width="480"></a></td>
+<td><strong>About &amp; updates</strong><br><a href="docs/assets/screenshots/en/about.jpg"><img src="docs/assets/screenshots/en/about.jpg" alt="About & updates — synthetic demonstration" width="480"></a></td>
 </tr>
 </table>
 
 </details>
 
-[Browse all English screenshots](docs/assets/screenshots/en/)
-
-## What you can do
-
-| Feature | Highlights |
-| --- | --- |
-| **Clipboard history** | Keep text and images with search, thumbnails, larger previews and Option-click paste; turn recording on or off, exclude apps and choose retention limits |
-| **Window management** | 29 actions for halves, quarters, thirds, a 3×3 grid, centering, resizing, display moves and restore |
-| **App shortcuts** | Launch apps or bring them forward; replace apps, drag to reorder and check shortcut conflicts |
-| **Browser routing** | Choose browsers by domain or source app, with installed-browser icons; open Safari, Chrome or Brave clear-data confirmation |
-| **Keep awake** | Optional idle-sleep prevention and a dependent Keep display on switch, both off by default |
-| **Input sources** | Assign an input source to an app and switch automatically when you activate it |
-| **System information** | See network speed in the menu bar and choose CPU, memory, disk, network addresses and dates to display |
-| **Personalization & migration** | Simplified/Traditional Chinese, English and Japanese in 2.0.0; light and dark appearances, sidebar ordering and JSON configuration import/export |
-
-## Get started
-
-1. Download **either the DMG or ZIP** from [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/latest).
-2. Move `Nivlet.app` to Applications and open it.
-3. Click the menu bar **N icon → Settings…**, enable your tools and configure their rules.
-4. In 2.0.0, click **Save All Settings** in the bottom-right corner to save every changed page. Switching sidebar sections keeps drafts; an orange dot marks each unsaved page. **Cancel Page Changes** affects only the current page.
-
-Enable the tools you need. Window and app shortcuts are configurable; the clipboard menu has an enable switch for Command-Shift-V. Window management and Option-click paste require **Accessibility permission**. Browser routing requires choosing **Nivlet as your default browser**.
-
-## Release and architecture support
-
-**[Download the latest release](https://github.com/wivnelo/Nivlet/releases/latest) for Apple Silicon (arm64), macOS 13.0+.** Release packages are Developer ID signed and notarized by Apple. The current version and its verification scope are recorded in [BASELINE](BASELINE.md); every version's changes are in the [release notes index](documentation/README.md).
-
-**[v1.0.8 / Build 55](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8) is the final Intel (x86_64) release.** Its existing signed and notarized downloads remain available. New releases will no longer build or support Intel; no Intel hardware validation is claimed for 2.0.0.
-
-Download a published DMG or ZIP from [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/latest), move `Nivlet.app` to Applications and launch that copy. No separate Hammerspoon installation is needed.
-
-Signing and notarization do not replace **Accessibility permission**. Moving from an older ad-hoc build may require reauthorization; permission carryover depends on the tested release and system. Return to General or click **Recheck** after granting access. Do not disable Gatekeeper. If macOS reports malware, damage or a checksum mismatch, stop and report the exact message.
-
-See the [installation, upgrade and removal guide](documentation/INSTALLATION.en.md). About → Check for Updates remains manual; confirm before installation.
-
-## Local processing, optional recording
-
-No account required. Settings, clipboard contents and system information are processed locally without being uploaded to a server. Core desktop tools work offline; opening websites and external links uses the network.
-
-Clipboard history is cleared on exit by default. Optional persistence uses a **local plaintext cache**; turn off recording and save before copying sensitive content. Turning recording off keeps existing history subject to its original retention limits. Clearing history also clears the current system clipboard, with a confirmation prompt.
-
-Check for signed updates in About, then confirm to download, install and restart. Checking for updates uses the network.
-
-## Learn more
+## More
 
 - [User guide](documentation/USAGE.en.md) · [Configuration import/export](documentation/CONFIGURATION.md) (Chinese)
-- [Releases](https://github.com/wivnelo/Nivlet/releases) · [Roadmap](ROADMAP.md) (Chinese)
-- [Development & building](documentation/DEVELOPMENT.md) (Chinese)
+- [Roadmap](ROADMAP.md) (Chinese) · [Development and building](documentation/DEVELOPMENT.md) (Chinese)
+- Report problems in [Issues](https://github.com/wivnelo/Nivlet/issues) with the app version, macOS version and steps. Don't upload sensitive clipboard contents, personal configurations or credentials.
 
-Report problems or suggestions through [GitHub Issues](https://github.com/wivnelo/Nivlet/issues). Include the app version, macOS version and reproduction steps. Do not upload sensitive clipboard contents, personal configurations or credentials.
+## License
 
-## License & acknowledgements
-
-Nivlet uses the [MIT License](LICENSE). Its embedded Runtime is based on [Hammerspoon](https://github.com/Hammerspoon/hammerspoon). Third-party components retain their own licenses; see [third-party notices](THIRD-PARTY-NOTICES.md).
-
-Version 2.0.0 unifies all eight settings pages with a sidebar, adds local `.html`/`.htm` routing and saves drafts across pages together. Clipboard recording uses one enable switch; its menu shortcut uses an enable switch for ⌘⇧V, while existing custom shortcuts are preserved until that switch is changed and saved. Click a thumbnail, or focus it and press Enter or Space, to open an image preview; click outside the image within Nivlet or press Escape to close it. Existing HTTP/HTTPS routing remains in scope; see [detailed changes, migration rules, package sizes and validation gates](documentation/RELEASE-v2.0.0.md).
-
-Later changes are listed per version in the [release notes index](documentation/README.md).
+[MIT License](LICENSE). The embedded runtime is based on [Hammerspoon](https://github.com/Hammerspoon/hammerspoon); third-party components keep their own licenses — see [third-party notices](THIRD-PARTY-NOTICES.md).
