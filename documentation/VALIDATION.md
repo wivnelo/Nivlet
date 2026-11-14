@@ -1,4 +1,8 @@
-# 当前验收：2.0.5 / Build 65
+# 当前验收：2.0.6 / Build 66
+
+58 项命令行回归本地与 CI 通过，`tests/signing_preflight.py` 新增“缺少 dmgbuild 时在任何外部工具与输出前停止”的用例。候选包：Toolkit 与源码一致，66 个 Mach-O 均为 arm64，无个人路径，`docs.json` 为 `[]`。本机 Developer ID 签名副本替换安装后启动，屏幕截图确认无报错对话框、网速与剪贴板菜单栏项出现，随后恢复原版本。最终 DMG 由 `scripts/make-dmg.py` 生成，只读挂载复验 `.DS_Store`、背景、`Applications` 链接与内含 App 严格签名通过；`.DS_Store` 不含个人路径。安装窗口观感由用户在同配置的试做 DMG 上目视确认，最终发行 DMG 未再逐像素目视。App/DMG 公证 Accepted、票据与 Gatekeeper 通过；appcast 版本、SHA-256、EdDSA 签名与篡改拒绝通过。见 [2.0.6 版本说明](RELEASE-v2.0.6.md)。
+
+## 历史验收：2.0.5 / Build 65
 
 58 项命令行回归（Lua、Python、非 UI JS、隐私扫描、运行时补丁一致性、运行时裁剪、版本中性）本地与 CI 通过；CI 另跑四语言 × 深浅色设置页 UI 回归。本版只改图标资源，未重复隔离 WKWebView 的 350 项检查。候选包：Toolkit 与源码一致，66 个 Mach-O 均为 arm64，无个人路径，`docs.json` 为 `[]`；打包的 160 px 应用图标与菜单栏图标与源文件逐字节一致。本机 Developer ID 签名副本替换安装后启动，屏幕截图确认无报错对话框、网速与剪贴板菜单栏项出现，随后恢复原版本；该机设置隐藏了 N 主图标，新菜单栏字形未在屏幕上目视。README 与官网媒体经 `scripts/verify-readme-media.cjs` 校验 54 处引用与 GIF 播放。最终 App/DMG 公证 Accepted、票据与 Gatekeeper 通过；appcast 版本、SHA-256、EdDSA 签名与篡改拒绝通过。见 [2.0.5 版本说明](RELEASE-v2.0.5.md)。
 

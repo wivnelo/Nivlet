@@ -1,6 +1,10 @@
 # Nivlet 会话交接 · 2026-11-14
 
-## 当前状态 · 2.0.5 / Build 65
+## 当前状态 · 2.0.6 / Build 66
+
+安装体验更新版，App 功能不变。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.0.6 版本说明](documentation/RELEASE-v2.0.6.md)。产品源码 `386f844`，仅 Apple Silicon。正式 DMG 由 `scripts/make-dmg.py` 生成定制安装窗口，依赖固定版本的 dmgbuild（`scripts/requirements-dmg.txt`，装在 `build/dmg-venv`），`sign-notarize.py` 缺少时在预检阶段停止；设计与注意事项见 [开发与构建](documentation/DEVELOPMENT.md) 的“DMG 安装窗口”。本地 ad-hoc 包仍为普通窗口。发版流程见本机 skill `nivlet-release`。
+
+## 历史 · 2.0.5 / Build 65
 
 图标更新版，功能不变。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.0.5 版本说明](documentation/RELEASE-v2.0.5.md)。产品源码 `2a60c55`，仅 Apple Silicon。应用图标为石墨灰底板配柔和青蓝色折带 N，由旧蓝色图标色调映射生成；菜单栏模板图标重绘为同款折带。图标来源与更换步骤见 [开发与构建](documentation/DEVELOPMENT.md) 的“应用与菜单栏图标”，截图与 GIF 重新生成方式见 [公开截图](documentation/SCREENSHOTS.md)。官网 `docs/` 重做为简洁风格，首屏按语言嵌入演示 GIF，样式与脚本带内容哈希避免缓存错配。发版流程见本机 skill `nivlet-release`。
 
