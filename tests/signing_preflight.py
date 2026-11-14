@@ -18,6 +18,9 @@ class SigningPreflightTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix='nivlet-sign-preflight-')
         self.addCleanup(self.temporary.cleanup)
+        environment = patch.dict(signer.os.environ, {'NIVLET_DMGBUILD': signer.sys.executable})
+        environment.start()
+        self.addCleanup(environment.stop)
         self.release = Path(self.temporary.name).resolve() / 'release'
         self.source = self.release / 'arm64/DerivedData/Build/Products/Release/Nivlet.app'
         self.version = (ROOT / 'VERSION').read_text().strip()
@@ -81,6 +84,19 @@ class SigningPreflightTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'CFBundleVersion mismatch'):
                 signer.main()
             external.assert_not_called()
+        self.assertFalse((self.release / 'dist').exists())
+
+    def test_missing_dmgbuild_fails_before_any_tool_or_output(self):
+        self.write_source()
+        missing = str(Path(self.temporary.name) / 'no-dmgbuild')
+        with patch.dict(signer.os.environ, {'NIVLET_DMGBUILD': missing}), \
+                patch.object(signer.sys, 'argv', self.argv), \
+                patch.object(signer.subprocess, 'run') as external, \
+                patch('sys.stderr', new_callable=io.StringIO) as error:
+            with self.assertRaises(SystemExit):
+                signer.main()
+            external.assert_not_called()
+        self.assertIn('dmgbuild not found', error.getvalue())
         self.assertFalse((self.release / 'dist').exists())
 
 

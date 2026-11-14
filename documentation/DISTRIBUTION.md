@@ -7,7 +7,7 @@
 1. 在隔离目录固定源码、Runtime 与 Sparkle 2.10.0，递增 Build；不覆盖旧附件或未提交工作区。Git author/committer 使用指定 noreply 身份。
 2. 完成相关回归、独立审阅、原生构建和产物隐私检查。所有内嵌 Mach-O 必须仅 arm64，Toolkit 资源与源码逐文件相同。
 3. 签名前只裁剪不参与运行的框架开发文件，保留运行资源、许可证、更新器及匹配 dSYM；dSYM 不进入安装包。
-4. 使用既有 Developer ID、Team、Bundle ID 和 entitlement 签名嵌套代码；不增加权限。App ZIP 公证 Accepted 后 staple，最终 DMG 同样签名、公证、staple，二者均通过严格签名与 Gatekeeper。
+4. 使用既有 Developer ID、Team、Bundle ID 和 entitlement 签名嵌套代码；不增加权限。App ZIP 公证 Accepted 后 staple，再由 `scripts/make-dmg.py` 生成带定制安装窗口的 DMG（见[开发与构建](DEVELOPMENT.md)的“DMG 安装窗口”），最终 DMG 同样签名、公证、staple，二者均通过严格签名与 Gatekeeper。签名前需先安装固定版本的 dmgbuild，否则 `sign-notarize.py` 在预检阶段即停止。
 5. 隔离生成 appcast，使用 Keychain 中已有 Sparkle Ed25519 密钥签名；验证版本、Build、实际架构、公钥、SHA-256 和篡改拒绝。新项必须包含 `hardwareRequirements=arm64`。
 6. 用户授权发布后上传版本 tag 和 ZIP/DMG/SHA-256；重新下载附件核对，再将已验证 feed 与官网状态发布到 `main` 的 `docs/`，回查 GitHub Pages 和 CI。
 7. 不上传个人配置、私钥、公证凭据、内部日志或私人截图。不将静态前端测试写成原生或跨设备验证，不将停止 Intel 构建写成 ARM 包体减半。

@@ -52,6 +52,10 @@ def main():
             parser.error('Missing required --' + flag.replace('_', '-') + ' (or its NIVLET environment variable)')
     if not args.build.isdecimal():
         parser.error('--build must be a numeric build number')
+    dmgbuild = Path(os.environ.get('NIVLET_DMGBUILD') or ROOT / 'build/dmg-venv/bin/dmgbuild')
+    if not args.dry_run and not (dmgbuild.is_file() and os.access(dmgbuild, os.X_OK)):
+        parser.error(f'dmgbuild not found at {dmgbuild}; install it with: python3 -m venv build/dmg-venv'
+                     ' && build/dmg-venv/bin/pip install -r scripts/requirements-dmg.txt')
     archs = args.archs or ['arm64']
     if len(set(archs)) != len(archs):
         parser.error('Duplicate architectures')
@@ -109,7 +113,7 @@ def main():
     for arch in archs:
         work = release / arch
         base = f'Nivlet-{version}-build{args.build}-{arch}'
-        outputs = [work / 'Nivlet.app', work / 'dmg-stage', work / (base + '-notary.zip')]
+        outputs = [work / 'Nivlet.app', work / (base + '-notary.zip')]
         outputs += [dist / (base + suffix) for suffix in ['.zip', '.dmg', '.sha256']]
         outputs += [release / f'notary-{kind}-{arch}{suffix}'
                     for kind in ['app', 'dmg'] for suffix in ['.json', '-log.json']]
@@ -164,16 +168,8 @@ def main():
         archive, dmg = dist / (base + '.zip'), dist / (base + '.dmg')
         run('ditto', '-c', '-k', '--sequesterRsrc', '--keepParent', app, archive)
         run(sys.executable, ROOT / 'scripts/check-privacy.py', '--zip', archive)
-        stage = work / 'dmg-stage'
-        print('+ mkdir ' + shlex.quote(str(stage)))
-        if not args.dry_run:
-            stage.mkdir()
-        run('ditto', app, stage / 'Nivlet.app')
-        print('+ ln -s /Applications ' + shlex.quote(str(stage / 'Applications')))
-        if not args.dry_run:
-            (stage / 'Applications').symlink_to('/Applications')
-        run('hdiutil', 'create', '-quiet', '-volname', 'Nivlet ' + version,
-            '-srcfolder', stage, '-format', 'UDZO', dmg)
+        run(sys.executable, ROOT / 'scripts/make-dmg.py', '--dmgbuild', dmgbuild,
+            '--volname', 'Nivlet ' + version, app, dmg)
         sign(dmg, runtime=False)
         notarize(dmg, 'dmg-' + arch)
         run('xcrun', 'stapler', 'staple', dmg)

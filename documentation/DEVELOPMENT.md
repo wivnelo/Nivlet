@@ -36,6 +36,20 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=arm64 NIVLE
 - 菜单栏图标 `Toolkit/assets/nivlet-menu.svg` / `.png`（18 pt，72 px 模板图，纯黑加透明）与应用图标同为折带造型，斜带与竖笔间留细缝表现折叠；由系统按深浅色着色，不随应用图标换色。
 - 更换图标后需重新生成截图与 GIF（见[公开截图](SCREENSHOTS.md)），以免媒体中仍显示旧图标。
 
+## DMG 安装窗口
+
+- 正式 DMG 打开后是定制的 Finder 窗口：660 × 400 pt，青蓝中间调背景，左侧 Nivlet、右侧“应用程序”快捷方式，中间弧形箭头和“拖到‘应用程序’即可安装”的中英提示；隐藏工具栏、侧栏、路径栏与状态栏，图标 128 pt。
+- 设计资源在 `assets/dmg/`：`background.svg` 为背景源文件，`background.tiff` 含 660 × 400 与 1320 × 800 两档（由无头 Chrome 按 1x、2x 渲染后用 `tiffutil -cathidpicheck` 合成），`dmg-settings.py` 为窗口与图标坐标。改背景箭头位置时须同步图标坐标。
+- 背景取中间亮度：Finder 图标下的文件名在浅色模式为黑字、深色模式为白字且不可更改，两者在此背景上都可读。
+- `scripts/make-dmg.py` 调用 [dmgbuild](https://pypi.org/project/dmgbuild/) 写入窗口布局（不需要脚本控制 Finder），随后只读挂载复验 `.DS_Store`、背景、`Applications` 链接与 App 严格签名。dmgbuild 版本固定在 `scripts/requirements-dmg.txt`，安装到被忽略的 `build/dmg-venv`：
+
+```sh
+python3 -m venv build/dmg-venv && build/dmg-venv/bin/pip install -r scripts/requirements-dmg.txt
+```
+
+- 不要设置 dmgbuild 的 `hide_extensions`：它会在 App 包上写 Finder 信息，导致 `codesign --verify --strict` 失败。
+- `scripts/package-local.sh` 的本地 ad-hoc 包仍用普通 `hdiutil` 窗口并附说明文本，不使用此设计。
+
 ## 回归与隐私检查
 
 ```sh
