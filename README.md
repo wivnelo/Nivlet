@@ -5,8 +5,8 @@
 <h1 align="center">Nivlet for Mac</h1>
 
 <p align="center">
-  <strong>Everyday tools. Right in your menu bar.</strong><br>
-  Clipboard history, window management, app shortcuts and browser routing — all in one small app.
+  <strong>The little things. Taken care of.</strong><br>
+  Find anything you copied, snap windows into place, open apps with a keystroke and send every link to the right browser — all from the menu bar.
 </p>
 
 <p align="center">
@@ -65,7 +65,7 @@ macOS 13.0 or later on Apple Silicon. Every release is Developer ID signed and n
 
 <br>
 
-Rendered from the 2.0.1 / Build 61 settings frontend with synthetic data, before the current icon. They illustrate the interface, not a native end-to-end test.
+Rendered from the settings frontend with synthetic data. They illustrate the interface, not a native end-to-end test.
 
 <table>
 <tr>

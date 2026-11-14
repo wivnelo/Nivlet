@@ -5,8 +5,8 @@
 <h1 align="center">Nivlet for Mac</h1>
 
 <p align="center">
-  <strong>常用工具，就在菜单栏。</strong><br>
-  剪贴板历史、窗口管理、应用快捷启动与浏览器分流，一个应用全部搞定。
+  <strong>常用的小事，交给菜单栏。</strong><br>
+  复制过的内容随时找回，窗口一键摆好，常用应用一按就开，链接自动用对的浏览器打开。
 </p>
 
 <p align="center">
@@ -65,7 +65,7 @@ macOS 13.0 及以上，Apple Silicon。正式版均使用 Developer ID 签名并
 
 <br>
 
-截图来自 2.0.1 / Build 61 设置前端与合成数据，早于当前图标，仅示意界面，不代表原生端到端验收。
+截图来自设置前端与合成数据，仅示意界面，不代表原生端到端验收。
 
 <table>
 <tr>

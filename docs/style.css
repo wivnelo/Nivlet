@@ -19,6 +19,7 @@ a:hover{text-decoration:underline}
 a:focus-visible,button:focus-visible{outline:2px solid var(--link);outline-offset:3px;border-radius:6px}
 h1,h2,h3{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Helvetica Neue",sans-serif;margin:0;color:var(--ink)}
 p{margin:0}
+h1,h2,h3,.lead,.sub,.fine{text-wrap:balance}
 
 /* nav */
 .nav{position:sticky;top:0;z-index:10;background:var(--nav);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line)}
@@ -49,24 +50,11 @@ h1{font-size:clamp(40px,7vw,72px);line-height:1.06;letter-spacing:-.015em;font-w
 .lead{font-size:clamp(19px,2.4vw,24px);line-height:1.35;color:var(--muted);max-width:640px;margin:20px auto 30px}
 .fine{font-size:12px;color:var(--muted);margin-top:18px}
 
-/* illustrative menu bar */
-.stage{margin:56px auto 0;max-width:880px}
-.desktop{position:relative;height:340px;border-radius:22px 22px 0 0;overflow:hidden;background:linear-gradient(160deg,var(--desk-a),var(--desk-b));text-align:left}
-.menubar{height:30px;display:flex;justify-content:space-between;align-items:center;padding:0 16px;background:var(--menubar);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);color:var(--menu-ink);font-size:13px;font-weight:600}
-.menubar-left{display:flex;align-items:center;gap:16px}
-.menubar-left b{width:12px;height:12px;border-radius:50%;background:currentColor;opacity:.85}
-.menubar-right{display:flex;align-items:center;gap:16px}
-.speed{font-size:8.5px;line-height:1.1;font-weight:600;font-variant-numeric:tabular-nums}
-.glyph{width:16px;height:16px;color:var(--menu-ink)}
-.menu-n{padding:3px;width:24px;height:22px;border-radius:5px;background:rgba(127,127,127,.28)}
-.dropdown{position:absolute;right:28px;top:36px;width:300px;padding:6px;border-radius:12px;background:var(--menu);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);box-shadow:0 0 0 .5px rgba(0,0,0,.18),0 12px 40px rgba(0,0,0,.28);color:var(--menu-ink);font-size:13px}
-.dropdown-title{font-size:11px;font-weight:600;color:var(--muted);padding:6px 10px 4px}
-.item{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.item:first-of-type{background:var(--link);color:#fff}
-.item i{font-style:normal;width:20px;text-align:center;opacity:.6}
-.item.muted{color:var(--muted);border-top:1px solid var(--line);border-radius:0;margin-top:4px;padding-top:9px}
-.thumb{width:20px;height:20px;border-radius:5px;background:url(assets/nivlet-icon.webp) center/cover}
-.stage figcaption{font-size:12px;color:var(--muted);padding:12px 0 0}
+/* demo */
+.stage{margin:56px auto 0;max-width:900px}
+.screen{border-radius:18px;overflow:hidden;background:#1f1e20;box-shadow:0 0 0 1px var(--line),0 30px 80px rgba(0,0,0,.22)}
+.screen img{display:block;width:100%;height:auto}
+.stage figcaption{font-size:12px;color:var(--muted);padding:14px 0 0}
 
 /* bands */
 .band{padding:110px 22px}
@@ -149,9 +137,7 @@ footer{background:var(--bg-alt);border-top:1px solid var(--line);padding:22px}
   .tile.span3 .visual{padding-top:22px}
   .tile{min-height:0;padding:28px 24px}
   .band{padding:64px 16px}
-  .desktop{height:300px;border-radius:16px 16px 0 0}
-  .dropdown{right:12px;left:12px;width:auto}
-  .speed{display:none}
+  .screen{border-radius:12px}
   .foot{flex-direction:column}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}

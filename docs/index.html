@@ -6,7 +6,7 @@
 <meta name="description" content="Nivlet for Mac brings clipboard history, window management, app shortcuts and browser routing to your Mac menu bar. Free and open source.">
 <meta name="color-scheme" content="light dark">
 <link rel="canonical" href="https://wivnelo.github.io/Nivlet/">
-<title data-zh="Nivlet for Mac — 常用工具，就在菜单栏">Nivlet for Mac — Everyday tools in your menu bar</title>
+<title data-zh="Nivlet for Mac — 常用的小事，交给菜单栏">Nivlet for Mac — The little things, taken care of</title>
 <link rel="icon" href="assets/favicon.png">
 <link rel="apple-touch-icon" href="assets/nivlet-icon.webp">
 <link rel="stylesheet" href="style.css">
@@ -35,85 +35,69 @@
 <section class="hero">
   <img class="hero-icon" src="assets/nivlet-icon.webp" alt="Nivlet app icon" width="168" height="168" decoding="async">
   <p class="kicker">Nivlet for Mac</p>
-  <h1 data-zh="常用工具，<br>就在菜单栏。">Everyday tools.<br>Right in your menu bar.</h1>
-  <p class="lead" data-zh="剪贴板历史、窗口管理、应用快捷启动与浏览器分流，一个应用全部搞定。">Clipboard history, window management, app shortcuts and browser routing — all in one small app.</p>
+  <h1 data-zh="常用的小事，<br>交给菜单栏。">The little things.<br>Taken care of.</h1>
+  <p class="lead" data-zh="复制过的内容随时找回，窗口一键摆好，常用应用一按就开，链接自动用对的浏览器打开。">Find anything you copied, snap windows into place, open apps with a keystroke and send every link to the right browser — all from the menu bar.</p>
   <div class="cta">
     <a class="pill" href="https://github.com/wivnelo/Nivlet/releases/latest" data-zh="下载 Mac 版">Download for Mac</a>
     <a class="more" href="#features" data-zh="了解更多">Learn more</a>
   </div>
-  <p class="fine" data-zh="免费开源 · macOS 13.0+ · Apple Silicon">Free and open source · macOS 13.0+ · Apple Silicon</p>
+  <p class="fine" data-zh="免费开源 · macOS 13 或更高版本 · Apple 芯片">Free and open source · macOS 13 or later · Apple silicon</p>
 
-  <figure class="stage" aria-label="Illustrative menu bar with the Nivlet clipboard menu">
-    <div class="desktop">
-      <div class="menubar">
-        <span class="menubar-left"><b></b><span>Finder</span></span>
-        <span class="menubar-right">
-          <span class="speed">↑ 12 KB/s<br>↓ 84 KB/s</span>
-          <svg class="glyph" viewBox="0 0 18 18" aria-hidden="true"><rect x="4" y="3" width="10" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="6.5" y="1.8" width="5" height="3" rx="1" fill="currentColor"/></svg>
-          <svg class="glyph menu-n" viewBox="0 0 18 18" aria-hidden="true"><defs><mask id="fold"><rect width="18" height="18" fill="#fff"/><path d="M4.1 4.3 13.9 13.7" stroke="#000" stroke-width="5.5" stroke-linecap="round"/></mask></defs><g fill="currentColor"><g mask="url(#fold)"><rect x="2.2" y="2.4" width="3.8" height="13.2" rx="1.9"/><rect x="12" y="2.4" width="3.8" height="13.2" rx="1.9"/></g><path d="M4.1 4.3 13.9 13.7" stroke="currentColor" stroke-width="3.8" stroke-linecap="round"/></g></svg>
-        </span>
-      </div>
-      <div class="dropdown">
-        <div class="dropdown-title" data-zh="剪贴板历史">Clipboard history</div>
-        <div class="item"><span class="thumb"></span><span data-zh="图片 · 128×128">Image · 128×128</span></div>
-        <div class="item"><i>T</i><span data-zh="项目会议记录">Project meeting notes</span></div>
-        <div class="item"><i>T</i><span>https://github.com/wivnelo/Nivlet</span></div>
-        <div class="item muted"><i>⌕</i><span data-zh="搜索历史…">Search history…</span></div>
-      </div>
-    </div>
-    <figcaption data-zh="界面示意，不含个人数据">Illustrative interface. No personal data.</figcaption>
+  <figure class="stage">
+    <div class="screen"><img src="assets/demos/overview-en.gif" data-zh-src="assets/demos/overview-zh.gif" width="1120" height="850" alt="Nivlet demo: window layouts, clipboard search, browser routing and app shortcuts" data-zh-alt="Nivlet 动态演示：窗口布局、剪贴板搜索、浏览器分流与应用快捷键"></div>
+    <figcaption data-zh="演示使用示例数据，系统响应为模拟。">Demo uses sample data and simulated system responses.</figcaption>
   </figure>
 </section>
 
 <section id="features" class="band gray">
   <div class="wrap">
-    <h2 data-zh="伸手就用的，<br>都在这里。">Everything you reach for.<br>In one place.</h2>
-    <p class="sub" data-zh="需要什么就开启什么，在设置中直接配置，无需编写代码。">Turn on only what you need and set it up in Settings. No coding required.</p>
+    <h2 data-zh="每天都会用到的，<br>都在这儿了。">The things you do every day.<br>All in one place.</h2>
+    <p class="sub" data-zh="用得上的打开，用不上的关掉。全部在设置里点选完成，不用写一行代码。">Turn on what you use and leave the rest off. It’s all point-and-click in Settings — no code.</p>
 
     <div class="grid">
       <article class="tile span2">
         <div class="tile-text">
           <p class="label" data-zh="剪贴板">Clipboard</p>
-          <h3 data-zh="复制过的，都能找回。">Everything you copied. Found again.</h3>
-          <p data-zh="保留文字和图片，支持搜索、缩略图与放大预览，按住 Option 点击直接粘贴。可设置保留期限、排除指定应用，或随时关闭记录。">Keep text and images with search, thumbnails and larger previews. Option-click to paste. Set retention limits, exclude apps or turn recording off at any time.</p>
+          <h3 data-zh="刚才复制的，还在这儿。">That thing you copied? Still here.</h3>
+          <p data-zh="文字和图片都会记下来，可以搜索、看大图，按住 Option 点一下就能直接粘贴。记多久、哪些应用不记，都由你定，也能随时关掉。">Text and images are saved as you copy. Search them, preview images, or Option-click to paste straight in. You decide how long to keep things and which apps to skip — or switch it off anytime.</p>
         </div>
-        <div class="visual search"><span>⌕</span><span data-zh="查找之前复制的内容">Find something you copied</span><kbd>⌘⇧V</kbd></div>
+        <div class="visual search"><span>⌕</span><span data-zh="搜一下刚才复制的…">Search what you copied…</span><kbd>⌘⇧V</kbd></div>
       </article>
 
       <article class="tile">
         <p class="label" data-zh="窗口管理">Windows</p>
-        <h3 data-zh="一键摆好窗口。">Windows, arranged.</h3>
-        <p data-zh="半屏、四角、三分区、九宫格、居中、跨屏与恢复，共 29 项操作。">Halves, quarters, thirds, a 3×3 grid, centering, display moves and restore — 29 actions.</p>
+        <h3 data-zh="窗口，一键摆好。">Windows, right where you want them.</h3>
+        <p data-zh="左右半屏、四角、三等分、九宫格，居中、换屏、复原，一共 29 种摆法，都能配快捷键。">Halves, quarters, thirds, a 3×3 grid, centered, moved to another display or put back — 29 layouts, each on a shortcut.</p>
         <div class="visual layout"><span></span><span></span><span></span></div>
       </article>
 
       <article class="tile">
         <p class="label" data-zh="应用启动">App shortcuts</p>
-        <h3 data-zh="按一下，应用就到。">Press a key. There’s your app.</h3>
-        <p data-zh="为常用应用设置快捷键，打开或切到前台，并自动检查冲突。">Assign shortcuts to open or bring forward your apps, with conflict checks built in.</p>
+        <h3 data-zh="想用哪个，按一下就来。">One keystroke. Right app.</h3>
+        <p data-zh="给常用应用配个快捷键：没开就打开，开着就切到前面。快捷键撞车了会提醒你。">Give your favorite apps a shortcut. Nivlet opens them or brings them forward, and lets you know if two shortcuts clash.</p>
         <div class="visual keys"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>1</kbd></div>
       </article>
 
       <article class="tile">
         <p class="label" data-zh="浏览器分流">Browser routing</p>
-        <h3 data-zh="每个链接，去对的浏览器。">Every link. The right browser.</h3>
-        <p data-zh="按来源应用或网站选择浏览器，未匹配的链接使用你指定的默认浏览器。部分应用可能无法识别来源。">Choose a browser by source app or website, with a fallback for everything else. Some apps may not report their source.</p>
+        <h3 data-zh="链接，自动用对的浏览器打开。">Every link, in the right browser.</h3>
+        <p data-zh="比如聊天里的链接用 Safari、工作网站用 Chrome。按来源应用或网址定规则，其余链接走默认浏览器；个别应用不提供来源，也按默认处理。">Chat links in Safari, work sites in Chrome. Set rules by source app or website and everything else goes to your fallback — including links from the few apps that don’t say where they came from.</p>
         <div class="visual route"><span data-zh="聊天应用">Chat app</span><b>→</b><span>Safari</span></div>
       </article>
 
       <article class="tile">
         <p class="label" data-zh="系统与输入法">System &amp; input</p>
-        <h3 data-zh="状态一眼可见。">Status at a glance.</h3>
-        <p data-zh="菜单栏显示网速，菜单里查看 CPU、内存、磁盘与网络地址。为应用指定输入法，切换时自动切换。">See network speed in the menu bar, with CPU, memory, disk and addresses in its menu. Assign an input source to each app and switch automatically.</p>
+        <h3 data-zh="网速负载，心里有数。">Know what your Mac is up to.</h3>
+        <p data-zh="菜单栏上直接看网速，点开还能看 CPU、内存、磁盘和 IP。还可以给每个应用指定输入法，切过去自动换好。">Network speed sits in the menu bar; CPU, memory, disk and IP addresses are a click away. Pick an input source for each app and it switches for you.</p>
       </article>
 
       <article class="tile span3 dark">
         <div class="tile-text">
-          <p class="label" data-zh="更多">And more</p>
-          <h3 data-zh="贴合你的 Mac。">Made to fit your Mac.</h3>
-          <p data-zh="可选保持唤醒与屏幕长亮；简体/繁体中文、英文、日语；跟随深浅色外观；配置可导出为 JSON，换机时导入。">Optional Keep Awake and Keep Display On. Simplified and Traditional Chinese, English and Japanese. Light and dark appearance. Export settings as JSON and import them on another Mac.</p>
+          <p class="label" data-zh="还有更多">And more</p>
+          <h3 data-zh="细节，也替你想到了。">The details, covered.</h3>
+          <p data-zh="需要时让 Mac 保持唤醒、屏幕常亮；界面支持简繁中文、英文和日文，跟随系统深浅色；换电脑时，把设置导出成 JSON 再导入就行。">Keep your Mac awake — and the display on — when you need to. Use it in Simplified or Traditional Chinese, English or Japanese, in light or dark. New Mac? Export your settings as JSON and bring them along.</p>
         </div>
-        <div class="visual chips"><span>Keep Awake</span><span>中文</span><span>English</span><span>日本語</span><span>JSON</span></div>
+        <div class="visual chips"><span data-zh="保持唤醒">Keep Awake</span><span>中文</span><span>English</span><span>日本語</span><span>JSON</span></div>
       </article>
     </div>
   </div>
@@ -121,37 +105,37 @@
 
 <section id="privacy" class="band">
   <div class="wrap narrow center">
-    <h2 data-zh="你的数据，<br>留在你的 Mac 上。">Your data stays<br>on your Mac.</h2>
-    <p class="sub" data-zh="无需账号。配置和剪贴板记录都在本机处理，不会上传。核心工具可离线使用。">No account. Settings and clipboard history are processed locally and never uploaded. Core tools work offline.</p>
+    <h2 data-zh="你的数据，<br>只在你的 Mac 上。">Your data stays<br>on your Mac.</h2>
+    <p class="sub" data-zh="不用注册账号。设置和剪贴板内容都留在本机，不会上传，断网也照常能用。">No sign-up. Your settings and clipboard never leave your Mac, and the core tools work offline.</p>
     <div class="facts">
-      <div><h3 data-zh="默认退出即清空">Cleared on quit</h3><p data-zh="剪贴板历史默认退出后清空。跨重启保留使用本地明文缓存，复制敏感内容前可关闭记录。">Clipboard history is cleared on quit by default. Optional persistence uses a local plaintext cache; turn recording off before copying sensitive content.</p></div>
-      <div><h3 data-zh="签名并经公证">Signed and notarized</h3><p data-zh="正式版均使用 Developer ID 签名并通过 Apple 公证，更新需你确认后才安装。">Every release is Developer ID signed and notarized by Apple. Updates install only after you confirm.</p></div>
-      <div><h3 data-zh="不做追踪">No tracking</h3><p data-zh="本站不使用分析脚本或追踪 Cookie。检查更新和打开网页时才会联网。">This site uses no analytics scripts or tracking cookies. The app goes online only to check for updates or open links.</p></div>
+      <div><h3 data-zh="退出就清空">Gone when you quit</h3><p data-zh="剪贴板记录默认在退出时清空。如果选择保留，内容会以明文存在本机，复制密码这类敏感信息前，记得先暂停记录。">Clipboard history is cleared when you quit, by default. If you choose to keep it, it’s stored as plain text on your Mac — so pause recording before copying anything sensitive.</p></div>
+      <div><h3 data-zh="签名公证，更新你说了算">Signed, notarized, your call</h3><p data-zh="每个正式版都有 Developer ID 签名并经过 Apple 公证。有新版本时，你点了确认才会安装。">Every release is signed with a Developer ID and notarized by Apple. Updates install only when you say so.</p></div>
+      <div><h3 data-zh="不追踪">No tracking</h3><p data-zh="这个网站没有统计脚本，也不用追踪 Cookie。应用只在检查更新或打开链接时联网。">This site has no analytics or tracking cookies. The app goes online only to check for updates or open a link.</p></div>
     </div>
   </div>
 </section>
 
 <section id="start" class="band gray">
   <div class="wrap">
-    <h2 data-zh="三步开始。">Up and running in three steps.</h2>
+    <h2 data-zh="三步，就能用上。">Up and running in three steps.</h2>
     <ol class="steps">
-      <li><span>1</span><h3 data-zh="下载安装">Download</h3><p data-zh="下载 DMG 或 ZIP，将 Nivlet 拖入“应用程序”后打开。">Get the DMG or ZIP, move Nivlet to Applications and open it.</p></li>
-      <li><span>2</span><h3 data-zh="按需授权">Allow access</h3><p data-zh="窗口管理和 Option 直接粘贴需要辅助功能权限。无需关闭 Gatekeeper。">Window actions and Option-paste need Accessibility permission. Never disable Gatekeeper.</p></li>
-      <li><span>3</span><h3 data-zh="设置并保存">Set it up</h3><p data-zh="点击菜单栏 N 图标打开设置，开启所需功能，点击“保存全部设置”。浏览器分流需将 Nivlet 设为默认浏览器。">Click the N in the menu bar, open Settings, turn on what you need and click Save All Settings. Browser routing needs Nivlet as the default browser.</p></li>
+      <li><span>1</span><h3 data-zh="下载">Download</h3><p data-zh="下载 DMG 或 ZIP，把 Nivlet 拖进“应用程序”，然后打开。">Grab the DMG or ZIP, drag Nivlet into Applications and open it.</p></li>
+      <li><span>2</span><h3 data-zh="允许访问">Allow access</h3><p data-zh="摆窗口和 Option 直接粘贴需要“辅助功能”权限，按提示打开即可。不需要关闭 Gatekeeper。">Arranging windows and Option-paste need Accessibility access — just follow the prompt. There’s no need to turn off Gatekeeper.</p></li>
+      <li><span>3</span><h3 data-zh="按你的习惯设置">Make it yours</h3><p data-zh="点菜单栏里的 N 打开设置，开启想用的功能，再点“保存全部设置”。要用浏览器分流，记得把 Nivlet 设为默认浏览器。">Click the N in the menu bar, open Settings, turn on what you want and click Save All Settings. For browser routing, set Nivlet as your default browser.</p></li>
     </ol>
-    <p class="center"><a class="more" id="installGuide" href="https://github.com/wivnelo/Nivlet/blob/main/documentation/INSTALLATION.en.md" data-zh="完整安装与升级指南">Installation and upgrade guide</a></p>
+    <p class="center"><a class="more" id="installGuide" href="https://github.com/wivnelo/Nivlet/blob/main/documentation/INSTALLATION.en.md" data-zh="查看完整安装与升级说明">Full install and upgrade guide</a></p>
   </div>
 </section>
 
 <section class="band closing">
   <div class="wrap center">
     <img src="assets/nivlet-icon.webp" alt="" width="96" height="96" loading="lazy">
-    <h2 data-zh="让 Mac 更顺手。">Make your Mac feel easier.</h2>
+    <h2 data-zh="让每天的操作，<br>顺手一点。">Make every day<br>a little smoother.</h2>
     <div class="cta">
       <a class="pill" href="https://github.com/wivnelo/Nivlet/releases/latest" data-zh="下载 Mac 版">Download for Mac</a>
       <a class="more" href="https://github.com/wivnelo/Nivlet/blob/main/documentation/README.md" data-zh="版本说明">Release notes</a>
     </div>
-    <p class="fine" data-zh="macOS 13.0+，仅支持 Apple Silicon。1.0.8 / Build 55 是最后一个 Intel 版本，<a href=&quot;https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8&quot;>仍可下载</a>。">macOS 13.0+, Apple Silicon only. Version 1.0.8 / Build 55 is the final Intel release and <a href="https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8">remains available</a>.</p>
+    <p class="fine" data-zh="需要 macOS 13 或更高版本，以及搭载 Apple 芯片的 Mac。Intel 芯片的 Mac 可下载<a href=&quot;https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8&quot;>最后一个 Intel 版本 1.0.8</a>。">Requires macOS 13 or later on a Mac with Apple silicon. On an Intel Mac, you can still download <a href="https://github.com/wivnelo/Nivlet/releases/tag/v1.0.8">1.0.8, the last Intel version</a>.</p>
   </div>
 </section>
 
