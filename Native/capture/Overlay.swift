@@ -435,6 +435,7 @@ final class Session: NSObject, NSTextFieldDelegate {
         case .undo: undo()
         case .redo: redo()
         case .ocr: recognizeText()
+        case .pin: pinAndFinish()
         case .qr: recognizeCodes()
         case .save: saveAndFinish()
         case .cancel: cancel()
@@ -548,6 +549,7 @@ final class Session: NSObject, NSTextFieldDelegate {
         if phase == .choosing && key == "c" { copyColor(); return true }
         guard phase == .selected else { return false }
         if key == "o" { recognizeText(); return true }
+        if key == "p" { pinAndFinish(); return true }
         if key == "q" { recognizeCodes(); return true }
         let shortcuts: [String: Tool] = ["r": .rect, "a": .arrow, "b": .pen, "t": .text, "m": .mosaic]
         if let t = shortcuts[key] { setTool(tool == t ? nil : t); return true }
@@ -616,7 +618,7 @@ final class Session: NSObject, NSTextFieldDelegate {
     private func copyAndFinish() {
         if editor != nil { commitText() }
         guard let image = render() else { return }
-        guard ClipboardWriter.write(image) else { finish(["event": "error", "message": "copy"]); return }
+        guard ClipboardWriter.write(image, scale: frozen[activeIndex ?? 0].pixelScale) else { finish(["event": "error", "message": "copy"]); return }
         finish(["event": "copied", "width": image.width, "height": image.height])
     }
 
@@ -624,7 +626,7 @@ final class Session: NSObject, NSTextFieldDelegate {
         if editor != nil { commitText() }
         guard let image = render() else { return }
         do {
-            let url = try FileSaver.save(image, directory: config.saveDirectory, format: config.format)
+            let url = try FileSaver.save(image, directory: config.saveDirectory, format: config.format, scale: frozen[activeIndex ?? 0].pixelScale)
             finish(["event": "saved", "path": url.path, "width": image.width, "height": image.height])
         } catch {
             finish(["event": "error", "message": "save", "detail": error.localizedDescription])
@@ -632,6 +634,16 @@ final class Session: NSObject, NSTextFieldDelegate {
     }
 
     func cancel() { finish(["event": "cancelled"]) }
+
+    /// Pins the annotated selection where it sits on screen, then closes the overlay.
+    private func pinAndFinish() {
+        if editor != nil { commitText() }
+        guard let i = activeIndex, let image = render() else { return }
+        let origin = windows[i].frame.origin
+        let global = selection.offsetBy(dx: origin.x, dy: origin.y)
+        finish(["event": "pinnedCapture"])
+        PinManager.shared.pin(image, pointSize: selection.size, at: global)
+    }
 
     // MARK: Recognition
 

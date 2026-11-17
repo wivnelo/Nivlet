@@ -27,7 +27,7 @@ window.runImagePreviewFocusRefreshRegression=async function(data){
   const thumbnail=preview();thumbnail.scrollIntoView({block:'center'});
   if(window.capturePreviewState)await window.capturePreviewState('thumbnail');
   check(thumbnail?.tagName==='IMG'&&thumbnail.tabIndex===0&&thumbnail.getAttribute('role')==='button'&&thumbnail.getAttribute('aria-label')===t('放大预览'),'Thumbnail lacks accessible preview activation');
-  check(document.querySelectorAll('#clipHistory .clip-card-actions button').length===1,'Visible preview button remains beside Copy');
+  check(document.querySelectorAll('#clipHistory .clip-card-actions button:not([data-clip-action=pin])').length===1,'Visible preview button remains beside Copy');
   let bubbled=0;const countBubble=()=>bubbled++;thumbnail.parentElement.addEventListener('click',countBubble);
   requests=[];thumbnail.click();
   check(requests.length===1&&requests[0].action==='previewClipboard'&&requests[0].id===entry.id&&bubbled===0,'Thumbnail click copied, bubbled or targeted the wrong entry');

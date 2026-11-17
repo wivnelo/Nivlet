@@ -9,10 +9,11 @@ var strings: [String: String] = [
     "ocrTitle": "识别到的文字", "qrTitle": "二维码", "noText": "没有识别到文字", "noCode": "没有找到二维码",
     "recognizeFailed": "识别失败，请重试", "copyClose": "复制并关闭", "openLink": "打开链接", "close": "关闭",
     "joinLines": "合并为一行", "copied": "已复制",
+    "pin": "钉到桌面", "opacity": "透明度", "actualSize": "原始大小", "closeAllPins": "关闭全部贴图",
 ]
 func t(_ key: String) -> String { strings[key] ?? key }
 
-enum ToolbarAction { case tool(Tool), undo, redo, ocr, qr, save, cancel, copy }
+enum ToolbarAction { case tool(Tool), undo, redo, ocr, qr, pin, save, cancel, copy }
 
 /// A small button that shows an SF Symbol and a pressed state, sized for a 30 pt toolbar.
 final class ToolButton: NSButton {
@@ -117,6 +118,7 @@ final class Toolbar: NSView {
         stack.addArrangedSubview(ToolButton(symbol: "text.viewfinder", tooltip: "\(t("ocr"))  O", target: self, action: #selector(ocr)))
         stack.addArrangedSubview(ToolButton(symbol: "qrcode.viewfinder", tooltip: "\(t("qr"))  Q", target: self, action: #selector(qr)))
         stack.addArrangedSubview(separator())
+        stack.addArrangedSubview(ToolButton(symbol: "pin", tooltip: "\(t("pin"))  P", target: self, action: #selector(pin)))
         stack.addArrangedSubview(ToolButton(symbol: "square.and.arrow.down", tooltip: "\(t("save"))  ⌘S", target: self, action: #selector(save)))
         stack.addArrangedSubview(ToolButton(symbol: "xmark", tooltip: "\(t("cancel"))  Esc", target: self, action: #selector(cancel)))
         let copy = PrimaryButton(title: t("copy"), target: self, action: #selector(copyPressed))
@@ -145,6 +147,7 @@ final class Toolbar: NSView {
     @objc private func undo() { onAction(.undo) }
     @objc private func redo() { onAction(.redo) }
     @objc private func ocr() { onAction(.ocr) }
+    @objc private func pin() { onAction(.pin) }
     @objc private func qr() { onAction(.qr) }
     @objc private func save() { onAction(.save) }
     @objc private func cancel() { onAction(.cancel) }

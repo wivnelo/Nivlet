@@ -143,7 +143,7 @@ local function shortcutEntries(pages)
     for _,rule in ipairs(pages.launcherSection.config.rules) do add("launcherSection",rule.shortcut,pages.launcherSection.config.enabled) end
     add("clipSection",pages.clipSection.popupShortcut,true)
     local captureConfig=pages.captureSection and pages.captureSection.config
-    if captureConfig then add("captureSection",captureConfig.shortcut,captureConfig.enabled) end
+    if captureConfig then add("captureSection",captureConfig.shortcut,captureConfig.enabled);add("captureSection",captureConfig.pinShortcut,captureConfig.enabled) end
     return entries
 end
 batchShortcutConflicts=function(shortcut,owner)
@@ -636,6 +636,18 @@ function app.openSettings(section, focus)
         if body.action == "previewClipboard" then
             local value, result = clipboard.preview(body.id)
             if value then app.settings:evaluateJavaScript("window.showImage("..hs.json.encode(value)..")") else reply(false,result,body.action) end
+        end
+        if body.action == "pinClipboard" then
+            local entry
+            for _,item in ipairs(clipboard.entries) do if item.id==body.id and item.kind=="image" then entry=item end end
+            if not entry then reply(false,i18n.t("图片已过期或被清除"),body.action);return end
+            local path=os.tmpname()..".png"
+            if not entry.image:saveToFile(path,true,"PNG") then reply(false,i18n.t("无法钉住这张图片"),body.action);return end
+            -- The saved file loses its Retina DPI, so pass the on-screen size along with it.
+            local ok,message=capture.pinFile(path,entry.image:size())
+            if not ok then os.remove(path) end
+            reply(ok,ok and "" or message,body.action)
+            return
         end
         if body.action == "copyClipboard" then local success, result = clipboard.copy(body.id); reply(success, result, body.action) end
         if body.action == "clearClipboard" then local success, result = clipboard.confirmClear(); reply(success~=false, result or "", body.action) end

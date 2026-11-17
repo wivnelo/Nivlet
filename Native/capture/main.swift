@@ -29,8 +29,8 @@ final class Helper {
     func handle(_ command: [String: Any]) {
         switch command["cmd"] as? String {
         case "config":
-            if let v = command["saveDirectory"] as? String { config.saveDirectory = v }
-            if let v = command["format"] as? String { config.format = v }
+            if let v = command["saveDirectory"] as? String { config.saveDirectory = v; PinManager.shared.saveDirectory = v }
+            if let v = command["format"] as? String { config.format = v; PinManager.shared.format = v }
             if let v = command["snapWindows"] as? Bool { config.snapWindows = v }
             if let v = command["loupe"] as? Bool { config.loupe = v }
             if let v = command["language"] as? String { config.language = v }
@@ -40,6 +40,13 @@ final class Helper {
             }
         case "capture":
             capture()
+        case "pinClipboard":
+            PinManager.shared.pinClipboard()
+        case "pinFile":
+            if let path = command["path"] as? String {
+                let w = command["width"] as? Double, h = command["height"] as? Double
+                PinManager.shared.pinFile(path, size: w.flatMap { w in h.map { NSSize(width: w, height: $0) } }.flatMap { $0.width > 0 && $0.height > 0 ? $0 : nil })
+            }
         #if NIVLET_SELFTEST
         case "selftest":
             selfTestPath = command["path"] as? String
@@ -96,6 +103,7 @@ final class Helper {
 let app = NSApplication.shared
 app.setActivationPolicy(.accessory)
 let helper = MainActor.assumeIsolated { Helper() }
+MainActor.assumeIsolated { PinManager.shared.emit = { emit($0) } }
 
 NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main) { _ in
     MainActor.assumeIsolated { helper.capturer.invalidate() }

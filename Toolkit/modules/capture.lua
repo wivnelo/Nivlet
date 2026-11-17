@@ -7,7 +7,7 @@ local settingsKey='desktoptoolkit.capture.v1'
 local formats={png=true,jpg=true}
 
 function M.defaults()
-    return {enabled=false,shortcut={key='F1',mods={}},saveDirectory='~/Pictures/Nivlet',format='png',snapWindows=true,loupe=true}
+    return {enabled=false,shortcut={key='F1',mods={}},pinShortcut={key='F3',mods={}},saveDirectory='~/Pictures/Nivlet',format='png',snapWindows=true,loupe=true}
 end
 
 -- F1–F19 may be used without modifiers here only; other keys follow the shared rules.
@@ -32,17 +32,24 @@ function M.validate(value)
     if type(value)~='table' or type(value.enabled)~='boolean' then return nil,i18n.t('截图设置格式无效') end
     local shortcut,message=M.normalizeShortcut(value.shortcut)
     if message then return nil,message end
+    -- Older saved settings have no pin shortcut; they get the default rather than none.
+    local pinValue=value.pinShortcut
+    if pinValue==nil then pinValue=M.defaults().pinShortcut end
+    local pinShortcut,pinMessage=M.normalizeShortcut(pinValue)
+    if pinMessage then return nil,pinMessage end
+    if shortcut and pinShortcut and preferences.same(shortcut,pinShortcut) then return nil,i18n.t('截图和贴图不能使用相同快捷键') end
     local dir=value.saveDirectory
     if type(dir)~='string' or dir=='' or #dir>1024 or not (dir:sub(1,1)=='/' or dir:sub(1,2)=='~/') then return nil,i18n.t('保存位置无效') end
     if not formats[value.format] then return nil,i18n.t('截图格式无效') end
     for _,field in ipairs({'snapWindows','loupe'}) do
         if value[field]~=nil and type(value[field])~='boolean' then return nil,i18n.t('截图设置格式无效') end
     end
-    return {enabled=value.enabled,shortcut=shortcut or false,saveDirectory=dir,format=value.format,snapWindows=value.snapWindows~=false,loupe=value.loupe~=false}
+    return {enabled=value.enabled,shortcut=shortcut or false,pinShortcut=pinShortcut or false,saveDirectory=dir,format=value.format,snapWindows=value.snapWindows~=false,loupe=value.loupe~=false}
 end
 
 function M.conflicts(shortcut)
-    return shortcut and M.config and M.config.enabled and M.config.shortcut and preferences.same(shortcut,M.config.shortcut) or false
+    if not (shortcut and M.config and M.config.enabled) then return false end
+    return (M.config.shortcut and preferences.same(shortcut,M.config.shortcut)) or (M.config.pinShortcut and preferences.same(shortcut,M.config.pinShortcut)) or false
 end
 
 local function helperPath() return hs.processInfo.bundlePath..'/Contents/Resources/Toolkit/capture-helper' end
@@ -62,7 +69,8 @@ local function strings()
     local keys={rect='矩形',arrow='箭头',pen='画笔',text='文字',mosaic='马赛克',undo='撤销',redo='重做',save='保存',cancel='取消',copy='复制',pixelate='像素化',blackout='涂黑',copyColorHint='C 复制颜色',
         ocr='识别文字',qr='识别二维码',recognizing='正在识别…',preparing='首次使用需要准备识别模型，请稍候…',
         ocrTitle='识别到的文字',qrTitle='二维码',noText='没有识别到文字',noCode='没有找到二维码',recognizeFailed='识别失败，请重试',
-        copyClose='复制并关闭',openLink='打开链接',close='关闭',joinLines='合并为一行',copied='已复制'}
+        copyClose='复制并关闭',openLink='打开链接',close='关闭',joinLines='合并为一行',copied='已复制',
+        pin='钉到桌面',opacity='透明度',actualSize='原始大小',closeAllPins='关闭全部贴图'}
     local result={}
     for k,v in pairs(keys) do result[k]=i18n.t(v) end
     return result
@@ -79,7 +87,9 @@ local function handleEvent(event)
         M.ready=true
         if type(event.permission)=='boolean' then M.permission=event.permission end
         sendConfig()
-        if M.pending then M.pending=false;send({cmd='capture'}) end
+        local queued=M.queue or {}
+        M.queue={}
+        for _,command in ipairs(queued) do send(command) end
     elseif kind=='copied' or kind=='textCopied' then
         if M.onCopied then M.onCopied() end
     elseif kind=='saved' then
@@ -87,12 +97,14 @@ local function handleEvent(event)
     elseif kind=='color' then
         if M.onCopied then M.onCopied() end
         notify(i18n.t('已复制颜色 ')..tostring(event.value))
+    elseif kind=='pinned' or kind=='pinnedCapture' then
+        -- Nothing to report: the pin itself is the feedback.
     elseif kind=='permission' then
         M.permission=false
         notify(i18n.t('截图需要屏幕录制权限。请在系统设置中允许 Nivlet，然后再按一次快捷键。'))
         if M.onPermission then M.onPermission() end
     elseif kind=='error' then
-        local messages={save=i18n.t('截图保存失败，请检查保存位置'),copy=i18n.t('截图复制失败，请重试'),capture=i18n.t('截屏失败，请重试')}
+        local messages={save=i18n.t('截图保存失败，请检查保存位置'),copy=i18n.t('截图复制失败，请重试'),capture=i18n.t('截屏失败，请重试'),noImage=i18n.t('剪贴板里没有图片')}
         notify(messages[event.message] or i18n.t('截图失败，请重试'))
     end
 end
@@ -121,7 +133,7 @@ end
 
 function M.stopHelper()
     local task=M.task
-    M.task=nil;M.ready=false;M.pending=false
+    M.task=nil;M.ready=false;M.queue={}
     if task and task:isRunning() then task:setInput(hs.json.encode({cmd='quit'})..'\n');task:closeInput() end
 end
 
@@ -131,11 +143,23 @@ function M.refreshConfig()
     if M.task and M.task:isRunning() and M.ready then sendConfig() end
 end
 
-function M.trigger()
-    if M.task and M.task:isRunning() and M.ready then sendConfig();send({cmd='capture'});return end
-    M.pending=true
+-- Sends a command now, or queues it until a freshly started helper reports ready.
+local function dispatch(command)
+    if M.task and M.task:isRunning() and M.ready then sendConfig();send(command);return end
+    M.queue=M.queue or {}
+    table.insert(M.queue,command)
     local ok,message=M.startHelper()
-    if not ok then M.pending=false;notify(message) end
+    if not ok then M.queue={};notify(message) end
+end
+
+function M.trigger() dispatch({cmd='capture'}) end
+function M.pinClipboard() dispatch({cmd='pinClipboard'}) end
+
+-- Pins an image file (from clipboard history); the helper deletes the file after loading it.
+function M.pinFile(path,size)
+    if not (M.config and M.config.enabled) then return false,i18n.t('请先在截图页启用截图') end
+    dispatch({cmd='pinFile',path=path,width=size and size.w or nil,height=size and size.h or nil})
+    return true
 end
 
 local function clearBindings()
@@ -146,13 +170,15 @@ M.releaseBindings=clearBindings
 
 local function install(config)
     if not config.enabled then return true end
-    local shortcut=config.shortcut
-    if shortcut then
-        if M.externalConflict and M.externalConflict(shortcut) then return false,i18n.t('截图快捷键与其他快捷键重复') end
-        if not preferences.bindable(shortcut.mods,shortcut.key:lower()) then return false,i18n.t('截图快捷键被系统占用或无法注册') end
-        local binding=hs.hotkey.bind(shortcut.mods,shortcut.key:lower(),M.trigger)
-        if not binding then return false,i18n.t('截图快捷键注册失败') end
-        table.insert(M.bindings,binding)
+    for _,item in ipairs({{config.shortcut,M.trigger},{config.pinShortcut,M.pinClipboard}}) do
+        local shortcut,action=item[1],item[2]
+        if shortcut then
+            if M.externalConflict and M.externalConflict(shortcut) then return false,i18n.t('截图快捷键与其他快捷键重复') end
+            if not preferences.bindable(shortcut.mods,shortcut.key:lower()) then return false,i18n.t('截图快捷键被系统占用或无法注册') end
+            local binding=hs.hotkey.bind(shortcut.mods,shortcut.key:lower(),action)
+            if not binding then return false,i18n.t('截图快捷键注册失败') end
+            table.insert(M.bindings,binding)
+        end
     end
     return true
 end

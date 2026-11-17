@@ -8,8 +8,11 @@ enum ClipboardWriter {
     /// Keeps the image alive so TIFF can be produced lazily if a pasting app asks for it.
     private static var provider: TIFFProvider?
 
-    static func write(_ image: CGImage) -> Bool {
+    /// `scale` is pixels per point; it is stored as the PNG's DPI so other apps (and pins) show the
+    /// screenshot at its on-screen size.
+    static func write(_ image: CGImage, scale: CGFloat = 1) -> Bool {
         let rep = NSBitmapImageRep(cgImage: image)
+        rep.size = NSSize(width: CGFloat(image.width) / scale, height: CGFloat(image.height) / scale)
         guard let png = rep.representation(using: .png, properties: [:]) else { return false }
         let item = NSPasteboardItem()
         item.setData(png, forType: .png)
@@ -32,7 +35,7 @@ final class TIFFProvider: NSObject, NSPasteboardItemDataProvider {
 }
 
 enum FileSaver {
-    static func save(_ image: CGImage, directory: String, format: String) throws -> URL {
+    static func save(_ image: CGImage, directory: String, format: String, scale: CGFloat = 1) throws -> URL {
         let dir = URL(fileURLWithPath: (directory as NSString).expandingTildeInPath, isDirectory: true)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let formatter = DateFormatter()
@@ -44,6 +47,7 @@ enum FileSaver {
         var n = 2
         while FileManager.default.fileExists(atPath: url.path) { url = dir.appendingPathComponent("\(base) \(n).\(ext)"); n += 1 }
         let rep = NSBitmapImageRep(cgImage: image)
+        rep.size = NSSize(width: CGFloat(image.width) / scale, height: CGFloat(image.height) / scale)
         let data = ext == "jpg" ? rep.representation(using: .jpeg, properties: [.compressionFactor: 0.9]) : rep.representation(using: .png, properties: [:])
         guard let data else { throw CocoaError(.fileWriteUnknown) }
         try data.write(to: url, options: .withoutOverwriting)
