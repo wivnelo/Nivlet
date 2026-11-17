@@ -314,7 +314,12 @@ final class Session: NSObject, NSTextFieldDelegate {
                     drag = .move(original: selection, start: p); hideBars(); closeResults(); NSCursor.closedHand.set()
                 }
             } else if annotations.isEmpty && tool == nil {
+                // Selecting somewhere else drops the old recognition result with the old selection.
+                closeResults()
                 phase = .choosing; drag = .newSelection(start: p); hideBars()
+            } else {
+                // A click outside the selection dismisses the result panel, like clicking off a popover.
+                closeResults()
             }
         }
         redraw()
@@ -719,6 +724,13 @@ final class Session: NSObject, NSTextFieldDelegate {
             let textArea = CGPoint(x: panel.frame.midX, y: panel.frame.midY)
             let outside = CGPoint(x: panel.frame.minX - 40, y: panel.frame.midY)
             onEvent(["event": "cursor", "header": cursorName(header), "text": cursorName(textArea), "outsideInSelection": cursorName(outside)])
+            // Click outside the selection: the panel must go and a new selection must start.
+            let away = CGPoint(x: max(4, selection.minX - 60), y: max(4, selection.minY - 60))
+            let windowPoint = view.convert(away, to: nil)
+            if let down = NSEvent.mouseEvent(with: .leftMouseDown, location: windowPoint, modifierFlags: [], timestamp: 0, windowNumber: view.window?.windowNumber ?? 0, context: nil, eventNumber: 0, clickCount: 1, pressure: 1) {
+                mouseDown(view, down)
+            }
+            onEvent(["event": "clickAway", "panelClosed": resultPanel == nil, "codeBoxesCleared": codeBoxes.isEmpty, "newSelection": phase == .choosing])
         } }
     }
     /// Selects the text tool and clicks the existing text so the editor and property bar are visible.
