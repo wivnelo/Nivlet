@@ -28,6 +28,9 @@ end
 function M.openSettings()
     return hs.urlevent.openURLWithBundle("x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility","com.apple.systempreferences")
 end
+function M.openScreenRecording()
+    return hs.urlevent.openURLWithBundle("x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture","com.apple.systempreferences")
+end
 function M.openLoginSettings()
     return hs.urlevent.openURLWithBundle("x-apple.systempreferences:com.apple.LoginItems-Settings.extension","com.apple.systempreferences")
 end

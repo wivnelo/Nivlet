@@ -28,6 +28,14 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=arm64 NIVLE
 - `scripts/trim-runtime.py` 在签名前移除 Nivlet 无法访问的 Hammerspoon 扩展（相机、定位、语音、HID/USB/MIDI、IPC 与 `hs` 命令行、HTTP 服务器、文档浏览器等），并把 API 文档 `docs.json`/`lua.json` 清空为 `[]`（核心启动时会把 `docs.json` 路径传给 Lua，文件必须存在），共约 16.3 MB。动态加载的 network、window 子模块及其依赖（spaces、spaces.watcher、plist、redshift）保留。只删除脚本中明确列出的路径，任一路径缺失或剩余 Mach-O 链接被删 dylib 即停止；未列出的模块一律保留。`tests/runtime_trim.py` 确保 Toolkit 不引用被删模块。新增 Toolkit 功能需用到被删模块时，先从列表移除再使用。
 - 最终体积以同架构 ZIP 与 App 实测比较为准；停止打 Intel 包与单个 ARM 包的压缩收益分别说明。
 
+## 截图辅助程序
+
+- `Native/capture/*.swift` 编译为 `Toolkit/capture-helper`，与 `system-probe` 一样由 `scripts/build-dev.sh` 生成，签名脚本会自动发现并签名。不改 Hammerspoon 运行时补丁。
+- `Toolkit/modules/capture.lua` 在截图模块开启时启动它并保持常驻，以便按键后约 80 ms 显示冻结画面；关闭模块或退出 Nivlet 时通过关闭标准输入让它退出。协议为每行一个 JSON：命令 `config` / `capture` / `quit`，事件 `ready` / `shown` / `copied` / `saved` / `color` / `cancelled` / `permission` / `error`。
+- 屏幕录制权限归属 Nivlet（辅助程序由 Nivlet 启动）。未授权时辅助程序请求一次授权后退出，下次按键由 Lua 重新启动。
+- 复制时写入 PNG 和标记类型 `dev.nivlet.capture`，剪贴板历史据此把图片标为截图来源；TIFF 只在粘贴方请求时生成。
+- 自检：`swiftc -D NIVLET_SELFTEST …` 编译的测试版支持 `{"cmd":"selftest","path":…}`，自动选区、画出每种标注并导出 PNG，用来核对渲染；正式构建不包含这段代码。
+
 ## 应用与菜单栏图标
 
 - 应用图标源文件为 `assets/nivlet-icon.png`（1254 × 1254，带透明通道）。构建时 `scripts/prepare-icon.py` 用 `sips` 生成 AppIcon 各尺寸，`scripts/build-dev.sh` 另生成 160 px 的 `Toolkit/nivlet-icon.png` 供设置窗口与“关于”页使用。

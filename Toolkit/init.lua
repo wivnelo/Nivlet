@@ -15,11 +15,13 @@ local browser = require("modules.browser")
 local browserData=require("modules.browser_data")
 browser.start()
 clipboard.start()
+local capture=require("modules.capture")
 local keepAwake=require("modules.keep_awake")
 local previousShutdown=hs.shutdownCallback
 hs.shutdownCallback=function()
     keepAwake.stop()
     clipboard.stop()
+    capture.stop()
     if type(previousShutdown)=="function" then previousShutdown() end
 end
 local launcher=require("modules.launcher")
@@ -30,7 +32,7 @@ local app = {bindings={}}
 
 local batchCandidates,batchShortcutConflicts
 local generalKey = "desktoptoolkit.general.v1"
-local tabIDs={windowSection=true,inputSection=true,clipSection=true,systemSection=true,browserSection=true,launcherSection=true,aboutSection=true}
+local tabIDs={windowSection=true,inputSection=true,clipSection=true,captureSection=true,systemSection=true,browserSection=true,launcherSection=true,aboutSection=true}
 local function validateGeneral(value)
     if type(value) ~= "table" or type(value.showMenu) ~= "boolean" or
         (value.appearance ~= "system" and value.appearance ~= "light" and value.appearance ~= "dark") then
@@ -72,6 +74,7 @@ function app.saveGeneral(value)
     elseif config.sleepShortcut then
         for _,shortcut in pairs(app.config and app.config.shortcuts or {}) do if sleep.matches(shortcut) then return false,i18n.t("Command + L 与已有快捷键冲突") end end
         if sleep.matches(app.popupShortcut) then return false,i18n.t("Command + L 与已有快捷键冲突") end
+        if capture.conflicts({key="L",mods={"cmd"}}) then return false,i18n.t("Command + L 与已有快捷键冲突") end
         for _,rule in ipairs(launcher.config.rules) do if sleep.matches(rule.shortcut) then return false,i18n.t("Command + L 与已有快捷键冲突") end end
     end
     local installed,result=sleep.configure(config.sleepShortcut)
@@ -138,6 +141,8 @@ local function shortcutEntries(pages)
     for _,item in pairs(pages.windowSection.config.shortcuts) do add("windowSection",item,pages.windowSection.config.enabled) end
     for _,rule in ipairs(pages.launcherSection.config.rules) do add("launcherSection",rule.shortcut,pages.launcherSection.config.enabled) end
     add("clipSection",pages.clipSection.popupShortcut,true)
+    local captureConfig=pages.captureSection and pages.captureSection.config
+    if captureConfig then add("captureSection",captureConfig.shortcut,captureConfig.enabled) end
     return entries
 end
 batchShortcutConflicts=function(shortcut,owner)
@@ -173,6 +178,7 @@ function app.savePopup(value)
     if sleep.conflicts(shortcut) then return false,i18n.t("Command + L 与已有快捷键冲突") end
     if launcher.conflicts(shortcut) then return false,i18n.t("快捷键与应用启动配置重复") end
     if popupConflicts(shortcut, app.config) then return false,i18n.t("剪贴板快捷键与窗口管理配置重复") end
+    if capture.conflicts(shortcut) then return false,i18n.t("快捷键与截图配置重复") end
     end
     if not (sameShortcut(shortcut, app.popupShortcut) and app.popupBinding) then
         local success, result = installPopup(shortcut)
@@ -266,6 +272,7 @@ function app.save(value)
     else
     for _,shortcut in pairs(config.shortcuts) do if sleep.conflicts(shortcut) then return false,i18n.t("Command + L 与已有快捷键冲突") end;if launcher.conflicts(shortcut) then return false,i18n.t("快捷键与应用启动配置重复") end end
     if popupConflicts(app.popupShortcut, config) then return false,i18n.t("窗口快捷键与剪贴板菜单配置重复") end
+    for _,shortcut in pairs(config.shortcuts) do if capture.conflicts(shortcut) then return false,i18n.t("快捷键与截图配置重复") end end
     end
     if config.enabled and not permissions.isGranted() then return false, i18n.t("请在通用设置中检查并开启辅助功能权限") end
     clearBindings()
@@ -283,10 +290,10 @@ local adapters={
     windows={get=function() return app.config end,defaults=preferences.defaults,validate=preferences.validate,save=app.save},
     popupShortcut={get=function() return app.popupShortcut or false end,defaults=defaultPopup,release=function() return app.savePopup(nil) end,validate=function(v) local item,message;if v~=false then item,message=normalizePopup(v) end;if message then return nil,message end;return item or false end,save=function(v) if v==false then return app.savePopup(nil) end;return app.savePopup(v) end},
 }
-for name,module in pairs({input=input,clipboard=clipboard,system=system,browser=browser,launcher=launcher}) do
+for name,module in pairs({input=input,clipboard=clipboard,system=system,browser=browser,launcher=launcher,capture=capture}) do
     adapters[name]={get=function() return module.config end,defaults=module.defaults or function() return {enabled=false,rules={}} end,validate=module.validate,save=module.save}
 end
-local configKeys={general=generalKey,windows=key,popupShortcut=popupKey,input="desktoptoolkit.input.v1",clipboard="desktoptoolkit.clipboard.v1",system="desktoptoolkit.system.v1",browser="desktoptoolkit.browser.v1",launcher="desktoptoolkit.launcher.v1"}
+local configKeys={capture="desktoptoolkit.capture.v1",general=generalKey,windows=key,popupShortcut=popupKey,input="desktoptoolkit.input.v1",clipboard="desktoptoolkit.clipboard.v1",system="desktoptoolkit.system.v1",browser="desktoptoolkit.browser.v1",launcher="desktoptoolkit.launcher.v1"}
 app.configuration=configuration.new(adapters,{
     systemAssigned=function(item) return preferences.systemAssigned(item.mods,item.key) end,
     accessibility=permissions.isGranted,
@@ -355,12 +362,14 @@ end)
 pageAdapters.systemSection=configPage(system)
 pageAdapters.browserSection=configPage(browser)
 pageAdapters.launcherSection=configPage(launcher)
+pageAdapters.captureSection=configPage(capture)
 local function releasePageBindings(group)
     for _,page in ipairs(group) do
         if page=="generalSection" then sleep.configure(false)
         elseif page=="windowSection" then clearBindings()
         elseif page=="clipSection" then installPopup(nil)
-        elseif page=="launcherSection" then launcher.releaseBindings() end
+        elseif page=="launcherSection" then launcher.releaseBindings()
+        elseif page=="captureSection" then capture.releaseBindings() end
     end
 end
 local saveBatch=require("modules.save_batch").new(pageAdapters,{
@@ -386,7 +395,7 @@ local saveBatch=require("modules.save_batch").new(pageAdapters,{
     groupPages=function(plan)
         local result={}
 
-        for _,page in ipairs({"windowSection","launcherSection","generalSection","clipSection"}) do if plan.selected[page] then result[#result+1]=page end end
+        for _,page in ipairs({"windowSection","launcherSection","generalSection","clipSection","captureSection"}) do if plan.selected[page] then result[#result+1]=page end end
         return result
     end,
     beginGroup=function(plan,group) batchCandidates=plan.pages;releasePageBindings(group);return true end,
@@ -449,7 +458,7 @@ local function reply(ok, message, action, requestID, saveBatch)
     if action=="refreshApplications" or action=="refreshBrowserStatus" or action=="refreshPermissionsSilent" or action=="prepareBrowserData" or action==nil then appIcons.clear() end
     local permission=permissionState()
     local icons=app.settings and configuredAppIcons()
-    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.translations(),general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),excludedAppNames=excludedAppNames(),appIcons=icons,applicationStates=applicationStates(icons),popupShortcut=app.popupShortcut or false,popupShortcutDefault=defaultPopup(),popupShortcutError=app.popupShortcutError and i18n.t(app.popupShortcutError) or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}) .. ")") end
+    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.translations(),general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),capture=capture.config,capturePermission=capture.permissionGranted(),excludedAppNames=excludedAppNames(),appIcons=icons,applicationStates=applicationStates(icons),popupShortcut=app.popupShortcut or false,popupShortcutDefault=defaultPopup(),popupShortcutError=app.popupShortcutError and i18n.t(app.popupShortcutError) or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}) .. ")") end
 end
 local function showSettingsWindow(view)
     hs.dockicon.show()
@@ -526,6 +535,21 @@ function app.openSettings(section, focus)
             reply(true,"",body.action);return
         end
         if body.action=="refreshBrowserStatus" then reply(true,"",body.action);return end
+        if body.action=="requestScreenRecording" then
+            local granted=capture.requestPermission()
+            if not granted then permissions.openScreenRecording() end
+            reply(true,granted and i18n.t("屏幕录制权限已开启") or i18n.t("请在系统设置中允许 Nivlet 录制屏幕，然后重新检测"),body.action)
+            return
+        end
+        if body.action=="chooseCaptureFolder" then
+            local path=selectedPath(hs.dialog.chooseFileOrFolder(i18n.t("选择截图保存位置"),os.getenv("HOME"),false,true,false,{},true))
+            if type(path)=="string" and path~="" then
+                local home=os.getenv("HOME")
+                if home and path:sub(1,#home+1)==home.."/" then path="~"..path:sub(#home+1) end
+                app.settings:evaluateJavaScript("window.setCaptureFolder("..hs.json.encode({path}).."[0])")
+            end
+            return
+        end
         if body.action=="openDefaultBrowserSettings" then
             local ok=browser.openDefaultSettings()
             reply(ok,ok and "" or i18n.t("无法打开系统设置，请手动打开桌面与程序坞。"),body.action)
@@ -602,7 +626,7 @@ function app.openSettings(section, focus)
         if body.action == "saveLauncher" then local success,result=launcher.save(body.config);reply(success,result,body.action) end
         if body.action == "setShowMenu" then local success,result=app.setShowMenu(body.enabled); reply(success,result,body.action) end
         if body.action == "saveGeneral" then local success,result=app.saveGeneralPage(body.config,body.autoLaunch);reply(success,result,body.action) end
-        local save=({save=app.save,savePopup=app.savePopup,saveBrowser=browser.save,saveSystem=system.save,saveInput=input.save})[body.action]
+        local save=({save=app.save,saveCapture=capture.save,savePopup=app.savePopup,saveBrowser=browser.save,saveSystem=system.save,saveInput=input.save})[body.action]
         if save then local success, result = save(body.config); reply(success, result, body.action) end
         if body.action == "saveClipboard" then local success,result=app.saveClipboardPage(body.config,body.popupShortcut,body.popupShortcutChanged);reply(success,result,body.action) end
         if body.action == "refreshClipboard" then reply(true, "", body.action) end
@@ -684,8 +708,12 @@ else
         hs.alert.show(errorMessage)
     elseif popupLoadError then hs.alert.show(i18n.t(app.popupShortcutError)) end
 end
-launcher.start(function(shortcut) if batchCandidates then return batchShortcutConflicts(shortcut,"launcherSection") end;return sleep.conflicts(shortcut) or sameShortcut(shortcut,app.popupShortcut) or (shortcut and popupConflicts(shortcut,app.config)) end)
+launcher.start(function(shortcut) if batchCandidates then return batchShortcutConflicts(shortcut,"launcherSection") end;return sleep.conflicts(shortcut) or sameShortcut(shortcut,app.popupShortcut) or (shortcut and popupConflicts(shortcut,app.config)) or capture.conflicts(shortcut) end)
 system.start(function() app.openSettings("systemSection") end)
+capture.start(function(shortcut)
+    if batchCandidates then return batchShortcutConflicts(shortcut,"captureSection") end
+    return sleep.conflicts(shortcut) or sameShortcut(shortcut,app.popupShortcut) or popupConflicts(shortcut,app.config) or launcher.conflicts(shortcut)
+end,{copied=function() clipboard.poll() end,permission=function() reply(true,"","refreshPermissionsSilent") end})
 
 function app.arrangeMenus()
     clipboard.menu:removeFromMenuBar():returnToMenuBar():setTitle("")

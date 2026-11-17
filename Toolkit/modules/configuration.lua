@@ -1,6 +1,6 @@
 local i18n=require("modules.i18n")
 local preferences=require("modules.preferences")
-local M={version=1,names={"general","windows","input","clipboard","popupShortcut","system","browser","launcher"}}
+local M={version=1,names={"general","windows","input","clipboard","popupShortcut","system","browser","launcher","capture"}}
 local function copy(value)
     if type(value)~="table" then return value end
     local result={};for k,v in pairs(value) do result[k]=copy(v) end;return result
@@ -36,6 +36,7 @@ end
 local windowFields={};for _,action in ipairs(require("modules.windows").actions) do windowFields[action]=true end
 local function shape(name,value)
     if name=="popupShortcut" then return shortcut(value) end
+    if name=="capture" then return fields(value,{enabled=true,shortcut=true,saveDirectory=true,format=true,snapWindows=true,loupe=true}) and shortcut(value.shortcut) end
     if not fields(value,schemas[name]) then return false end
     if name=="general" and value.language~=nil and type(value.language)~="string" then return false end
     if name=="windows" then
@@ -91,6 +92,7 @@ function M.new(adapters,environment)
         for _,item in pairs(candidate.windows.shortcuts) do table.insert(checks,{item,candidate.windows.enabled}) end
         for _,rule in ipairs(candidate.launcher.rules) do if rule.shortcut then table.insert(checks,{rule.shortcut,candidate.launcher.enabled}) end end
         if candidate.popupShortcut~=false then table.insert(checks,{candidate.popupShortcut,true}) end
+        if candidate.capture.shortcut then table.insert(checks,{candidate.capture.shortcut,candidate.capture.enabled}) end
         for _,item in ipairs(checks) do local ok,message=check(item[1],item[2]);if not ok then return nil,message end end
         if (selected.windows or selected.launcher or selected.popupShortcut) and candidate.windows.enabled and not environment.accessibility() then return nil,i18n.t("请先在系统设置开启 Nivlet 的辅助功能权限") end
         local ok,message=environment.available(candidate,selected)
@@ -111,7 +113,7 @@ function M.new(adapters,environment)
         local function release()
             local general=copy(adapters.general.get())
             if general.sleepShortcut then general.sleepShortcut=false;local ok,result=adapters.general.save(general);if not ok then error(result) end end
-            for _,name in ipairs({"launcher","windows","popupShortcut"}) do
+            for _,name in ipairs({"launcher","windows","popupShortcut","capture"}) do
                 local ok,result
                 if adapters[name].release then ok,result=adapters[name].release()
                 else ok,result=adapters[name].save(adapters[name].defaults()) end
@@ -119,9 +121,10 @@ function M.new(adapters,environment)
             end
         end
         local function apply(config,selected)
-            if selected.windows or selected.launcher or selected.popupShortcut then release() end
-            for _,name in ipairs({"windows","popupShortcut","launcher","input","browser","system","general","clipboard"}) do
-                if (selected[name] or (selected.windows or selected.launcher or selected.popupShortcut) and (name=="windows" or name=="popupShortcut" or name=="launcher" or name=="general")) and not (name=="clipboard" and equal(config[name],adapters[name].get())) then
+            local shortcuts=selected.windows or selected.launcher or selected.popupShortcut or selected.capture
+            if shortcuts then release() end
+            for _,name in ipairs({"windows","popupShortcut","launcher","capture","input","browser","system","general","clipboard"}) do
+                if (selected[name] or shortcuts and (name=="windows" or name=="popupShortcut" or name=="launcher" or name=="capture" or name=="general")) and not (name=="clipboard" and equal(config[name],adapters[name].get())) then
                     local ok,result=adapters[name].save(config[name]);if not ok then error(result) end
                 end
             end

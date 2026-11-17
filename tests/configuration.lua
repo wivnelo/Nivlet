@@ -2,8 +2,8 @@ package.path="Toolkit/?.lua;"..package.path
 local configuration=require("modules.configuration")
 local preferences=require("modules.preferences")
 local function clone(v) if type(v)~="table" then return v end;local r={};for k,x in pairs(v) do r[k]=clone(x) end;return r end
-local defaults={general={showMenu=true,appearance="system",language="system"},windows=preferences.defaults(),input={enabled=false,rules={}},clipboard=require("modules.clipboard").defaults(),popupShortcut=false,system=require("modules.sys_info").defaults(),browser=require("modules.browser").defaults(),launcher={enabled=false,rules={}}}
-local validators={windows=preferences.validate,input=require("modules.input_method").validate,clipboard=require("modules.clipboard").validate,system=require("modules.sys_info").validate,browser=require("modules.browser").validate,launcher=require("modules.launcher").validate,
+local defaults={general={showMenu=true,appearance="system",language="system"},windows=preferences.defaults(),input={enabled=false,rules={}},clipboard=require("modules.clipboard").defaults(),popupShortcut=false,system=require("modules.sys_info").defaults(),browser=require("modules.browser").defaults(),launcher={enabled=false,rules={}},capture=require("modules.capture").defaults()}
+local validators={capture=require("modules.capture").validate,windows=preferences.validate,input=require("modules.input_method").validate,clipboard=require("modules.clipboard").validate,system=require("modules.sys_info").validate,browser=require("modules.browser").validate,launcher=require("modules.launcher").validate,
  general=function(v) if type(v.showMenu)~="boolean" or not ({system=true,light=true,dark=true})[v.appearance] or not ({system=true,en=true,["zh-Hans"]=true})[v.language] then return nil,"Invalid general" end;return clone(v) end,
  popupShortcut=function(v) if v==false then return false end;local c,e=preferences.validate({enabled=false,shortcuts={left=v}});if not c then return nil,e end;return c.shortcuts.left or false end}
 local state,stored,adapters=clone(defaults),{},{}
