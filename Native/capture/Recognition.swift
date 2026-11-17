@@ -36,22 +36,48 @@ enum Recognition {
     }
 
     /// The first text recognition by a newly built executable takes about 30 s while macOS prepares
-    /// the model for it; later runs take ~0.3 s. Warm it up quietly at low priority after launch so the
-    /// first click on Recognize Text after an update does not stall.
-    static func prewarm() {
+    /// the model for it; later runs take ~0.3 s. Loading the model also keeps ~40 MB resident, so the
+    /// warm-up runs once per helper version in a short-lived child process (`--prewarm`) that exits
+    /// afterwards, leaving the resident helper small.
+    static func prewarmInBackground() {
+        guard let exe = Bundle.main.executableURL,
+              let attrs = try? FileManager.default.attributesOfItem(atPath: exe.path),
+              let size = attrs[.size] as? NSNumber, let date = attrs[.modificationDate] as? Date,
+              let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else { return }
+        let dir = caches.appendingPathComponent("dev.local.DesktopToolkit", isDirectory: true)
+        let marker = dir.appendingPathComponent("capture-ocr-ready-\(size.intValue)-\(Int(date.timeIntervalSince1970))")
+        if FileManager.default.fileExists(atPath: marker.path) { return }
         DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 3) {
-            let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: 160, pixelsHigh: 48, bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)
-            guard let rep, let context = NSGraphicsContext(bitmapImageRep: rep) else { return }
-            NSGraphicsContext.saveGraphicsState(); NSGraphicsContext.current = context
-            NSColor.white.setFill(); NSRect(x: 0, y: 0, width: 160, height: 48).fill()
-            ("Nivlet 截图" as NSString).draw(at: NSPoint(x: 8, y: 12), withAttributes: [.font: NSFont.systemFont(ofSize: 20), .foregroundColor: NSColor.black])
-            NSGraphicsContext.restoreGraphicsState()
-            guard let image = rep.cgImage else { return }
-            let request = VNRecognizeTextRequest()
-            request.recognitionLevel = .accurate
-            request.recognitionLanguages = languages(for: "zh-Hans")
-            try? VNImageRequestHandler(cgImage: image, options: [:]).perform([request])
+            let child = Process()
+            child.executableURL = exe
+            child.arguments = ["--prewarm"]
+            child.qualityOfService = .utility
+            child.standardInput = FileHandle.nullDevice; child.standardOutput = FileHandle.nullDevice; child.standardError = FileHandle.nullDevice
+            guard (try? child.run()) != nil else { return }
+            child.waitUntilExit()
+            guard child.terminationStatus == 0 else { return }
+            // Old markers belong to previous versions.
+            if let old = try? FileManager.default.contentsOfDirectory(atPath: dir.path) {
+                for name in old where name.hasPrefix("capture-ocr-ready-") { try? FileManager.default.removeItem(at: dir.appendingPathComponent(name)) }
+            }
+            try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            FileManager.default.createFile(atPath: marker.path, contents: Data())
         }
+    }
+
+    /// Runs one small recognition so macOS prepares the model for this executable.
+    static func prewarmNow() {
+        let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: 160, pixelsHigh: 48, bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)
+        guard let rep, let context = NSGraphicsContext(bitmapImageRep: rep) else { return }
+        NSGraphicsContext.saveGraphicsState(); NSGraphicsContext.current = context
+        NSColor.white.setFill(); NSRect(x: 0, y: 0, width: 160, height: 48).fill()
+        ("Nivlet 截图" as NSString).draw(at: NSPoint(x: 8, y: 12), withAttributes: [.font: NSFont.systemFont(ofSize: 20), .foregroundColor: NSColor.black])
+        NSGraphicsContext.restoreGraphicsState()
+        guard let image = rep.cgImage else { return }
+        let request = VNRecognizeTextRequest()
+        request.recognitionLevel = .accurate
+        request.recognitionLanguages = languages(for: "zh-Hans")
+        try? VNImageRequestHandler(cgImage: image, options: [:]).perform([request])
     }
 
     struct Code { let payload: String; let box: CGRect }

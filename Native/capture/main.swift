@@ -7,6 +7,10 @@ setvbuf(stdout, nil, _IOLBF, 0)
 
 // `capture-helper --permission` answers with the system's own Screen Recording check and exits.
 // Nivlet starts this helper, so the answer reflects Nivlet's permission.
+if CommandLine.arguments.contains("--prewarm") {
+    Recognition.prewarmNow()
+    exit(0)
+}
 if CommandLine.arguments.contains("--permission") {
     print(CGPreflightScreenCaptureAccess() ? "granted" : "denied")
     exit(0)
@@ -121,6 +125,6 @@ Thread.detachNewThread {
 Task { @MainActor in
     if CGPreflightScreenCaptureAccess() { await helper.capturer.prewarm() }
     emit(["event": "ready", "permission": CGPreflightScreenCaptureAccess()])
-    Recognition.prewarm()
+    Recognition.prewarmInBackground()
 }
 app.run()

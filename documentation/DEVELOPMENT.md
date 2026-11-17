@@ -34,7 +34,7 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_ARCH=arm64 NIVLE
 - `Toolkit/modules/capture.lua` 在截图模块开启时启动它并保持常驻，以便按键后约 80 ms 显示冻结画面；关闭模块或退出 Nivlet 时通过关闭标准输入让它退出。协议为每行一个 JSON：命令 `config` / `capture` / `quit`，事件 `ready` / `shown` / `copied` / `saved` / `color` / `cancelled` / `permission` / `error`。
 - 屏幕录制权限归属 Nivlet（辅助程序由 Nivlet 启动）。未授权时辅助程序请求一次授权后退出，下次按键由 Lua 重新启动。
 - 复制时写入 PNG 和标记类型 `dev.nivlet.capture`，剪贴板历史据此把图片标为截图来源；TIFF 只在粘贴方请求时生成。
-- 识别文字与二维码用系统 Vision 在本机完成，识别对象是带标注的导出图，马赛克和涂黑下的文字不会被识别出来。文字识别只用精确模式（快速模式会把中日文识别成乱码）。每个新编译的可执行文件第一次文字识别约需 30 秒（系统为它准备模型），之后约 0.3 秒；辅助程序启动后会在后台低优先级预热一次，面板在等待超过 1.5 秒时提示“首次使用需要准备识别模型”。
+- 识别文字与二维码用系统 Vision 在本机完成，识别对象是带标注的导出图，马赛克和涂黑下的文字不会被识别出来。文字识别只用精确模式（快速模式会把中日文识别成乱码）。每个新编译的可执行文件第一次文字识别约需 30 秒（系统为它准备模型），之后约 0.3 秒；辅助程序启动后，若本版本尚未预热，会以低优先级启动一次性子进程 `capture-helper --prewarm` 完成预热后退出，并在 `~/Library/Caches/dev.local.DesktopToolkit/` 记录标记；常驻进程因此保持约 9 MB，模型只在真正识别时载入（约 40 MB）。面板在等待超过 1.5 秒时提示“首次使用需要准备识别模型”。
 - 自检：`swiftc -D NIVLET_SELFTEST …` 编译的测试版支持 `{"cmd":"selftest","path":…}`，自动选区、画出每种标注并导出 PNG，用来核对渲染；正式构建不包含这段代码。
 
 ## 应用与菜单栏图标
