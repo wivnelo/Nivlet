@@ -178,12 +178,15 @@ final class Session: NSObject, NSTextFieldDelegate {
             }
         }
         let label = "\(Int(r.width.rounded())) × \(Int(r.height.rounded()))  ·  \(Int((r.width * scale).rounded())) × \(Int((r.height * scale).rounded())) px" as NSString
-        let attrs: [NSAttributedString.Key: Any] = [.font: NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .medium), .foregroundColor: NSColor.white]
+        let attrs: [NSAttributedString.Key: Any] = [.font: NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .medium), .foregroundColor: NSColor.labelColor]
         let size = label.size(withAttributes: attrs)
         var origin = CGPoint(x: r.minX, y: r.maxY + 6)
         if origin.y + size.height + 8 > bounds.maxY { origin = CGPoint(x: r.minX + 6, y: r.maxY - size.height - 12) }
         let box = CGRect(x: origin.x, y: origin.y, width: size.width + 14, height: size.height + 6)
-        NSColor(white: 0.08, alpha: 0.82).setFill(); NSBezierPath(roundedRect: box, xRadius: 6, yRadius: 6).fill()
+        // Same surface as the toolbar so the size label follows light and dark appearance.
+        let badge = NSBezierPath(roundedRect: box, xRadius: 6, yRadius: 6)
+        barBackground.setFill(); badge.fill()
+        barBorder.setStroke(); badge.lineWidth = 1; badge.stroke()
         label.draw(at: CGPoint(x: box.minX + 7, y: box.minY + 3), withAttributes: attrs)
     }
 
@@ -206,15 +209,15 @@ final class Session: NSObject, NSTextFieldDelegate {
         if box.maxX > view.bounds.maxX - 6 { box.origin.x = p.x - 22 - side }
         if box.minY < 6 { box.origin.y = p.y + 22 }
         let outer = NSBezierPath(roundedRect: box, xRadius: 10, yRadius: 10)
-        NSColor(white: 0.1, alpha: 0.94).setFill(); outer.fill()
-        NSColor(white: 1, alpha: 0.16).setStroke(); outer.lineWidth = 1; outer.stroke()
+        barBackground.setFill(); outer.fill()
+        barBorder.setStroke(); outer.lineWidth = 1; outer.stroke()
         let grid = CGRect(x: box.minX, y: box.maxY - side, width: side, height: side)
         guard let cg = NSGraphicsContext.current?.cgContext else { return }
         cg.saveGState()
         NSBezierPath(roundedRect: grid, xRadius: 10, yRadius: 10).addClip()
         cg.interpolationQuality = .none; cg.draw(piece, in: grid)
         // Pixel grid makes the magnification readable even on flat colours.
-        NSColor(white: 0.5, alpha: 0.18).setStroke()
+        NSColor(white: 0.5, alpha: 0.22).setStroke()
         let lines = NSBezierPath(); lines.lineWidth = 0.5
         for i in 1..<cells {
             let o = CGFloat(i) * zoom
@@ -230,9 +233,9 @@ final class Session: NSObject, NSTextFieldDelegate {
         let color = pixelColor(piece, x: cells / 2, y: cells / 2)
         let swatch = CGRect(x: box.minX + 10, y: box.minY + 34, width: 14, height: 14)
         (color ?? .black).setFill(); NSBezierPath(roundedRect: swatch, xRadius: 3, yRadius: 3).fill()
-        NSColor(white: 1, alpha: 0.35).setStroke(); let sw = NSBezierPath(roundedRect: swatch, xRadius: 3, yRadius: 3); sw.lineWidth = 1; sw.stroke()
-        let strong: [NSAttributedString.Key: Any] = [.font: NSFont.monospacedDigitSystemFont(ofSize: 11.5, weight: .semibold), .foregroundColor: NSColor.white]
-        let soft: [NSAttributedString.Key: Any] = [.font: NSFont.monospacedDigitSystemFont(ofSize: 10.5, weight: .regular), .foregroundColor: NSColor(white: 1, alpha: 0.62)]
+        NSColor.separatorColor.setStroke(); let sw = NSBezierPath(roundedRect: swatch, xRadius: 3, yRadius: 3); sw.lineWidth = 1; sw.stroke()
+        let strong: [NSAttributedString.Key: Any] = [.font: NSFont.monospacedDigitSystemFont(ofSize: 11.5, weight: .semibold), .foregroundColor: NSColor.labelColor]
+        let soft: [NSAttributedString.Key: Any] = [.font: NSFont.monospacedDigitSystemFont(ofSize: 10.5, weight: .regular), .foregroundColor: NSColor.secondaryLabelColor]
         ((color?.hexString ?? "—") as NSString).draw(at: CGPoint(x: swatch.maxX + 7, y: swatch.minY - 1), withAttributes: strong)
         ("\(Int(p.x)), \(Int(view.bounds.height - p.y))" as NSString).draw(at: CGPoint(x: box.minX + 10, y: box.minY + 18), withAttributes: soft)
         (t("copyColorHint") as NSString).draw(at: CGPoint(x: box.minX + 10, y: box.minY + 4), withAttributes: soft)

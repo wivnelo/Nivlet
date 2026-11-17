@@ -559,4 +559,7 @@ return {
     ["打开链接"] = "Open Link",
     ["关闭"] = "Close",
     ["合并为一行"] = "Join Lines",
+    ["用于：窗口管理、剪贴板 Option 直接粘贴、清除浏览数据"] = "Used for: window management, Option-click paste from clipboard history, clearing browsing data",
+    ["用于：截图、识别文字和二维码"] = "Used for: screenshots, text and QR code recognition",
+    ["窗口管理、剪贴板 Option 直接粘贴和清除浏览数据需要辅助功能权限，截图需要屏幕录制权限。剪贴板记录、系统信息和应用启动不需要权限。"] = "Window management, Option-click paste and clearing browsing data need Accessibility; screenshots need Screen Recording. Clipboard history, system info and app shortcuts need no permission.",
 }
