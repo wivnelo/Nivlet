@@ -484,10 +484,10 @@ final class Session: NSObject, NSTextFieldDelegate {
 
     // MARK: Keyboard
 
+    /// Esc leaves the capture at once. Stepping back to window choosing looked like a second,
+    /// duplicate selection; reselecting is done with a right-click instead.
     func escape() {
         if editor != nil { cancelText(); return }
-        if tool != nil { setTool(nil); return }
-        if phase == .selected { resetToChoosing(); return }
         cancel()
     }
 
