@@ -3,11 +3,13 @@ import Vision
 
 /// On-device text and QR recognition with Vision. Nothing leaves the Mac.
 enum Recognition {
-    /// Recognition languages, the interface language first so mixed Chinese/Japanese text resolves sensibly.
+    /// The first language picks Vision's model. With English first it uses the Latin model and Chinese
+    /// comes back as garbage or not at all, while the CJK models read English just as well. So a CJK
+    /// language always leads: Japanese or Traditional Chinese when that is the interface language,
+    /// otherwise Simplified Chinese, including for an English interface.
     static func languages(for interface: String) -> [String] {
-        let all = ["zh-Hans", "zh-Hant", "ja-JP", "en-US"]
-        let first: String = ["zh-Hant": "zh-Hant", "ja": "ja-JP", "en": "en-US"][interface] ?? "zh-Hans"
-        return [first] + all.filter { $0 != first }
+        let first: String = ["zh-Hant": "zh-Hant", "ja": "ja-JP"][interface] ?? "zh-Hans"
+        return [first] + ["zh-Hans", "zh-Hant", "ja-JP", "en-US"].filter { $0 != first }
     }
 
     /// Accurate mode only: fast mode garbles Chinese and Japanese (S0 measurement).

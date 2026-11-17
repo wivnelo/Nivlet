@@ -101,6 +101,7 @@ function app.saveGeneral(value)
         if app.settings then app.settings:windowTitle("Nivlet for Mac") end
         clipboard.menu:setTooltip(i18n.t("Nivlet 剪贴板历史"))
         system.menu:setTooltip(i18n.t("Nivlet 系统信息")):setMenu(nil):setMenu(system.menuItems)
+        if capture.refreshConfig then capture.refreshConfig() end
     end
     local ran=pcall(function()
         applyMetadata(config)

@@ -42,7 +42,10 @@ func selfTestRecognition(_ done: @escaping ([String: Any]) -> Void) {
     NSGraphicsContext.restoreGraphicsState()
     Recognition.codes(in: qrImage) { codes in
         Recognition.text(in: rep.cgImage!, interface: "zh-Hans") { lines in
-            done(["qr": (try? codes.get().map(\.payload)) ?? [], "ocr": (try? lines.get()) ?? []])
+            // Same image with an English interface: Chinese must still be read (regression test).
+            Recognition.text(in: rep.cgImage!, interface: "en") { english in
+                done(["qr": (try? codes.get().map(\.payload)) ?? [], "ocr": (try? lines.get()) ?? [], "ocrEnglishUI": (try? english.get()) ?? []])
+            }
         }
     }
 }

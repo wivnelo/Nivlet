@@ -125,6 +125,12 @@ function M.stopHelper()
     if task and task:isRunning() then task:setInput(hs.json.encode({cmd='quit'})..'\n');task:closeInput() end
 end
 
+-- Called after General settings change, so a new language or appearance reaches the running helper
+-- straight away instead of on the next shortcut press.
+function M.refreshConfig()
+    if M.task and M.task:isRunning() and M.ready then sendConfig() end
+end
+
 function M.trigger()
     if M.task and M.task:isRunning() and M.ready then sendConfig();send({cmd='capture'});return end
     M.pending=true
