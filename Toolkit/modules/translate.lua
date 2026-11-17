@@ -11,19 +11,22 @@ local modes={auto=true,['zh-Hans']=true,['zh-Hant']=true,en=true,ja=true,ko=true
 local tapWindow,pressWindow=0.4,0.35
 
 function M.defaults()
-    return {enabled=false,selectionTrigger='doubleAlt',mode='auto',remember=true,showSource=true,autoCopy=false}
+    return {enabled=false,selectionTrigger='doubleAlt',screenshotTrigger='doubleCtrl',mode='auto',remember=true,showSource=true,autoCopy=false}
 end
 
 function M.validate(value)
     if type(value)~='table' or type(value.enabled)~='boolean' then return nil,i18n.t('翻译设置格式无效') end
     local trigger=value.selectionTrigger or 'doubleAlt'
     if triggers[trigger]==nil then return nil,i18n.t('翻译设置格式无效') end
+    local shot=value.screenshotTrigger or 'doubleCtrl'
+    if triggers[shot]==nil then return nil,i18n.t('翻译设置格式无效') end
+    if shot~='off' and shot==trigger then return nil,i18n.t('选词翻译和截图翻译不能使用同一个按键') end
     local mode=value.mode or 'auto'
     if not modes[mode] then return nil,i18n.t('翻译设置格式无效') end
     for _,field in ipairs({'remember','showSource','autoCopy'}) do
         if value[field]~=nil and type(value[field])~='boolean' then return nil,i18n.t('翻译设置格式无效') end
     end
-    return {enabled=value.enabled,selectionTrigger=trigger,mode=mode,remember=value.remember~=false,showSource=value.showSource~=false,autoCopy=value.autoCopy==true}
+    return {enabled=value.enabled,selectionTrigger=trigger,screenshotTrigger=shot,mode=mode,remember=value.remember~=false,showSource=value.showSource~=false,autoCopy=value.autoCopy==true}
 end
 
 -- System translation needs macOS 15.
@@ -137,14 +140,21 @@ local function stopWatcher()
     if M.watcher then M.watcher:stop();M.watcher=nil end
 end
 
+function M.translateScreenshot() M.capture.dispatch({cmd='captureTranslate'}) end
+
 local function startWatcher(config)
     stopWatcher()
-    local modifier=triggers[config.selectionTrigger]
-    if not modifier then return end
+    local detectors={}
+    for _,item in ipairs({{config.selectionTrigger,M.translateSelection},{config.screenshotTrigger,M.translateScreenshot}}) do
+        local modifier=triggers[item[1]]
+        local action=item[2]
+        if modifier then table.insert(detectors,M.newTapDetector(modifier,function() hs.timer.doAfter(0,action) end,hs.timer.secondsSinceEpoch)) end
+    end
+    if #detectors==0 then return end
     local types=hs.eventtap.event.types
-    local detector=M.newTapDetector(modifier,function() hs.timer.doAfter(0,M.translateSelection) end,hs.timer.secondsSinceEpoch)
     M.watcher=hs.eventtap.new({types.flagsChanged,types.keyDown},function(event)
-        if event:getType()==types.keyDown then detector.key() else detector.flags(event:getFlags()) end
+        if event:getType()==types.keyDown then for _,d in ipairs(detectors) do d.key() end
+        else local flags=event:getFlags();for _,d in ipairs(detectors) do d.flags(flags) end end
         return false
     end)
     M.watcher:start()
@@ -169,12 +179,14 @@ function M.save(value)
     M.config=config
     apply(config)
     hs.settings.set(settingsKey,config)
+    if M.capture.refreshConfig then M.capture.refreshConfig() end
     return true,i18n.t('翻译设置已保存')
 end
 
 function M.clearMemory()
     M.memory={}
     hs.settings.set(memoryKey,{})
+    if M.capture and M.capture.refreshConfig then M.capture.refreshConfig() end
     return true,i18n.t('已清除记住的翻译方向')
 end
 
@@ -183,6 +195,14 @@ local function remember(event)
     if type(event.source)~='string' or type(event.target)~='string' or #event.source>16 or #event.target>16 then return end
     M.memory[event.source]=event.target
     hs.settings.set(memoryKey,M.memory)
+    if M.capture.refreshConfig then M.capture.refreshConfig() end
+end
+
+-- Preferences the helper needs for screenshot translation and the toolbar's Translate button.
+local function prefs()
+    local c=M.config
+    if not (c and c.enabled and M.supported()) then return {enabled=false} end
+    return {enabled=true,mode=c.mode,remembered=c.remember and M.memory or {},showSource=c.showSource,autoCopy=c.autoCopy}
 end
 
 -- Put the translation in place of the selection: paste it, then restore the clipboard.
@@ -206,6 +226,7 @@ function M.start(capture,clipboard)
     M.capture=capture;M.clipboard=clipboard
     capture.handlers.directionChosen=remember
     capture.handlers.replaceSelection=replace
+    capture.translatePrefs=prefs
     M.config=M.validate(hs.settings.get(settingsKey)) or M.defaults()
     local stored=hs.settings.get(memoryKey)
     M.memory=type(stored)=='table' and stored or {}

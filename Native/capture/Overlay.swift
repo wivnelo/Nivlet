@@ -65,6 +65,17 @@ struct SessionConfig {
     var snapWindows = true
     var loupe = true
     var language = "zh-Hans"
+    /// Translation preferences from the Translation tab; nil hides the toolbar's Translate button.
+    var translate: TranslatePrefs?
+    /// Screenshot translation: no tools, recognise and translate as soon as the selection is made.
+    var translateOnly = false
+}
+
+struct TranslatePrefs {
+    var mode = "auto"
+    var remembered: [String: String] = [:]
+    var showSource = true
+    var autoCopy = false
 }
 
 /// One capture from freeze to output. Owns the overlay windows and all editing state.
@@ -90,7 +101,7 @@ final class Session: NSObject, NSTextFieldDelegate {
     private var tool: Tool?
     private var annotations: [Annotation] = []
     private var redoStack: [Annotation] = []
-    private let toolbar = Toolbar()
+    private lazy var toolbar = Toolbar(showTranslate: config.translate != nil && !config.translateOnly)
     private let properties = PropertyBar()
     private var editor: NSTextField?
     private var editorPoint: CGPoint = .zero
@@ -365,7 +376,8 @@ final class Session: NSObject, NSTextFieldDelegate {
             break
         case .newSelection:
             if selection.width < 4 || selection.height < 4 { selection = hover?.index == view.index ? hover!.rect : view.bounds }
-            phase = .selected; showBars()
+            phase = .selected
+            if config.translateOnly { translateSelection(); return } else { showBars() }
         case .move, .resize:
             selection = selection.integral; showBars()
         case .annotate(let a):
@@ -436,6 +448,7 @@ final class Session: NSObject, NSTextFieldDelegate {
         case .redo: redo()
         case .ocr: recognizeText()
         case .pin: pinAndFinish()
+        case .translate: translateSelection()
         case .qr: recognizeCodes()
         case .save: saveAndFinish()
         case .cancel: cancel()
@@ -550,6 +563,7 @@ final class Session: NSObject, NSTextFieldDelegate {
         guard phase == .selected else { return false }
         if key == "o" { recognizeText(); return true }
         if key == "p" { pinAndFinish(); return true }
+        if key == "l" && config.translate != nil { translateSelection(); return true }
         if key == "q" { recognizeCodes(); return true }
         let shortcuts: [String: Tool] = ["r": .rect, "a": .arrow, "b": .pen, "t": .text, "m": .mosaic]
         if let t = shortcuts[key] { setTool(tool == t ? nil : t); return true }
@@ -634,6 +648,29 @@ final class Session: NSObject, NSTextFieldDelegate {
     }
 
     func cancel() { finish(["event": "cancelled"]) }
+
+    /// Recognises the text in the (annotated) selection, closes the overlay and shows the same
+    /// translation card as selected-text translation, just below where the selection was.
+    private func translateSelection() {
+        guard let prefs = config.translate, let i = activeIndex, let image = render() else { cancel(); return }
+        if editor != nil { commitText() }
+        let origin = windows[i].frame.origin
+        let anchor = NSPoint(x: selection.minX + origin.x, y: selection.minY + origin.y)
+        let token = beginRecognition(title: t("ocrTitle"))
+        Recognition.text(in: image, interface: config.language) { [weak self] result in
+            guard let self, token == self.recognition else { return }
+            let lines = (try? result.get()) ?? []
+            guard !lines.isEmpty else {
+                // Stay in the overlay so another area can be chosen.
+                self.resultPanel?.show(title: t("ocrTitle"), content: .message(t("noText"))); self.placeResults()
+                if self.config.translateOnly { self.showBars() }
+                return
+            }
+            let interface = self.config.language
+            self.finish(["event": "captureTranslated"])
+            TranslateController.shared.show(TranslateRequest(text: lines.joined(separator: "\n"), anchor: anchor, mode: prefs.mode, remembered: prefs.remembered, showSource: prefs.showSource, autoCopy: prefs.autoCopy, editable: false, interface: interface))
+        }
+    }
 
     /// Pins the annotated selection where it sits on screen, then closes the overlay.
     private func pinAndFinish() {
@@ -737,6 +774,20 @@ final class Session: NSObject, NSTextFieldDelegate {
     var testView: OverlayView? { views.first }
     func testSelect(_ r: CGRect, index: Int) { activeIndex = index; selection = r; phase = .selected; showBars(); redraw() }
     func testAnnotate(_ list: [Annotation]) { annotations = list; redraw() }
+    /// Drags a selection over the middle of the screen in translate-only mode (the release starts
+    /// recognition and translation).
+    func testTranslateDrag() {
+        guard let view = views.first else { return }
+        let b = view.bounds
+        func event(_ type: NSEvent.EventType, _ p: CGPoint) -> NSEvent {
+            NSEvent.mouseEvent(with: type, location: view.convert(p, to: nil), modifierFlags: [], timestamp: 0, windowNumber: view.window?.windowNumber ?? 0, context: nil, eventNumber: 0, clickCount: 1, pressure: 1)!
+        }
+        let start = CGPoint(x: b.width * 0.22, y: b.height * 0.72), end = CGPoint(x: b.width * 0.62, y: b.height * 0.5)
+        mouseDown(view, event(.leftMouseDown, start))
+        mouseDragged(view, event(.leftMouseDragged, end))
+        mouseUp(view, event(.leftMouseUp, end))
+    }
+
     /// Simulates clicks around a plain selection (no annotations) and reports what happened.
     func testClicks() {
         guard let view = views.first else { return }

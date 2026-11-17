@@ -579,7 +579,7 @@ return {
     ["双击 ⌥ Option"] = "Double-tap ⌥ Option",
     ["双击 ⌘ Command"] = "Double-tap ⌘ Command",
     ["双击 ⌃ Control"] = "Double-tap ⌃ Control",
-    ["选中文字后快速按两下所选按键。两次按键需在 0.4 秒内完成，中间不按其他键。使用前请关掉 Bob 或“快捷指令”里相同的触发方式，以免弹出两个窗口。"] = "Select text, then quickly press the chosen key twice within 0.4 seconds without pressing anything else. Turn off the same trigger in Bob or Shortcuts first, or two windows will open.",
+    ["选中文字后快速按两下选词翻译的按键；按两下截图翻译的按键后框选区域，松开即识别并翻译（需要屏幕录制权限）。两次按键需在 0.4 秒内完成，中间不按其他键。使用前请关掉 Bob 或“快捷指令”里相同的触发方式，以免弹出两个窗口。"] = "Select text and quickly press the selection key twice; press the screenshot key twice, select an area and release to recognise and translate it (needs Screen Recording). Press twice within 0.4 seconds without other keys in between. Turn off the same triggers in Bob or Shortcuts first, or two windows will open.",
     ["翻译方向"] = "Translation direction",
     ["自动（推荐）"] = "Automatic (recommended)",
     ["总是译成简体中文"] = "Always to Simplified Chinese",
@@ -609,4 +609,6 @@ return {
     ["钉住"] = "Pin",
     ["不使用"] = "Off",
     ["显示"] = "Display",
+    ["截图翻译"] = "Screenshot translation",
+    ["选词翻译和截图翻译不能使用同一个按键"] = "Selection and screenshot translation can't use the same key.",
 }

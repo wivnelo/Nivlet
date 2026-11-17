@@ -62,13 +62,49 @@ final class TranslateCard: NSView {
         translate()
     }
 
-    private enum State { case working, done, failed(String) }
+    private enum State { case working, partial, done, failed(String) }
+
+    /// Detection can confidently pick a language system translation lacks (garbled OCR often reads
+    /// as Hungarian). Latin-script text then falls back to English once before giving up.
+    private func retryAsEnglish() -> Bool {
+        guard source != "en", !source.hasPrefix("zh"), !["ja", "ko"].contains(source),
+              !request.text.unicodeScalars.contains(where: { $0.value >= 0x3040 }) else { return false }
+        source = "en"
+        target = Direction.target(source: source, mode: request.mode, remembered: request.remembered)
+        render(state: .working)
+        translate()
+        return true
+    }
 
     private func translate() {
         token += 1
         let current = token
         guard #available(macOS 15.0, *) else { render(state: .failed(t("needsMacOS15"))); return }
         let text = request.text, from = source, to = target
+        let lines = text.split(whereSeparator: \.isNewline).map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+        if lines.count > 1 {
+            Task { @MainActor in
+                var parts = [String?](repeating: nil, count: lines.count)
+                let started = Date()
+                do {
+                    try await SystemTranslator.shared.translateLines(lines, from: from, to: to) { index, line in
+                        guard current == self.token else { return }
+                        if index < 0 { parts = [line] } else if parts.indices.contains(index) { parts[index] = line }
+                        self.result = parts.compactMap { $0 }.joined(separator: "\n")
+                        self.render(state: parts.contains(where: { $0 == nil }) ? .partial : .done)
+                    }
+                    guard current == token else { return }
+                    onEvent(["event": "translated", "ms": Int(Date().timeIntervalSince(started) * 1000), "lines": lines.count])
+                    render(state: .done)
+                    if request.autoCopy { copy(result, flash: nil) }
+                } catch {
+                    guard current == token else { return }
+                    if (error as? TranslateError) == .unsupported, retryAsEnglish() { return }
+                    render(state: .failed((error as? TranslateError) == .unsupported ? t("pairUnsupported") : t("translateFailed")))
+                }
+            }
+            return
+        }
         Task { @MainActor in
             do {
                 let started = Date()
@@ -81,6 +117,7 @@ final class TranslateCard: NSView {
                 if request.autoCopy { copy(result, flash: nil) }
             } catch {
                 guard current == token else { return }
+                if (error as? TranslateError) == .unsupported, retryAsEnglish() { return }
                 render(state: .failed((error as? TranslateError) == .unsupported ? t("pairUnsupported") : t("translateFailed")))
             }
         }
@@ -116,6 +153,10 @@ final class TranslateCard: NSView {
             let row = NSStackView(); row.spacing = 8
             row.addArrangedSubview(FlatButton(title: t("openLanguageSettings"), target: self, action: #selector(openSettings)))
             add(row)
+        case .partial:
+            let out = NSTextField(wrappingLabelWithString: result + "\n…")
+            out.font = .systemFont(ofSize: 15); out.textColor = .labelColor; out.isSelectable = true
+            add(out)
         case .done:
             let out = NSTextField(wrappingLabelWithString: result)
             out.font = .systemFont(ofSize: 15); out.textColor = .labelColor; out.isSelectable = true

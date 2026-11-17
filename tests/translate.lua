@@ -25,4 +25,7 @@ fired=0;local d5=detector();now=now+1;d5.flags({alt=true});now=now+0.8;d5.flags(
 fired=0;local d6=detector();tap(d6,'cmd');tap(d6,'cmd',0.1);assert(fired==0,'other modifiers do not fire')
 fired=0;local d7=detector();tap(d7,'alt');tap(d7,'alt',0.1);tap(d7,'alt',0.1);assert(fired==1,'a third tap starts over')
 fired=0;local d8=detector();now=now+0.05;d8.flags({alt=true,fn=true});now=now+0.05;d8.flags({});tap(d8,'alt',0.1);assert(fired==1,'fn is ignored')
+assert(translate.validate({enabled=true}).screenshotTrigger=='doubleCtrl','Screenshot translation defaults to double Control')
+assert(not translate.validate({enabled=true,selectionTrigger='doubleCtrl',screenshotTrigger='doubleCtrl'}),'Both triggers cannot share a key')
+assert(translate.validate({enabled=true,selectionTrigger='off',screenshotTrigger='off'}))
 print('translate module: settings validation and double-tap detection')

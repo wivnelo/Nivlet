@@ -36,7 +36,7 @@ end
 local windowFields={};for _,action in ipairs(require("modules.windows").actions) do windowFields[action]=true end
 local function shape(name,value)
     if name=="popupShortcut" then return shortcut(value) end
-    if name=="translate" then return fields(value,{enabled=true,selectionTrigger=true,mode=true,remember=true,showSource=true,autoCopy=true}) end
+    if name=="translate" then return fields(value,{enabled=true,selectionTrigger=true,screenshotTrigger=true,mode=true,remember=true,showSource=true,autoCopy=true}) end
     if name=="capture" then return fields(value,{enabled=true,shortcut=true,pinShortcut=true,saveDirectory=true,format=true,snapWindows=true,loupe=true}) and shortcut(value.shortcut) and (value.pinShortcut==nil or shortcut(value.pinShortcut)) end
     if not fields(value,schemas[name]) then return false end
     if name=="general" and value.language~=nil and type(value.language)~="string" then return false end

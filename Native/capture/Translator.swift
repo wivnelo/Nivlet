@@ -71,6 +71,27 @@ final class SystemTranslator {
         return try await viaSwiftUI(text, from: from, to: to)
     }
 
+    /// Multi-line text: the engine works line by line (~0.9 s each), so lines are streamed back as
+    /// they finish and the card fills in progressively instead of waiting for the whole block.
+    func translateLines(_ lines: [String], from source: String, to target: String, onLine: @escaping (Int, String) -> Void) async throws {
+        let from = Locale.Language(identifier: source), to = Locale.Language(identifier: target)
+        let status = await LanguageAvailability().status(from: from, to: to)
+        if status == .unsupported { throw TranslateError.unsupported }
+        if status == .installed, #available(macOS 26.0, *) {
+            let key = "\(source)>\(target)"
+            let session = (sessions[key] as? TranslationSession) ?? TranslationSession(installedSource: from, target: to)
+            sessions[key] = session
+            let requests = lines.enumerated().map { TranslationSession.Request(sourceText: $0.element, clientIdentifier: String($0.offset)) }
+            for try await response in session.translate(batch: requests) {
+                if let id = response.clientIdentifier, let index = Int(id) { onLine(index, response.targetText) }
+            }
+            return
+        }
+        // SwiftUI route: one request for the whole text.
+        let whole = try await viaSwiftUI(lines.joined(separator: "\n"), from: from, to: to)
+        onLine(-1, whole)
+    }
+
     /// Loads the English ↔ Chinese models once so the first double-tap does not wait ~2 s.
     /// The models live in a system service, so this adds only a few MB to the helper.
     func prewarm() {

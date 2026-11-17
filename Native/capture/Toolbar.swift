@@ -12,11 +12,11 @@ var strings: [String: String] = [
     "pin": "钉到桌面", "opacity": "透明度", "actualSize": "原始大小", "closeAllPins": "关闭全部贴图",
     "translating": "正在翻译…", "translateFailed": "翻译失败，请重试", "pairUnsupported": "系统翻译不支持这两种语言",
     "openLanguageSettings": "打开语言设置", "replaceSource": "替换原文", "copySource": "复制原文", "copyTranslation": "复制译文",
-    "pinCard": "钉住", "needsMacOS15": "翻译需要 macOS 15 或更高版本",
+    "pinCard": "钉住", "translateAction": "翻译", "needsMacOS15": "翻译需要 macOS 15 或更高版本",
 ]
 func t(_ key: String) -> String { strings[key] ?? key }
 
-enum ToolbarAction { case tool(Tool), undo, redo, ocr, qr, pin, save, cancel, copy }
+enum ToolbarAction { case tool(Tool), undo, redo, ocr, qr, translate, pin, save, cancel, copy }
 
 /// A small button that shows an SF Symbol and a pressed state, sized for a 30 pt toolbar.
 final class ToolButton: NSButton {
@@ -103,7 +103,7 @@ final class Toolbar: NSView {
     private var toolButtons: [Tool: ToolButton] = [:]
     private let hud = makeHUD()
 
-    init() {
+    init(showTranslate: Bool = false) {
         super.init(frame: .zero)
         addSubview(hud)
         let stack = NSStackView()
@@ -120,6 +120,7 @@ final class Toolbar: NSView {
         stack.addArrangedSubview(separator())
         stack.addArrangedSubview(ToolButton(symbol: "text.viewfinder", tooltip: "\(t("ocr"))  O", target: self, action: #selector(ocr)))
         stack.addArrangedSubview(ToolButton(symbol: "qrcode.viewfinder", tooltip: "\(t("qr"))  Q", target: self, action: #selector(qr)))
+        if showTranslate { stack.addArrangedSubview(ToolButton(symbol: "translate", tooltip: "\(t("translateAction"))  L", target: self, action: #selector(translateAction))) }
         stack.addArrangedSubview(separator())
         stack.addArrangedSubview(ToolButton(symbol: "pin", tooltip: "\(t("pin"))  P", target: self, action: #selector(pin)))
         stack.addArrangedSubview(ToolButton(symbol: "square.and.arrow.down", tooltip: "\(t("save"))  ⌘S", target: self, action: #selector(save)))
@@ -151,6 +152,7 @@ final class Toolbar: NSView {
     @objc private func redo() { onAction(.redo) }
     @objc private func ocr() { onAction(.ocr) }
     @objc private func pin() { onAction(.pin) }
+    @objc private func translateAction() { onAction(.translate) }
     @objc private func qr() { onAction(.qr) }
     @objc private func save() { onAction(.save) }
     @objc private func cancel() { onAction(.cancel) }

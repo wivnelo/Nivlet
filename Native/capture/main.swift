@@ -29,6 +29,7 @@ final class Helper {
     var busy = false
     var selfTestPath: String?
     var clickTest = false
+    var translateTest = false
 
     func handle(_ command: [String: Any]) {
         switch command["cmd"] as? String {
@@ -38,12 +39,20 @@ final class Helper {
             if let v = command["snapWindows"] as? Bool { config.snapWindows = v }
             if let v = command["loupe"] as? Bool { config.loupe = v }
             if let v = command["language"] as? String { config.language = v }
+            if let t = command["translate"] as? [String: Any], t["enabled"] as? Bool == true {
+                config.translate = TranslatePrefs(mode: t["mode"] as? String ?? "auto", remembered: t["remembered"] as? [String: String] ?? [:],
+                                                  showSource: t["showSource"] as? Bool ?? true, autoCopy: t["autoCopy"] as? Bool ?? false)
+            } else if command["translate"] != nil {
+                config.translate = nil
+            }
             if let v = command["strings"] as? [String: String] { strings.merge(v) { _, new in new } }
             if let v = command["appearance"] as? String {
                 NSApp.appearance = v == "dark" ? NSAppearance(named: .darkAqua) : v == "light" ? NSAppearance(named: .aqua) : nil
             }
         case "capture":
             capture()
+        case "captureTranslate":
+            if config.translate != nil { capture(translateOnly: true) }
         case "translate":
             guard let text = command["text"] as? String, !text.isEmpty else { return }
             let x = command["x"] as? Double ?? Double(NSEvent.mouseLocation.x)
@@ -67,6 +76,9 @@ final class Helper {
         case "selftest":
             selfTestPath = command["path"] as? String
             capture()
+        case "selftest-translate":
+            translateTest = true
+            capture(translateOnly: true)
         case "selftest-clicks":
             clickTest = true
             capture()
@@ -80,7 +92,7 @@ final class Helper {
         }
     }
 
-    func capture() {
+    func capture(translateOnly: Bool = false) {
         guard !busy, session == nil else { return }
         guard CGPreflightScreenCaptureAccess() else {
             // The system prompt appears once; after the user grants access macOS needs a fresh process,
@@ -95,7 +107,9 @@ final class Helper {
             defer { busy = false }
             do {
                 let frozen = try await capturer.captureAll()
-                let s = Session(frozen: frozen, config: config)
+                var sessionConfig = config
+                sessionConfig.translateOnly = translateOnly
+                let s = Session(frozen: frozen, config: sessionConfig)
                 s.onEvent = { event in emit(event) }
                 s.onFinish = { event in
                     emit(event)
@@ -106,6 +120,7 @@ final class Helper {
                 #if NIVLET_SELFTEST
                 if let path = selfTestPath { selfTestPath = nil; s.runSelfTest(path: path) }
                 if clickTest { clickTest = false; s.testClicks() }
+                if translateTest { translateTest = false; s.testTranslateDrag() }
                 #endif
                 emit(["event": "shown", "ms": Int((DispatchTime.now().uptimeNanoseconds - started) / 1_000_000)])
             } catch {
