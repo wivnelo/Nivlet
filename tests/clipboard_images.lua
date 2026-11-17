@@ -21,7 +21,11 @@ local path=c.entries[1].path;assert(path and io.open(path,'rb'))
 assert(c.preview(c.entries[1].id).url:find('data:image/png',1,true));assert(not c.preview(-1))
 local snap=c.snapshot();assert(snap.entries[1].preview and not snap.entries[1].image)
 c.entries={};c.load();assert(#c.entries==10 and c.entries[1].kind=='image')
-count=count+1;c.poll();assert(#c.entries==1,'Restored images must match the same encoded image')
+assert(c.entries[1].fingerprint=='data:image/png;base64,fixture12','Restored images keep their saved fingerprint without re-encoding')
+count=count+1;c.poll()
+local same=0;for _,e in ipairs(c.entries) do if e.fingerprint=='data:image/png;base64,fixture12' then same=same+1 end end
+assert(#c.entries==10 and same==1,'Copying a restored image again replaces it instead of duplicating')
+c.entries={c.entries[1]}
 assert(c.copy(c.entries[1].id));assert(writes==1)
 local menu=c.menuItems();menu[3].fn({alt=true});assert(writes==2 and keys==1)
 hs.accessibilityState=function() return false end;assert(not c.copy(c.entries[1].id,hs.application.frontmostApplication()) and writes==2)

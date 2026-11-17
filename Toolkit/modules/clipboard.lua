@@ -49,7 +49,8 @@ function M.persist()
                 if not entry.image:saveToFile(path,true,"PNG") then return false,i18n.t("图片缓存写入失败") end
                 entry.path=path
             end
-            table.insert(saved,{id=entry.id,kind="image",time=entry.time,path=entry.path,source=entry.source})
+            -- Fingerprint and size are stored so startup never has to decode and re-encode images.
+            table.insert(saved,{id=entry.id,kind="image",time=entry.time,path=entry.path,source=entry.source,fingerprint=entry.fingerprint,bytes=entry.menuBytes})
         else table.insert(saved,{id=entry.id,kind="text",time=entry.time,text=entry.text}) end
     end
     if hs.settings.set(historyKey,saved)==false then return false,i18n.t("保存失败，请检查设置") end
@@ -149,9 +150,13 @@ function M.load()
             if entry.kind=="image" and managed(entry.path) then
                 local attr=hs.fs.symlinkAttributes(entry.path)
                 if attr and attr.mode=="file" and attr.size<=10485760 then
+                    -- Restoring used to re-encode every image to PNG/base64 for a fingerprint, which
+                    -- pushed startup past 2 GB with full-screen captures. Saved records now carry the
+                    -- fingerprint; older ones get theirs lazily, only when a copied image needs comparing.
                     local image=hs.image.imageFromPath(entry.path)
-                    local encoded=image and image:encodeAsURLString(true,"PNG")
-                    if image then item={id=entry.id,time=entry.time,kind="image",image=image,path=entry.path,source=entry.source=="capture" and "capture" or nil,thumb=thumbnail(image),fingerprint=hs.hash.SHA256(encoded),menuBytes=pngBytes(encoded)} end
+                    local fingerprint=type(entry.fingerprint)=="string" and entry.fingerprint or nil
+                    local bytes=type(entry.bytes)=="number" and entry.bytes or attr.size
+                    if image then item={id=entry.id,time=entry.time,kind="image",image=image,path=entry.path,source=entry.source=="capture" and "capture" or nil,thumb=thumbnail(image),fingerprint=fingerprint,menuBytes=bytes} end
                 end
             end
         end
@@ -213,6 +218,9 @@ function M.poll()
     if hs.pasteboard.changeCount()~=count then return end
     for i=#M.entries,1,-1 do
         local entry=M.entries[i]
+        if fingerprint and entry.kind=="image" and not entry.fingerprint and entry.image then
+            entry.fingerprint=hs.hash.SHA256(entry.image:encodeAsURLString(true,"PNG"))
+        end
         if value and entry.text==value or fingerprint and entry.fingerprint==fingerprint then remove(entry);table.remove(M.entries,i) end
     end
     M.nextID=M.nextID+1
