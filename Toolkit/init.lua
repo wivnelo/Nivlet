@@ -16,12 +16,14 @@ local browserData=require("modules.browser_data")
 browser.start()
 clipboard.start()
 local capture=require("modules.capture")
+local translate=require("modules.translate")
 local keepAwake=require("modules.keep_awake")
 local previousShutdown=hs.shutdownCallback
 hs.shutdownCallback=function()
     keepAwake.stop()
     clipboard.stop()
     capture.stop()
+    translate.stop()
     if type(previousShutdown)=="function" then previousShutdown() end
 end
 local launcher=require("modules.launcher")
@@ -32,7 +34,7 @@ local app = {bindings={}}
 
 local batchCandidates,batchShortcutConflicts
 local generalKey = "desktoptoolkit.general.v1"
-local tabIDs={windowSection=true,inputSection=true,clipSection=true,captureSection=true,systemSection=true,browserSection=true,launcherSection=true,aboutSection=true}
+local tabIDs={windowSection=true,inputSection=true,clipSection=true,captureSection=true,translateSection=true,systemSection=true,browserSection=true,launcherSection=true,aboutSection=true}
 local function validateGeneral(value)
     if type(value) ~= "table" or type(value.showMenu) ~= "boolean" or
         (value.appearance ~= "system" and value.appearance ~= "light" and value.appearance ~= "dark") then
@@ -291,10 +293,10 @@ local adapters={
     windows={get=function() return app.config end,defaults=preferences.defaults,validate=preferences.validate,save=app.save},
     popupShortcut={get=function() return app.popupShortcut or false end,defaults=defaultPopup,release=function() return app.savePopup(nil) end,validate=function(v) local item,message;if v~=false then item,message=normalizePopup(v) end;if message then return nil,message end;return item or false end,save=function(v) if v==false then return app.savePopup(nil) end;return app.savePopup(v) end},
 }
-for name,module in pairs({input=input,clipboard=clipboard,system=system,browser=browser,launcher=launcher,capture=capture}) do
+for name,module in pairs({input=input,clipboard=clipboard,system=system,browser=browser,launcher=launcher,capture=capture,translate=translate}) do
     adapters[name]={get=function() return module.config end,defaults=module.defaults or function() return {enabled=false,rules={}} end,validate=module.validate,save=module.save}
 end
-local configKeys={capture="desktoptoolkit.capture.v1",general=generalKey,windows=key,popupShortcut=popupKey,input="desktoptoolkit.input.v1",clipboard="desktoptoolkit.clipboard.v1",system="desktoptoolkit.system.v1",browser="desktoptoolkit.browser.v1",launcher="desktoptoolkit.launcher.v1"}
+local configKeys={capture="desktoptoolkit.capture.v1",translate="desktoptoolkit.translate.v1",general=generalKey,windows=key,popupShortcut=popupKey,input="desktoptoolkit.input.v1",clipboard="desktoptoolkit.clipboard.v1",system="desktoptoolkit.system.v1",browser="desktoptoolkit.browser.v1",launcher="desktoptoolkit.launcher.v1"}
 app.configuration=configuration.new(adapters,{
     systemAssigned=function(item) return preferences.systemAssigned(item.mods,item.key) end,
     accessibility=permissions.isGranted,
@@ -364,6 +366,7 @@ pageAdapters.systemSection=configPage(system)
 pageAdapters.browserSection=configPage(browser)
 pageAdapters.launcherSection=configPage(launcher)
 pageAdapters.captureSection=configPage(capture)
+pageAdapters.translateSection=configPage(translate)
 local function releasePageBindings(group)
     for _,page in ipairs(group) do
         if page=="generalSection" then sleep.configure(false)
@@ -459,7 +462,7 @@ local function reply(ok, message, action, requestID, saveBatch)
     if action=="refreshApplications" or action=="refreshBrowserStatus" or action=="refreshPermissionsSilent" or action=="prepareBrowserData" or action==nil then appIcons.clear() end
     local permission=permissionState()
     local icons=app.settings and configuredAppIcons()
-    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.translations(),general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),capture=capture.config,capturePermission=capture.permissionGranted(),excludedAppNames=excludedAppNames(),appIcons=icons,applicationStates=applicationStates(icons),popupShortcut=app.popupShortcut or false,popupShortcutDefault=defaultPopup(),popupShortcutError=app.popupShortcutError and i18n.t(app.popupShortcutError) or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}) .. ")") end
+    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.translations(),general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),capture=capture.config,capturePermission=capture.permissionGranted(),translate=translate.config,translateSupported=translate.supported(),translateRemembered=translate.memory,excludedAppNames=excludedAppNames(),appIcons=icons,applicationStates=applicationStates(icons),popupShortcut=app.popupShortcut or false,popupShortcutDefault=defaultPopup(),popupShortcutError=app.popupShortcutError and i18n.t(app.popupShortcutError) or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}) .. ")") end
 end
 local function showSettingsWindow(view)
     hs.dockicon.show()
@@ -543,6 +546,7 @@ function app.openSettings(section, focus)
             end)
             return
         end
+        if body.action=="clearTranslateMemory" then local ok,result=translate.clearMemory();reply(ok,result,body.action);return end
         if body.action=="chooseCaptureFolder" then
             local path=selectedPath(hs.dialog.chooseFileOrFolder(i18n.t("选择截图保存位置"),os.getenv("HOME"),false,true,false,{},true))
             if type(path)=="string" and path~="" then
@@ -629,7 +633,7 @@ function app.openSettings(section, focus)
         if body.action == "saveLauncher" then local success,result=launcher.save(body.config);reply(success,result,body.action) end
         if body.action == "setShowMenu" then local success,result=app.setShowMenu(body.enabled); reply(success,result,body.action) end
         if body.action == "saveGeneral" then local success,result=app.saveGeneralPage(body.config,body.autoLaunch);reply(success,result,body.action) end
-        local save=({save=app.save,saveCapture=capture.save,savePopup=app.savePopup,saveBrowser=browser.save,saveSystem=system.save,saveInput=input.save})[body.action]
+        local save=({save=app.save,saveCapture=capture.save,saveTranslate=translate.save,savePopup=app.savePopup,saveBrowser=browser.save,saveSystem=system.save,saveInput=input.save})[body.action]
         if save then local success, result = save(body.config); reply(success, result, body.action) end
         if body.action == "saveClipboard" then local success,result=app.saveClipboardPage(body.config,body.popupShortcut,body.popupShortcutChanged);reply(success,result,body.action) end
         if body.action == "refreshClipboard" then reply(true, "", body.action) end
@@ -729,6 +733,7 @@ capture.start(function(shortcut)
     if batchCandidates then return batchShortcutConflicts(shortcut,"captureSection") end
     return sleep.conflicts(shortcut) or sameShortcut(shortcut,app.popupShortcut) or popupConflicts(shortcut,app.config) or launcher.conflicts(shortcut)
 end,{copied=function() clipboard.poll() end,permission=function() reply(true,"","refreshPermissionsSilent") end,appearance=function() return app.general.appearance end})
+translate.start(capture,clipboard)
 
 function app.arrangeMenus()
     clipboard.menu:removeFromMenuBar():returnToMenuBar():setTitle("")

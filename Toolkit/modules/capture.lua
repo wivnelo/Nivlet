@@ -2,7 +2,7 @@
 -- while the module is enabled; this module owns the shortcut, settings and output feedback.
 local i18n=require('modules.i18n')
 local preferences=require('modules.preferences')
-local M={bindings={},buffer=''}
+local M={bindings={},buffer='',users={},handlers={}}
 local settingsKey='desktoptoolkit.capture.v1'
 local formats={png=true,jpg=true}
 
@@ -70,7 +70,9 @@ local function strings()
         ocr='识别文字',qr='识别二维码',recognizing='正在识别…',preparing='首次使用需要准备识别模型，请稍候…',
         ocrTitle='识别到的文字',qrTitle='二维码',noText='没有识别到文字',noCode='没有找到二维码',recognizeFailed='识别失败，请重试',
         copyClose='复制并关闭',openLink='打开链接',close='关闭',joinLines='合并为一行',copied='已复制',
-        pin='钉到桌面',opacity='透明度',actualSize='原始大小',closeAllPins='关闭全部贴图'}
+        pin='钉到桌面',opacity='透明度',actualSize='原始大小',closeAllPins='关闭全部贴图',
+        translating='正在翻译…',translateFailed='翻译失败，请重试',pairUnsupported='系统翻译不支持这两种语言',openLanguageSettings='打开语言设置',
+        replaceSource='替换原文',copySource='复制原文',copyTranslation='复制译文',pinCard='钉住',needsMacOS15='翻译需要 macOS 15 或更高版本'}
     local result={}
     for k,v in pairs(keys) do result[k]=i18n.t(v) end
     return result
@@ -97,6 +99,8 @@ local function handleEvent(event)
     elseif kind=='color' then
         if M.onCopied then M.onCopied() end
         notify(i18n.t('已复制颜色 ')..tostring(event.value))
+    elseif M.handlers[kind] then
+        M.handlers[kind](event)
     elseif kind=='pinned' or kind=='pinnedCapture' then
         -- Nothing to report: the pin itself is the feedback.
     elseif kind=='permission' then
@@ -144,12 +148,22 @@ function M.refreshConfig()
 end
 
 -- Sends a command now, or queues it until a freshly started helper reports ready.
+-- Other modules (translation) use the same helper through M.dispatch.
 local function dispatch(command)
     if M.task and M.task:isRunning() and M.ready then sendConfig();send(command);return end
     M.queue=M.queue or {}
     table.insert(M.queue,command)
     local ok,message=M.startHelper()
     if not ok then M.queue={};notify(message) end
+end
+
+M.dispatch=dispatch
+
+-- Another module that needs the helper keeps it running even while screenshots are off.
+-- The helper itself still starts only on first use.
+function M.setUser(name,active)
+    M.users[name]=active or nil
+    if not active and not (M.config and M.config.enabled) and not next(M.users) then M.stopHelper() end
 end
 
 function M.trigger() dispatch({cmd='capture'}) end
@@ -190,7 +204,7 @@ local function apply(config)
     if config.enabled then
         M.startHelper()
         if M.ready then sendConfig() end
-    else
+    elseif not next(M.users) then
         M.stopHelper()
     end
     return true

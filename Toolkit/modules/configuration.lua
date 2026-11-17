@@ -1,6 +1,6 @@
 local i18n=require("modules.i18n")
 local preferences=require("modules.preferences")
-local M={version=1,names={"general","windows","input","clipboard","popupShortcut","system","browser","launcher","capture"}}
+local M={version=1,names={"general","windows","input","clipboard","popupShortcut","system","browser","launcher","capture","translate"}}
 local function copy(value)
     if type(value)~="table" then return value end
     local result={};for k,v in pairs(value) do result[k]=copy(v) end;return result
@@ -36,6 +36,7 @@ end
 local windowFields={};for _,action in ipairs(require("modules.windows").actions) do windowFields[action]=true end
 local function shape(name,value)
     if name=="popupShortcut" then return shortcut(value) end
+    if name=="translate" then return fields(value,{enabled=true,selectionTrigger=true,mode=true,remember=true,showSource=true,autoCopy=true}) end
     if name=="capture" then return fields(value,{enabled=true,shortcut=true,pinShortcut=true,saveDirectory=true,format=true,snapWindows=true,loupe=true}) and shortcut(value.shortcut) and (value.pinShortcut==nil or shortcut(value.pinShortcut)) end
     if not fields(value,schemas[name]) then return false end
     if name=="general" and value.language~=nil and type(value.language)~="string" then return false end
@@ -124,7 +125,7 @@ function M.new(adapters,environment)
         local function apply(config,selected)
             local shortcuts=selected.windows or selected.launcher or selected.popupShortcut or selected.capture
             if shortcuts then release() end
-            for _,name in ipairs({"windows","popupShortcut","launcher","capture","input","browser","system","general","clipboard"}) do
+            for _,name in ipairs({"windows","popupShortcut","launcher","capture","translate","input","browser","system","general","clipboard"}) do
                 if (selected[name] or shortcuts and (name=="windows" or name=="popupShortcut" or name=="launcher" or name=="capture" or name=="general")) and not (name=="clipboard" and equal(config[name],adapters[name].get())) then
                     local ok,result=adapters[name].save(config[name]);if not ok then error(result) end
                 end

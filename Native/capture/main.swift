@@ -44,6 +44,18 @@ final class Helper {
             }
         case "capture":
             capture()
+        case "translate":
+            guard let text = command["text"] as? String, !text.isEmpty else { return }
+            let x = command["x"] as? Double ?? Double(NSEvent.mouseLocation.x)
+            let y = command["y"] as? Double ?? Double(NSEvent.mouseLocation.y)
+            TranslateController.shared.show(TranslateRequest(
+                text: String(text.prefix(5000)), anchor: NSPoint(x: x, y: y),
+                mode: command["mode"] as? String ?? "auto",
+                remembered: command["remembered"] as? [String: String] ?? [:],
+                showSource: command["showSource"] as? Bool ?? true,
+                autoCopy: command["autoCopy"] as? Bool ?? false,
+                editable: command["editable"] as? Bool ?? false,
+                interface: config.language))
         case "pinClipboard":
             PinManager.shared.pinClipboard()
         case "pinFile":
@@ -107,7 +119,10 @@ final class Helper {
 let app = NSApplication.shared
 app.setActivationPolicy(.accessory)
 let helper = MainActor.assumeIsolated { Helper() }
-MainActor.assumeIsolated { PinManager.shared.emit = { emit($0) } }
+MainActor.assumeIsolated {
+    PinManager.shared.emit = { emit($0) }
+    TranslateController.shared.emit = { emit($0) }
+}
 
 NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main) { _ in
     MainActor.assumeIsolated { helper.capturer.invalidate() }

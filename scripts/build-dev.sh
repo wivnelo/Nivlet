@@ -34,7 +34,8 @@ sh "$project_dir/scripts/prepare-updater.sh" "$app_path"
 python3 "$project_dir/scripts/collect-notices.py" "$app_path/Contents/Resources/Toolkit/THIRD-PARTY-NOTICES.md"
 xcrun clang -fobjc-arc -Wall -Wextra -Werror -arch "$architecture" -mmacosx-version-min=13.0 -framework Foundation "$project_dir/Native/system_probe.m" -o "$app_path/Contents/Resources/Toolkit/system-probe"
 # Screenshot overlay helper (Toolkit/modules/capture.lua). Swift 5 mode keeps the AppKit code free of strict-concurrency noise.
-xcrun swiftc -O -swift-version 5 -warnings-as-errors -target "$architecture-apple-macos13.0" "$project_dir"/Native/capture/*.swift -o "$app_path/Contents/Resources/Toolkit/capture-helper"
+# Translation exists only on macOS 15+, so it is weak-linked and guarded with availability checks.
+xcrun swiftc -O -swift-version 5 -warnings-as-errors -target "$architecture-apple-macos13.0" -Xlinker -weak_framework -Xlinker Translation -Xlinker -weak_framework -Xlinker _Translation_SwiftUI "$project_dir"/Native/capture/*.swift -o "$app_path/Contents/Resources/Toolkit/capture-helper"
 python3 "$project_dir/scripts/optimize-app.py" "$app_path" "$configuration" "$architecture"
 python3 "$project_dir/scripts/trim-runtime.py" "$app_path"
 if [ "$configuration" = Release ]; then

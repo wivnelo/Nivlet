@@ -10,6 +10,9 @@ var strings: [String: String] = [
     "recognizeFailed": "识别失败，请重试", "copyClose": "复制并关闭", "openLink": "打开链接", "close": "关闭",
     "joinLines": "合并为一行", "copied": "已复制",
     "pin": "钉到桌面", "opacity": "透明度", "actualSize": "原始大小", "closeAllPins": "关闭全部贴图",
+    "translating": "正在翻译…", "translateFailed": "翻译失败，请重试", "pairUnsupported": "系统翻译不支持这两种语言",
+    "openLanguageSettings": "打开语言设置", "replaceSource": "替换原文", "copySource": "复制原文", "copyTranslation": "复制译文",
+    "pinCard": "钉住", "needsMacOS15": "翻译需要 macOS 15 或更高版本",
 ]
 func t(_ key: String) -> String { strings[key] ?? key }
 

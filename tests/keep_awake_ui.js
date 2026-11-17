@@ -29,7 +29,7 @@ window.runKeepAwakeUIRegression=function(data){
   const contentHeight=row=>{const style=getComputedStyle(row);return row.getBoundingClientRect().height-parseFloat(style.borderTopWidth)-parseFloat(style.borderBottomWidth)};
   const referenceHeight=contentHeight(document.getElementById('sleepShortcut').closest('p'));
   for(const element of [awake,display]){const row=element.closest('p');check(!row.querySelector('.help-text'),'Removed help text returned');check(Math.abs(contentHeight(row)-referenceHeight)<1,'Power row spacing differs from adjacent setting');}
-  check(document.querySelectorAll('[role=tab]').length===9,'Nine settings pages, including Screenshot');
+  check(document.querySelectorAll('[role=tab]').length===10,'Ten settings pages, including Screenshot and Translation');
   return 'Default migration, dependency, deferred application, cancel isolation, global save, retry, repeated save and localization passed';
  }finally{send=original;window.receive({...data,ok:true,action:'load'})}
 };
