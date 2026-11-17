@@ -38,6 +38,7 @@ function loadFixture() {
    {id:2,time:1793325540,text:'https://example.com/design-notes'},
    {id:3,time:1793325480,text:language==='en'?'Release checklist\nReview the changes · Run tests · Update documentation':'发布清单\n审阅变更 · 运行测试 · 更新文档'}]},
   excludedAppNames:{},appIcons:{},applicationStates:Object.fromEntries(ids.map((id,i)=>[id,{installed:true,name:names[i]}])),
+  capture:{enabled:true,shortcut:{key:'4',mods:['cmd','shift']},saveDirectory:'~/Pictures/Nivlet',format:'png',snapWindows:true,loupe:true},capturePermission:true,
   popupShortcut:{key:'V',mods:['cmd','shift']},popupShortcutDefault:{key:'V',mods:['cmd','shift']},
   system:Object.fromEntries(['network','cpu','memory','disk','ipv4','ipv6','date','lunar'].map(id=>[id,true])),
   browser:{enabled:true,defaultBrowser:'com.apple.Safari',rules:[{domain:'example.com',browser:'com.google.Chrome',subdomains:true}],appRules:[{bundleID:ids[0],name:names[0],browser:'com.apple.Safari'}]},
@@ -46,7 +47,7 @@ function loadFixture() {
  };
 }
 const data=loadFixture();
-const pages={general:'generalSection',windows:'windowSection',input:'inputSection',clipboard:'clipSection',system:'systemSection',browser:'browserSection',launcher:'launcherSection',about:'aboutSection'};
+const pages={general:'generalSection',windows:'windowSection',input:'inputSection',clipboard:'clipSection',capture:'captureSection',system:'systemSection',browser:'browserSection',launcher:'launcherSection',about:'aboutSection'};
 const results=[];
 async function fresh(browser){
  const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:1,locale:locales[language],timezoneId:'UTC',colorScheme:theme==='dark'?'dark':'light'});

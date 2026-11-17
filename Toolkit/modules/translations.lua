@@ -503,7 +503,7 @@ return {
     ["打开系统设置"] = "Open System Settings",
     ["快捷键"] = "Shortcut",
     ["截图按键"] = "Screenshot key",
-    ["内置键盘按 fn + F1；外接键盘或开启“将 F1、F2 等键用作标准功能键”后直接按 F1。F1–F19 可以不带修饰键，其他按键需配合 Control、Option 或 Command。"] = "On the built-in keyboard press fn + F1. On an external keyboard, or with “Use F1, F2, etc. keys as standard function keys” on, press F1. F1–F19 work without modifiers; other keys need Control, Option or Command.",
+    ["F1–F19 可以不带修饰键（内置键盘需同时按 fn），其他按键需配合 Control、Option 或 Command。要用 ⌘⇧4 等系统截图快捷键，请先在“系统设置 → 键盘 → 键盘快捷键 → 截屏”中关闭对应项。"] = "F1–F19 work without modifiers (press fn as well on the built-in keyboard); other keys need Control, Option or Command. To use a system screenshot shortcut such as ⌘⇧4, first turn it off in System Settings → Keyboard → Keyboard Shortcuts → Screenshots.",
     ["输出"] = "Output",
     ["保存位置"] = "Save location",
     ["选择…"] = "Choose…",

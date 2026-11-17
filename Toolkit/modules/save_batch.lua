@@ -1,7 +1,7 @@
 
 
 local i18n=require('modules.i18n')
-local M={order={'generalSection','windowSection','inputSection','clipSection','systemSection','browserSection','launcherSection'}}
+local M={order={'generalSection','windowSection','inputSection','clipSection','captureSection','systemSection','browserSection','launcherSection'}}
 local function copy(value)
     if type(value)~='table' then return value end
     local result={};for key,item in pairs(value) do result[key]=copy(item) end;return result
