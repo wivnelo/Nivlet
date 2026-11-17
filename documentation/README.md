@@ -11,6 +11,7 @@
 - [当前验收](VALIDATION.md)
 - [公开截图](SCREENSHOTS.md)
 - [构建](DEVELOPMENT.md) · [分发](DISTRIBUTION.md)
+- [C3 截图 S0 技术验证](CAPTURE-S0.md)
 - [第三方许可核查](THIRD-PARTY-AUDIT.md)
 
 - [发布与推广用语](PROMOTION.md)：正式签名、公证与升级说明。
