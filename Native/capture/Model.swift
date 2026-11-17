@@ -29,6 +29,13 @@ final class Annotation {
         return CGRect(x: min(a.x, b.x), y: min(a.y, b.y), width: abs(a.x - b.x), height: abs(a.y - b.y))
     }
 
+    /// Area covered by a text annotation, used to click back into it for editing.
+    var textBounds: CGRect {
+        guard tool == .text, let origin = points.first else { return .zero }
+        let size = (text as NSString).size(withAttributes: [.font: NSFont.systemFont(ofSize: fontSize, weight: .semibold)])
+        return CGRect(origin: origin, size: size)
+    }
+
     var isMeaningful: Bool {
         switch tool {
         case .pen: return points.count > 2

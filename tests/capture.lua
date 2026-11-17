@@ -60,7 +60,7 @@ assert(#tasks[1].input==0)
 tasks[1].stream(nil,'{"event":"ready","permission":true}\n')
 assert(#tasks[1].input==2 and tasks[1].input[1]:match('cmd=config') and tasks[1].input[2]:match('cmd=capture'))
 bindings['+f1']()
-assert(tasks[1].input[3]:match('cmd=capture'))
+assert(tasks[1].input[3]:match('cmd=config') and tasks[1].input[4]:match('cmd=capture'), 'Each press refreshes config (appearance) before capturing')
 
 -- Split lines are buffered; copy events reach the clipboard callback.
 local copied=0
@@ -85,4 +85,18 @@ blocked=false
 assert(capture.save(config({enabled=false})))
 assert(next(bindings)==nil and tasks[1].closed and tasks[1].input[#tasks[1].input]:match('cmd=quit'))
 assert(stored['desktoptoolkit.capture.v1'].enabled==false)
+-- Permission comes from the helper's system check, never from hs.screenRecordingState's guess.
+hs.screenRecordingState=function() error('heuristic must not be used for the status') end
+assert(capture.permissionGranted()==true, 'Ready event recorded the helper answer')
+capture.permission=nil
+assert(capture.permissionGranted()==nil, 'Unknown until checked')
+local answered
+capture.checkPermission(function(value) answered=value end)
+local probe=tasks[#tasks]
+assert(probe.stream[1]=='--permission' and probe.running)
+probe.exit(0,'denied\n','')
+assert(answered==false and capture.permissionGranted()==false)
+capture.checkPermission(function(value) answered=value end)
+tasks[#tasks].exit(0,'granted\n','')
+assert(answered==true and capture.permissionGranted()==true)
 print('capture module: F-key validation, binding, helper lifecycle and events')

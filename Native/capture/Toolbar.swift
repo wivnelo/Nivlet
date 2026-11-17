@@ -4,7 +4,7 @@ import AppKit
 var strings: [String: String] = [
     "rect": "矩形", "arrow": "箭头", "pen": "画笔", "text": "文字", "mosaic": "马赛克",
     "undo": "撤销", "redo": "重做", "save": "保存", "cancel": "取消", "copy": "复制",
-    "pixelate": "像素化", "blackout": "涂黑", "copiedColor": "已复制颜色",
+    "pixelate": "像素化", "blackout": "涂黑", "copyColorHint": "C 复制颜色",
 ]
 func t(_ key: String) -> String { strings[key] ?? key }
 
@@ -31,23 +31,58 @@ final class ToolButton: NSButton {
     }
 
     override func updateLayer() {
-        layer?.backgroundColor = selectedState ? NSColor.controlAccentColor.withAlphaComponent(0.18).cgColor : NSColor.clear.cgColor
-        contentTintColor = selectedState ? .controlAccentColor : .labelColor
+        layer?.backgroundColor = selectedState ? accentColor.withAlphaComponent(0.16).cgColor : NSColor.clear.cgColor
+        contentTintColor = selectedState ? accentColor : .labelColor
     }
 }
 
-/// Floating HUD background used by both bars.
-func makeHUD() -> NSVisualEffectView {
-    let v = NSVisualEffectView()
-    v.material = .popover
-    v.state = .active
-    v.blendingMode = .withinWindow
-    v.wantsLayer = true
-    v.layer?.cornerRadius = 11
-    v.layer?.masksToBounds = true
-    v.layer?.borderWidth = 0.5
-    v.layer?.borderColor = NSColor.separatorColor.cgColor
-    return v
+/// Nivlet's own palette (settings page tokens) so the overlay matches the app instead of the
+/// near-black system popover material.
+func dynamicColor(light: NSColor, dark: NSColor) -> NSColor {
+    NSColor(name: nil) { $0.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? dark : light }
+}
+let barBackground = dynamicColor(light: NSColor(srgbRed: 1, green: 1, blue: 1, alpha: 0.97), dark: NSColor(srgbRed: 0.17, green: 0.17, blue: 0.18, alpha: 0.97))
+let barBorder = dynamicColor(light: NSColor(srgbRed: 0.87, green: 0.87, blue: 0.89, alpha: 1), dark: NSColor(srgbRed: 0.24, green: 0.24, blue: 0.25, alpha: 1))
+let accentColor = dynamicColor(light: NSColor(srgbRed: 0, green: 0.48, blue: 1, alpha: 1), dark: NSColor(srgbRed: 0.04, green: 0.52, blue: 1, alpha: 1))
+
+/// Floating bar background used by both bars.
+final class BarBackground: NSView {
+    override var wantsUpdateLayer: Bool { true }
+    override init(frame: NSRect) {
+        super.init(frame: frame)
+        wantsLayer = true
+        layer?.cornerRadius = 10
+        layer?.borderWidth = 1
+        layer?.shadowOpacity = 0.22; layer?.shadowRadius = 10; layer?.shadowOffset = CGSize(width: 0, height: -3)
+    }
+    required init?(coder: NSCoder) { fatalError() }
+    override func updateLayer() {
+        layer?.backgroundColor = barBackground.cgColor
+        layer?.borderColor = barBorder.cgColor
+    }
+}
+func makeHUD() -> NSView { BarBackground() }
+
+/// Flat accent button for the primary action, matching the settings page's blue buttons.
+final class PrimaryButton: NSButton {
+    override var wantsUpdateLayer: Bool { true }
+    convenience init(title: String, target: AnyObject, action: Selector) {
+        self.init(frame: .zero)
+        self.title = title
+        isBordered = false
+        image = NSImage(systemSymbolName: "checkmark", accessibilityDescription: nil)?.withSymbolConfiguration(.init(pointSize: 12, weight: .semibold))
+        imagePosition = .imageLeading
+        imageHugsTitle = true
+        self.target = target; self.action = action
+        wantsLayer = true
+        layer?.cornerRadius = 7
+        contentTintColor = .white
+        attributedTitle = NSAttributedString(string: " " + title, attributes: [.foregroundColor: NSColor.white, .font: NSFont.systemFont(ofSize: 12.5, weight: .semibold)])
+        translatesAutoresizingMaskIntoConstraints = false
+        heightAnchor.constraint(equalToConstant: 28).isActive = true
+        widthAnchor.constraint(greaterThanOrEqualToConstant: 68).isActive = true
+    }
+    override func updateLayer() { layer?.backgroundColor = accentColor.cgColor }
 }
 
 @MainActor
@@ -73,10 +108,8 @@ final class Toolbar: NSView {
         stack.addArrangedSubview(separator())
         stack.addArrangedSubview(ToolButton(symbol: "square.and.arrow.down", tooltip: "\(t("save"))  ⌘S", target: self, action: #selector(save)))
         stack.addArrangedSubview(ToolButton(symbol: "xmark", tooltip: "\(t("cancel"))  Esc", target: self, action: #selector(cancel)))
-        let copy = NSButton(title: t("copy"), image: NSImage(systemSymbolName: "checkmark", accessibilityDescription: nil)!, target: self, action: #selector(copyPressed))
-        copy.bezelStyle = .rounded; copy.bezelColor = .controlAccentColor; copy.keyEquivalent = ""
-        copy.toolTip = "\(t("copy"))  ↩"; copy.imagePosition = .imageLeading
-        copy.contentTintColor = .white; copy.font = .systemFont(ofSize: 12, weight: .semibold)
+        let copy = PrimaryButton(title: t("copy"), target: self, action: #selector(copyPressed))
+        copy.toolTip = "\(t("copy"))  ↩"
         stack.addArrangedSubview(copy)
         hud.addSubview(stack)
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -188,6 +221,11 @@ final class Dot: NSView {
         let r = NSRect(x: (bounds.width - diameter) / 2, y: (bounds.height - diameter) / 2, width: diameter, height: diameter)
         (faded ? color.withAlphaComponent(0.4) : color).setFill()
         NSBezierPath(ovalIn: r).fill()
+        if diameter >= 18 {
+            // Thin outline keeps dark and light swatches visible on either bar colour.
+            NSColor.separatorColor.setStroke()
+            let edge = NSBezierPath(ovalIn: r.insetBy(dx: 0.5, dy: 0.5)); edge.lineWidth = 1; edge.stroke()
+        }
         if selected && diameter >= 18 {
             NSColor.labelColor.setStroke()
             let ring = NSBezierPath(ovalIn: r.insetBy(dx: -2, dy: -2)); ring.lineWidth = 1.5; ring.stroke()

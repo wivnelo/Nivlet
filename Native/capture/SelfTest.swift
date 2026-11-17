@@ -22,6 +22,7 @@ extension Session {
         let k = Annotation(tool: .mosaic, color: .black, width: 0, start: CGPoint(x: sel.midX, y: sel.midY - 120))
         k.points[1] = CGPoint(x: sel.midX + 260, y: sel.midY - 40); k.mosaicMode = .blackout
         testAnnotate([r, a, p, t, m, k])
+        testShowTextEditing(in: v, at: CGPoint(x: sel.minX + 32, y: sel.minY + 126))
         testSaveRender(to: path)
     }
 }

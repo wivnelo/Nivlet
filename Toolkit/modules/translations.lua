@@ -503,7 +503,7 @@ return {
     ["打开系统设置"] = "Open System Settings",
     ["快捷键"] = "Shortcut",
     ["截图按键"] = "Screenshot key",
-    ["F1–F19 可以不带修饰键（内置键盘需同时按 fn），其他按键需配合 Control、Option 或 Command。要用 ⌘⇧4 等系统截图快捷键，请先在“系统设置 → 键盘 → 键盘快捷键 → 截屏”中关闭对应项。"] = "F1–F19 work without modifiers (press fn as well on the built-in keyboard); other keys need Control, Option or Command. To use a system screenshot shortcut such as ⌘⇧4, first turn it off in System Settings → Keyboard → Keyboard Shortcuts → Screenshots.",
+    ["可以单独用一个功能键（如 F1，内置键盘需同时按 fn），或用 ⌃、⌥、⌘ 加其他键。键盘自带的截图键通常相当于 ⌘⇧4：先在“系统设置 → 键盘 → 键盘快捷键 → 截屏”中关闭它，再在这里设为 ⌘⇧4。"] = "Use a single function key such as F1 (press fn too on the built-in keyboard), or ⌃, ⌥ or ⌘ with another key. A keyboard's own screenshot key usually sends ⌘⇧4: turn that off in System Settings → Keyboard → Keyboard Shortcuts → Screenshots, then set ⌘⇧4 here.",
     ["输出"] = "Output",
     ["保存位置"] = "Save location",
     ["选择…"] = "Choose…",
@@ -542,4 +542,8 @@ return {
     ["快捷键与截图配置重复"] = "The shortcut is already used for screenshots.",
     ["请在系统设置中允许 Nivlet 录制屏幕，然后重新检测"] = "Allow Nivlet to record the screen in System Settings, then check again.",
     ["选择截图保存位置"] = "Choose where to save screenshots",
+    ["屏幕录制权限未开启（仅截图需要）"] = "Screen recording is not allowed (needed only for screenshots)",
+    ["正在检测屏幕录制权限…"] = "Checking screen recording permission…",
+    ["打开屏幕录制设置"] = "Open Screen Recording Settings",
+    ["C 复制颜色"] = "C Copy color",
 }

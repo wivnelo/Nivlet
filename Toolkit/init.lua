@@ -536,9 +536,10 @@ function app.openSettings(section, focus)
         end
         if body.action=="refreshBrowserStatus" then reply(true,"",body.action);return end
         if body.action=="requestScreenRecording" then
-            local granted=capture.requestPermission()
-            if not granted then permissions.openScreenRecording() end
-            reply(true,granted and i18n.t("屏幕录制权限已开启") or i18n.t("请在系统设置中允许 Nivlet 录制屏幕，然后重新检测"),body.action)
+            capture.requestPermission(function(granted)
+                if not granted then permissions.openScreenRecording() end
+                reply(true,granted and i18n.t("屏幕录制权限已开启") or i18n.t("请在系统设置中允许 Nivlet 录制屏幕，然后重新检测"),body.action)
+            end)
             return
         end
         if body.action=="chooseCaptureFolder" then
@@ -560,6 +561,7 @@ function app.openSettings(section, focus)
             reply(ok,ok and "" or i18n.t("无法打开登录项设置，请手动打开系统设置"),body.action)
             return
         end
+        if body.action=="refreshPermissions" or body.action=="load" then capture.checkPermission(function() reply(true,"","refreshPermissionsSilent") end) end
         if body.action=="refreshPermissions" then
             local permission=permissionState()
             local state=permission.accessibility
@@ -713,7 +715,7 @@ system.start(function() app.openSettings("systemSection") end)
 capture.start(function(shortcut)
     if batchCandidates then return batchShortcutConflicts(shortcut,"captureSection") end
     return sleep.conflicts(shortcut) or sameShortcut(shortcut,app.popupShortcut) or popupConflicts(shortcut,app.config) or launcher.conflicts(shortcut)
-end,{copied=function() clipboard.poll() end,permission=function() reply(true,"","refreshPermissionsSilent") end})
+end,{copied=function() clipboard.poll() end,permission=function() reply(true,"","refreshPermissionsSilent") end,appearance=function() return app.general.appearance end})
 
 function app.arrangeMenus()
     clipboard.menu:removeFromMenuBar():returnToMenuBar():setTitle("")

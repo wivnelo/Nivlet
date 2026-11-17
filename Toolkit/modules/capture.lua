@@ -59,7 +59,7 @@ local function notify(message)
 end
 
 local function strings()
-    local keys={rect='矩形',arrow='箭头',pen='画笔',text='文字',mosaic='马赛克',undo='撤销',redo='重做',save='保存',cancel='取消',copy='复制',pixelate='像素化',blackout='涂黑'}
+    local keys={rect='矩形',arrow='箭头',pen='画笔',text='文字',mosaic='马赛克',undo='撤销',redo='重做',save='保存',cancel='取消',copy='复制',pixelate='像素化',blackout='涂黑',copyColorHint='C 复制颜色'}
     local result={}
     for k,v in pairs(keys) do result[k]=i18n.t(v) end
     return result
@@ -67,14 +67,14 @@ end
 
 local function sendConfig()
     local c=M.config
-    send({cmd='config',saveDirectory=c.saveDirectory,format=c.format,snapWindows=c.snapWindows,loupe=c.loupe,strings=strings()})
+    send({cmd='config',saveDirectory=c.saveDirectory,format=c.format,snapWindows=c.snapWindows,loupe=c.loupe,strings=strings(),appearance=M.appearance and M.appearance() or 'system'})
 end
 
 local function handleEvent(event)
     local kind=event.event
     if kind=='ready' then
         M.ready=true
-        M.permission=event.permission
+        if type(event.permission)=='boolean' then M.permission=event.permission end
         sendConfig()
         if M.pending then M.pending=false;send({cmd='capture'}) end
     elseif kind=='copied' then
@@ -123,7 +123,7 @@ function M.stopHelper()
 end
 
 function M.trigger()
-    if M.task and M.task:isRunning() and M.ready then send({cmd='capture'});return end
+    if M.task and M.task:isRunning() and M.ready then sendConfig();send({cmd='capture'});return end
     M.pending=true
     local ok,message=M.startHelper()
     if not ok then M.pending=false;notify(message) end
@@ -176,13 +176,28 @@ function M.save(value)
     return true,i18n.t('截图设置已保存')
 end
 
-function M.permissionGranted()
-    return hs.screenRecordingState and hs.screenRecordingState(false)==true or false
+-- The runtime's hs.screenRecordingState guesses from readable window titles and reports "granted"
+-- on recent macOS even when access is off, so ask the helper for the system's own answer instead.
+-- nil means not checked yet.
+function M.permissionGranted() return M.permission end
+
+function M.checkPermission(callback)
+    if M.permissionTask and M.permissionTask:isRunning() then return end
+    local path=helperPath()
+    if not hs.fs.attributes(path) then return end
+    M.permissionTask=hs.task.new(path,function(_,stdout)
+        M.permissionTask=nil
+        local answer=stdout and stdout:match('(%a+)')
+        if answer=='granted' then M.permission=true elseif answer=='denied' then M.permission=false end
+        if callback then callback(M.permission) end
+    end,{'--permission'})
+    if not M.permissionTask or not M.permissionTask:start() then M.permissionTask=nil end
 end
 
-function M.requestPermission()
+-- Shows the system prompt the first time (it lists Nivlet); afterwards macOS only allows changes in System Settings.
+function M.requestPermission(callback)
     if hs.screenRecordingState then hs.screenRecordingState(true) end
-    return M.permissionGranted()
+    M.checkPermission(callback)
 end
 
 function M.start(externalConflict,callbacks)
@@ -190,6 +205,7 @@ function M.start(externalConflict,callbacks)
     callbacks=callbacks or {}
     M.onCopied=callbacks.copied
     M.onPermission=callbacks.permission
+    M.appearance=callbacks.appearance
     M.config=M.validate(hs.settings.get(settingsKey)) or M.defaults()
     local ok,message=apply(M.config)
     if not ok then hs.alert.show(message) end

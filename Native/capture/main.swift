@@ -5,6 +5,13 @@ import AppKit
 
 setvbuf(stdout, nil, _IOLBF, 0)
 
+// `capture-helper --permission` answers with the system's own Screen Recording check and exits.
+// Nivlet starts this helper, so the answer reflects Nivlet's permission.
+if CommandLine.arguments.contains("--permission") {
+    print(CGPreflightScreenCaptureAccess() ? "granted" : "denied")
+    exit(0)
+}
+
 func emit(_ event: [String: Any]) {
     guard let data = try? JSONSerialization.data(withJSONObject: event), let line = String(data: data, encoding: .utf8) else { return }
     print(line)
@@ -26,6 +33,9 @@ final class Helper {
             if let v = command["snapWindows"] as? Bool { config.snapWindows = v }
             if let v = command["loupe"] as? Bool { config.loupe = v }
             if let v = command["strings"] as? [String: String] { strings.merge(v) { _, new in new } }
+            if let v = command["appearance"] as? String {
+                NSApp.appearance = v == "dark" ? NSAppearance(named: .darkAqua) : v == "light" ? NSAppearance(named: .aqua) : nil
+            }
         case "capture":
             capture()
         #if NIVLET_SELFTEST

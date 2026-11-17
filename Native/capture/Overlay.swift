@@ -143,7 +143,7 @@ final class Session: NSObject, NSTextFieldDelegate {
             NSGraphicsContext.restoreGraphicsState()
             drawSelectionChrome(selection, bounds: bounds, scale: view.frozen.pixelScale)
         } else if let focus, phase == .choosing {
-            NSColor.controlAccentColor.setStroke()
+            accentColor.setStroke()
             let p = NSBezierPath(rect: focus.insetBy(dx: 1, dy: 1)); p.lineWidth = 2; p.stroke()
         }
         if config.loupe, let mouse, mouse.index == view.index, showsLoupe { drawLoupe(view, at: mouse.point) }
@@ -158,12 +158,12 @@ final class Session: NSObject, NSTextFieldDelegate {
     }
 
     private func drawSelectionChrome(_ r: CGRect, bounds: CGRect, scale: CGFloat) {
-        NSColor.controlAccentColor.setStroke()
+        accentColor.setStroke()
         let border = NSBezierPath(rect: r.insetBy(dx: -0.75, dy: -0.75)); border.lineWidth = 1.5; border.stroke()
         if tool == nil || isDraggingSelection {
             for h in handleRects(r) {
                 NSColor.white.setFill(); NSBezierPath(roundedRect: h, xRadius: 2, yRadius: 2).fill()
-                NSColor.controlAccentColor.setStroke()
+                accentColor.setStroke()
                 let p = NSBezierPath(roundedRect: h, xRadius: 2, yRadius: 2); p.lineWidth = 1.5; p.stroke()
             }
         }
@@ -189,26 +189,43 @@ final class Session: NSObject, NSTextFieldDelegate {
     private func drawLoupe(_ view: OverlayView, at p: CGPoint) {
         let img = view.frozen.image, scale = view.frozen.pixelScale
         let px = Int(p.x * scale), py = Int((view.bounds.height - p.y) * scale)
-        let cells = 11, zoom: CGFloat = 10
+        let cells = 15, zoom: CGFloat = 8
         guard let piece = img.cropping(to: CGRect(x: px - cells / 2, y: py - cells / 2, width: cells, height: cells)) else { return }
-        let side = CGFloat(cells) * zoom
-        var box = CGRect(x: p.x + 20, y: p.y - side - 50, width: side, height: side + 38)
-        if box.maxX > view.bounds.maxX - 4 { box.origin.x = p.x - 20 - side }
-        if box.minY < 4 { box.origin.y = p.y + 20 }
-        NSColor(white: 0.08, alpha: 0.9).setFill(); NSBezierPath(roundedRect: box, xRadius: 9, yRadius: 9).fill()
+        let side = CGFloat(cells) * zoom, infoHeight: CGFloat = 58
+        var box = CGRect(x: p.x + 22, y: p.y - 22 - side - infoHeight, width: side, height: side + infoHeight)
+        if box.maxX > view.bounds.maxX - 6 { box.origin.x = p.x - 22 - side }
+        if box.minY < 6 { box.origin.y = p.y + 22 }
+        let outer = NSBezierPath(roundedRect: box, xRadius: 10, yRadius: 10)
+        NSColor(white: 0.1, alpha: 0.94).setFill(); outer.fill()
+        NSColor(white: 1, alpha: 0.16).setStroke(); outer.lineWidth = 1; outer.stroke()
         let grid = CGRect(x: box.minX, y: box.maxY - side, width: side, height: side)
         guard let cg = NSGraphicsContext.current?.cgContext else { return }
         cg.saveGState()
-        NSBezierPath(roundedRect: grid, xRadius: 9, yRadius: 9).addClip()
+        NSBezierPath(roundedRect: grid, xRadius: 10, yRadius: 10).addClip()
         cg.interpolationQuality = .none; cg.draw(piece, in: grid)
+        // Pixel grid makes the magnification readable even on flat colours.
+        NSColor(white: 0.5, alpha: 0.18).setStroke()
+        let lines = NSBezierPath(); lines.lineWidth = 0.5
+        for i in 1..<cells {
+            let o = CGFloat(i) * zoom
+            lines.move(to: CGPoint(x: grid.minX + o, y: grid.minY)); lines.line(to: CGPoint(x: grid.minX + o, y: grid.maxY))
+            lines.move(to: CGPoint(x: grid.minX, y: grid.minY + o)); lines.line(to: CGPoint(x: grid.maxX, y: grid.minY + o))
+        }
+        lines.stroke()
         cg.restoreGState()
-        NSColor.white.setStroke()
         let center = CGRect(x: grid.midX - zoom / 2, y: grid.midY - zoom / 2, width: zoom, height: zoom)
-        let c = NSBezierPath(rect: center); c.lineWidth = 1.5; c.stroke()
-        let hex = pixelColor(piece, x: cells / 2, y: cells / 2)?.hexString ?? "—"
-        let attrs: [NSAttributedString.Key: Any] = [.font: NSFont.monospacedDigitSystemFont(ofSize: 10.5, weight: .regular), .foregroundColor: NSColor.white]
-        ("X \(Int(p.x))  Y \(Int(view.bounds.height - p.y))" as NSString).draw(at: CGPoint(x: box.minX + 8, y: box.minY + 20), withAttributes: attrs)
-        ("\(hex)   C" as NSString).draw(at: CGPoint(x: box.minX + 8, y: box.minY + 5), withAttributes: attrs)
+        NSColor.black.setStroke(); let c1 = NSBezierPath(rect: center.insetBy(dx: -1.5, dy: -1.5)); c1.lineWidth = 1; c1.stroke()
+        NSColor.white.setStroke(); let c2 = NSBezierPath(rect: center.insetBy(dx: -0.5, dy: -0.5)); c2.lineWidth = 1.2; c2.stroke()
+
+        let color = pixelColor(piece, x: cells / 2, y: cells / 2)
+        let swatch = CGRect(x: box.minX + 10, y: box.minY + 34, width: 14, height: 14)
+        (color ?? .black).setFill(); NSBezierPath(roundedRect: swatch, xRadius: 3, yRadius: 3).fill()
+        NSColor(white: 1, alpha: 0.35).setStroke(); let sw = NSBezierPath(roundedRect: swatch, xRadius: 3, yRadius: 3); sw.lineWidth = 1; sw.stroke()
+        let strong: [NSAttributedString.Key: Any] = [.font: NSFont.monospacedDigitSystemFont(ofSize: 11.5, weight: .semibold), .foregroundColor: NSColor.white]
+        let soft: [NSAttributedString.Key: Any] = [.font: NSFont.monospacedDigitSystemFont(ofSize: 10.5, weight: .regular), .foregroundColor: NSColor(white: 1, alpha: 0.62)]
+        ((color?.hexString ?? "—") as NSString).draw(at: CGPoint(x: swatch.maxX + 7, y: swatch.minY - 1), withAttributes: strong)
+        ("\(Int(p.x)), \(Int(view.bounds.height - p.y))" as NSString).draw(at: CGPoint(x: box.minX + 10, y: box.minY + 18), withAttributes: soft)
+        (t("copyColorHint") as NSString).draw(at: CGPoint(x: box.minX + 10, y: box.minY + 4), withAttributes: soft)
     }
 
     private func pixelColor(_ image: CGImage, x: Int, y: Int) -> NSColor? {
@@ -267,7 +284,18 @@ final class Session: NSObject, NSTextFieldDelegate {
             } else if selection.contains(p) {
                 if event.clickCount == 2 && tool == nil { copyAndFinish(); return }
                 if let tool {
-                    if tool == .text { beginText(in: view, at: p); return }
+                    if tool == .text {
+                        // Clicking existing text edits it instead of stacking a new text on top.
+                        if let index = annotations.lastIndex(where: { $0.tool == .text && $0.textBounds.insetBy(dx: -4, dy: -4).contains(p) }) {
+                            let existing = annotations.remove(at: index)
+                            redoStack.removeAll()
+                            beginText(in: view, at: p, editing: existing)
+                        } else {
+                            beginText(in: view, at: p)
+                        }
+                        redraw()
+                        return
+                    }
                     let a = Annotation(tool: tool, color: palette[properties.colorIndex], width: strokeWidths[properties.sizeIndex], start: p)
                     a.mosaicMode = properties.mosaicMode; a.mosaicBlock = mosaicBlocks[properties.sizeIndex]
                     drag = .annotate(a)
@@ -392,25 +420,53 @@ final class Session: NSObject, NSTextFieldDelegate {
 
     // MARK: Text
 
-    private func beginText(in view: OverlayView, at p: CGPoint) {
-        let size = textSizes[properties.sizeIndex]
-        let field = NSTextField(frame: CGRect(x: p.x - 2, y: p.y - size * 0.7, width: 240, height: size * 1.45))
+    private var editorColor = palette[0]
+    private var editorSize: CGFloat = 18
+
+    private func beginText(in view: OverlayView, at p: CGPoint, editing existing: Annotation? = nil) {
+        let size = existing?.fontSize ?? textSizes[properties.sizeIndex]
+        let color = existing?.color ?? palette[properties.colorIndex]
+        let origin = existing?.points[0] ?? CGPoint(x: p.x, y: p.y - size * 0.55)
+        let field = NSTextField(string: existing?.text ?? "")
         field.isBordered = false; field.drawsBackground = false; field.focusRingType = .none
         field.font = .systemFont(ofSize: size, weight: .semibold)
-        field.textColor = palette[properties.colorIndex]
+        field.textColor = color
         field.delegate = self
         field.cell?.isScrollable = true
+        field.cell?.usesSingleLineMode = true
+        // A dashed outline shows where typing goes, so new text is not placed on top of old text by mistake.
+        field.wantsLayer = true
+        let outline = CAShapeLayer()
+        outline.fillColor = nil; outline.strokeColor = accentColor.cgColor; outline.lineWidth = 1; outline.lineDashPattern = [4, 3]
+        field.layer?.addSublayer(outline)
+        editorOutline = outline
+        editorColor = color; editorSize = size; editorPoint = origin
         view.addSubview(field)
+        editor = field
+        resizeEditor()
         view.window?.makeFirstResponder(field)
-        editor = field; editorPoint = CGPoint(x: p.x, y: p.y - size * 0.55)
+        field.currentEditor()?.selectedRange = NSRange(location: field.stringValue.utf16.count, length: 0)
     }
+    private var editorOutline: CAShapeLayer?
+
+    private func resizeEditor() {
+        guard let field = editor else { return }
+        let text = field.stringValue.isEmpty ? "  " : field.stringValue
+        let width = max(80, (text as NSString).size(withAttributes: [.font: field.font!]).width + 18)
+        let height = ceil(editorSize * 1.45)
+        field.frame = CGRect(x: editorPoint.x - 4, y: editorPoint.y - height * 0.2, width: width, height: height)
+        editorOutline?.frame = field.bounds
+        editorOutline?.path = CGPath(roundedRect: field.bounds.insetBy(dx: 0.5, dy: 0.5), cornerWidth: 3, cornerHeight: 3, transform: nil)
+    }
+
+    func controlTextDidChange(_ obj: Notification) { resizeEditor() }
 
     private func commitText() {
         guard let field = editor else { return }
-        let a = Annotation(tool: .text, color: palette[properties.colorIndex], width: 0, start: editorPoint)
-        a.text = field.stringValue; a.fontSize = textSizes[properties.sizeIndex]
+        let a = Annotation(tool: .text, color: editorColor, width: 0, start: editorPoint)
+        a.text = field.stringValue; a.fontSize = editorSize
         if a.isMeaningful { annotations.append(a); redoStack.removeAll() }
-        field.removeFromSuperview(); editor = nil
+        field.removeFromSuperview(); editor = nil; editorOutline = nil
         if let i = activeIndex { windows[i].makeFirstResponder(views[i]) }
         redraw()
     }
@@ -545,8 +601,19 @@ final class Session: NSObject, NSTextFieldDelegate {
     var testView: OverlayView? { views.first }
     func testSelect(_ r: CGRect, index: Int) { activeIndex = index; selection = r; phase = .selected; showBars(); redraw() }
     func testAnnotate(_ list: [Annotation]) { annotations = list; redraw() }
+    /// Selects the text tool and clicks the existing text so the editor and property bar are visible.
+    func testShowTextEditing(in view: OverlayView, at p: CGPoint) {
+        setTool(.text)
+        if let index = annotations.lastIndex(where: { $0.tool == .text && $0.textBounds.insetBy(dx: -4, dy: -4).contains(p) }) {
+            let existing = annotations.remove(at: index)
+            beginText(in: view, at: p, editing: existing)
+        }
+        redraw()
+    }
     func testSaveRender(to path: String) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [self] in
+        let hold = Double(ProcessInfo.processInfo.environment["NIVLET_SELFTEST_HOLD"] ?? "") ?? 0.4
+        DispatchQueue.main.asyncAfter(deadline: .now() + hold) { [self] in
+            if editor != nil { commitText() }
             guard let image = render(), let data = NSBitmapImageRep(cgImage: image).representation(using: .png, properties: [:]) else { finish(["event": "error", "message": "selftest"]); return }
             try? data.write(to: URL(fileURLWithPath: path))
             finish(["event": "selftest", "width": image.width, "height": image.height, "copied": ClipboardWriter.write(image)])
