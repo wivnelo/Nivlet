@@ -94,7 +94,6 @@ function M.new(adapters,environment)
         for _,rule in ipairs(candidate.launcher.rules) do if rule.shortcut then table.insert(checks,{rule.shortcut,candidate.launcher.enabled}) end end
         if candidate.popupShortcut~=false then table.insert(checks,{candidate.popupShortcut,true}) end
         if candidate.capture.shortcut then table.insert(checks,{candidate.capture.shortcut,candidate.capture.enabled}) end
-        if candidate.capture.pinShortcut then table.insert(checks,{candidate.capture.pinShortcut,candidate.capture.enabled}) end
         for _,item in ipairs(checks) do local ok,message=check(item[1],item[2]);if not ok then return nil,message end end
         if (selected.windows or selected.launcher or selected.popupShortcut) and candidate.windows.enabled and not environment.accessibility() then return nil,i18n.t("请先在系统设置开启 Nivlet 的辅助功能权限") end
         local ok,message=environment.available(candidate,selected)

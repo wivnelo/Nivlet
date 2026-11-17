@@ -212,16 +212,6 @@ final class PinManager {
         emit(["event": "pinned", "count": windows.count])
     }
 
-    /// Pins the image on the clipboard, if there is one.
-    func pinClipboard() {
-        guard let data = NSPasteboard.general.data(forType: .png) ?? NSPasteboard.general.data(forType: .tiff),
-              let rep = NSBitmapImageRep(data: data), let image = rep.cgImage else {
-            emit(["event": "error", "message": "noImage"]); return
-        }
-        pin(image, pointSize: pointSize(rep))
-    }
-
-    /// Pins an image file written by Nivlet (clipboard history), then removes the file.
     /// `size` is the on-screen size in points when Nivlet knows it (its image export drops the DPI).
     func pinFile(_ path: String, size: NSSize? = nil) {
         defer { try? FileManager.default.removeItem(atPath: path) }

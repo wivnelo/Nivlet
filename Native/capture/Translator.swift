@@ -49,16 +49,36 @@ final class SystemTranslator {
     static let shared = SystemTranslator()
     private var host: NSPanel?
     private let model = HostModel()
+    /// One session per installed pair (macOS 26+); reusing it saves 0.1–0.2 s per translation.
+    private var sessions: [String: AnyObject] = [:]
+
+    /// Milliseconds spent in the last call: availability check, then translation.
+    var lastTiming: (check: Int, translate: Int) = (0, 0)
 
     func translate(_ text: String, from source: String, to target: String) async throws -> String {
         let from = Locale.Language(identifier: source), to = Locale.Language(identifier: target)
+        let t0 = Date()
         let status = await LanguageAvailability().status(from: from, to: to)
+        lastTiming.check = Int(Date().timeIntervalSince(t0) * 1000)
+        defer { lastTiming.translate = Int(Date().timeIntervalSince(t0) * 1000) - lastTiming.check }
         if status == .unsupported { throw TranslateError.unsupported }
         if status == .installed, #available(macOS 26.0, *) {
-            let session = TranslationSession(installedSource: from, target: to)
+            let key = "\(source)>\(target)"
+            let session = (sessions[key] as? TranslationSession) ?? TranslationSession(installedSource: from, target: to)
+            sessions[key] = session
             return try await session.translate(text).targetText
         }
         return try await viaSwiftUI(text, from: from, to: to)
+    }
+
+    /// Loads the English ↔ Chinese models once so the first double-tap does not wait ~2 s.
+    /// The models live in a system service, so this adds only a few MB to the helper.
+    func prewarm() {
+        guard #available(macOS 26.0, *) else { return }
+        Task(priority: .utility) { @MainActor in
+            _ = try? await translate("Hello", from: "en", to: "zh-Hans")
+            _ = try? await translate("你好", from: "zh-Hans", to: "en")
+        }
     }
 
     private func viaSwiftUI(_ text: String, from: Locale.Language, to: Locale.Language) async throws -> String {

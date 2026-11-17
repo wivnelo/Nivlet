@@ -7,7 +7,7 @@ window.runCapturePageRegression=function(){
   check(!section.hidden,'Screenshot page opens');
   // Rows follow the General page: inner padding, dividers, switches on the right.
   const rows=[...section.querySelectorAll('.capture-rows>.capture-item')];
-  check(rows.length===6,'Six setting rows');
+  check(rows.length===5,'Five setting rows');
   for(const row of rows){
    const style=getComputedStyle(row),box=row.getBoundingClientRect(),group=row.parentElement.getBoundingClientRect();
    check(parseFloat(style.paddingLeft)>=16&&parseFloat(style.paddingRight)>=16,'Row padding: '+row.textContent.trim().slice(0,8));

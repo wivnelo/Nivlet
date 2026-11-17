@@ -145,7 +145,7 @@ local function shortcutEntries(pages)
     for _,rule in ipairs(pages.launcherSection.config.rules) do add("launcherSection",rule.shortcut,pages.launcherSection.config.enabled) end
     add("clipSection",pages.clipSection.popupShortcut,true)
     local captureConfig=pages.captureSection and pages.captureSection.config
-    if captureConfig then add("captureSection",captureConfig.shortcut,captureConfig.enabled);add("captureSection",captureConfig.pinShortcut,captureConfig.enabled) end
+    if captureConfig then add("captureSection",captureConfig.shortcut,captureConfig.enabled) end
     return entries
 end
 batchShortcutConflicts=function(shortcut,owner)

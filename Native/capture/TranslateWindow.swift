@@ -71,7 +71,10 @@ final class TranslateCard: NSView {
         let text = request.text, from = source, to = target
         Task { @MainActor in
             do {
+                let started = Date()
                 let translated = try await SystemTranslator.shared.translate(text, from: from, to: to)
+                let timing = SystemTranslator.shared.lastTiming
+                onEvent(["event": "translated", "ms": Int(Date().timeIntervalSince(started) * 1000), "checkMs": timing.check, "translateMs": timing.translate])
                 guard current == token else { return }
                 result = translated
                 render(state: .done)

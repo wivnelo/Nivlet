@@ -56,8 +56,8 @@ final class Helper {
                 autoCopy: command["autoCopy"] as? Bool ?? false,
                 editable: command["editable"] as? Bool ?? false,
                 interface: config.language))
-        case "pinClipboard":
-            PinManager.shared.pinClipboard()
+        case "prewarmTranslation":
+            if #available(macOS 15.0, *) { SystemTranslator.shared.prewarm() }
         case "pinFile":
             if let path = command["path"] as? String {
                 let w = command["width"] as? Double, h = command["height"] as? Double

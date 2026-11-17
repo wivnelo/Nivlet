@@ -7,7 +7,7 @@ local settingsKey='desktoptoolkit.capture.v1'
 local formats={png=true,jpg=true}
 
 function M.defaults()
-    return {enabled=false,shortcut={key='F1',mods={}},pinShortcut={key='F3',mods={}},saveDirectory='~/Pictures/Nivlet',format='png',snapWindows=true,loupe=true}
+    return {enabled=false,shortcut={key='F1',mods={}},saveDirectory='~/Pictures/Nivlet',format='png',snapWindows=true,loupe=true}
 end
 
 -- F1–F19 may be used without modifiers here only; other keys follow the shared rules.
@@ -32,24 +32,18 @@ function M.validate(value)
     if type(value)~='table' or type(value.enabled)~='boolean' then return nil,i18n.t('截图设置格式无效') end
     local shortcut,message=M.normalizeShortcut(value.shortcut)
     if message then return nil,message end
-    -- Older saved settings have no pin shortcut; they get the default rather than none.
-    local pinValue=value.pinShortcut
-    if pinValue==nil then pinValue=M.defaults().pinShortcut end
-    local pinShortcut,pinMessage=M.normalizeShortcut(pinValue)
-    if pinMessage then return nil,pinMessage end
-    if shortcut and pinShortcut and preferences.same(shortcut,pinShortcut) then return nil,i18n.t('截图和贴图不能使用相同快捷键') end
     local dir=value.saveDirectory
     if type(dir)~='string' or dir=='' or #dir>1024 or not (dir:sub(1,1)=='/' or dir:sub(1,2)=='~/') then return nil,i18n.t('保存位置无效') end
     if not formats[value.format] then return nil,i18n.t('截图格式无效') end
     for _,field in ipairs({'snapWindows','loupe'}) do
         if value[field]~=nil and type(value[field])~='boolean' then return nil,i18n.t('截图设置格式无效') end
     end
-    return {enabled=value.enabled,shortcut=shortcut or false,pinShortcut=pinShortcut or false,saveDirectory=dir,format=value.format,snapWindows=value.snapWindows~=false,loupe=value.loupe~=false}
+    return {enabled=value.enabled,shortcut=shortcut or false,saveDirectory=dir,format=value.format,snapWindows=value.snapWindows~=false,loupe=value.loupe~=false}
 end
 
 function M.conflicts(shortcut)
     if not (shortcut and M.config and M.config.enabled) then return false end
-    return (M.config.shortcut and preferences.same(shortcut,M.config.shortcut)) or (M.config.pinShortcut and preferences.same(shortcut,M.config.pinShortcut)) or false
+    return M.config.shortcut and preferences.same(shortcut,M.config.shortcut) or false
 end
 
 local function helperPath() return hs.processInfo.bundlePath..'/Contents/Resources/Toolkit/capture-helper' end
@@ -167,7 +161,6 @@ function M.setUser(name,active)
 end
 
 function M.trigger() dispatch({cmd='capture'}) end
-function M.pinClipboard() dispatch({cmd='pinClipboard'}) end
 
 -- Pins an image file (from clipboard history); the helper deletes the file after loading it.
 function M.pinFile(path,size)
@@ -184,7 +177,7 @@ M.releaseBindings=clearBindings
 
 local function install(config)
     if not config.enabled then return true end
-    for _,item in ipairs({{config.shortcut,M.trigger},{config.pinShortcut,M.pinClipboard}}) do
+    for _,item in ipairs({{config.shortcut,M.trigger}}) do
         local shortcut,action=item[1],item[2]
         if shortcut then
             if M.externalConflict and M.externalConflict(shortcut) then return false,i18n.t('截图快捷键与其他快捷键重复') end

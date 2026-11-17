@@ -154,6 +154,8 @@ local function apply(config)
     if config.enabled and M.supported() then
         startWatcher(config)
         M.capture.setUser('translate',true)
+        -- Start the helper and load the common models once, so the first translation is quick.
+        if not M.prewarmed then M.prewarmed=true;hs.timer.doAfter(3,function() M.capture.dispatch({cmd='prewarmTranslation'}) end) end
     else
         stopWatcher()
         M.capture.setUser('translate',false)
