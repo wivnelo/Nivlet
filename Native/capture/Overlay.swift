@@ -271,6 +271,7 @@ final class Session: NSObject, NSTextFieldDelegate {
 
     private func updateCursor(_ view: OverlayView, _ p: CGPoint) {
         guard phase == .selected, activeIndex == view.index else { NSCursor.crosshair.set(); return }
+        if let panel = resultPanel, panel.superview != nil, panel.frame.contains(p) { panel.cursor(at: view.convert(p, to: panel)).set(); return }
         if toolbar.frame.contains(p) || (properties.superview != nil && properties.frame.contains(p)) { NSCursor.arrow.set(); return }
         if tool == nil, let h = handleRects(selection).firstIndex(where: { $0.insetBy(dx: -4, dy: -4).contains(p) }) {
             ([1, 6].contains(h) ? NSCursor.resizeUpDown : [3, 4].contains(h) ? NSCursor.resizeLeftRight : NSCursor.crosshair).set(); return
@@ -704,7 +705,22 @@ final class Session: NSObject, NSTextFieldDelegate {
     var testView: OverlayView? { views.first }
     func testSelect(_ r: CGRect, index: Int) { activeIndex = index; selection = r; phase = .selected; showBars(); redraw() }
     func testAnnotate(_ list: [Annotation]) { annotations = list; redraw() }
-    func testRecognize() { recognizeText() }
+    func testRecognize() {
+        recognizeText()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [self] in MainActor.assumeIsolated {
+            guard let panel = resultPanel, let i = activeIndex else { onEvent(["event": "cursor", "error": "no panel"]); return }
+            let view = views[i]
+            @MainActor func cursorName(_ p: CGPoint) -> String {
+                updateCursor(view, p)
+                let c = NSCursor.current
+                return c == .arrow ? "arrow" : c == .iBeam ? "iBeam" : c == .crosshair ? "crosshair" : "other"
+            }
+            let header = CGPoint(x: panel.frame.minX + 20, y: panel.frame.maxY - 20)
+            let textArea = CGPoint(x: panel.frame.midX, y: panel.frame.midY)
+            let outside = CGPoint(x: panel.frame.minX - 40, y: panel.frame.midY)
+            onEvent(["event": "cursor", "header": cursorName(header), "text": cursorName(textArea), "outsideInSelection": cursorName(outside)])
+        } }
+    }
     /// Selects the text tool and clicks the existing text so the editor and property bar are visible.
     func testShowTextEditing(in view: OverlayView, at p: CGPoint) {
         setTool(.text)

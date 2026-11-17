@@ -1,5 +1,8 @@
 import AppKit
 
+let secondaryFill = dynamicColor(light: NSColor(srgbRed: 0.93, green: 0.93, blue: 0.95, alpha: 1), dark: NSColor(srgbRed: 0.27, green: 0.27, blue: 0.29, alpha: 1))
+let fieldFill = dynamicColor(light: NSColor(srgbRed: 0.97, green: 0.97, blue: 0.98, alpha: 1), dark: NSColor(srgbRed: 0.12, green: 0.12, blue: 0.13, alpha: 1))
+
 /// Quiet secondary button that sits beside the blue primary one.
 final class FlatButton: NSButton {
     override var wantsUpdateLayer: Bool { true }
@@ -12,9 +15,12 @@ final class FlatButton: NSButton {
         attributedTitle = NSAttributedString(string: title, attributes: [.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 12.5, weight: .medium)])
         translatesAutoresizingMaskIntoConstraints = false
         heightAnchor.constraint(equalToConstant: 28).isActive = true
-        widthAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
     }
-    override func updateLayer() { layer?.backgroundColor = barBorder.cgColor }
+    override var intrinsicContentSize: NSSize {
+        let base = super.intrinsicContentSize
+        return NSSize(width: base.width + 24, height: 28)
+    }
+    override func updateLayer() { layer?.backgroundColor = secondaryFill.cgColor }
 }
 
 /// Panel next to the selection that shows recognised text or QR codes.
@@ -63,7 +69,9 @@ final class ResultPanel: NSView {
             add(note)
         case .text(let lines):
             let scroll = NSScrollView()
-            scroll.hasVerticalScroller = true; scroll.drawsBackground = false; scroll.borderType = .noBorder
+            scroll.hasVerticalScroller = true; scroll.borderType = .noBorder
+            // A filled field reads as editable in both themes; the bare border was nearly invisible on dark.
+            scroll.drawsBackground = true; scroll.backgroundColor = fieldFill
             scroll.wantsLayer = true; scroll.layer?.cornerRadius = 7; scroll.layer?.borderWidth = 1; scroll.layer?.borderColor = barBorder.cgColor
             let view = NSTextView()
             view.string = lines.joined(separator: "\n")
@@ -121,6 +129,14 @@ final class ResultPanel: NSView {
         frame.size = NSSize(width: width, height: height)
         background.frame = bounds
         stack.frame = background.bounds
+    }
+
+    /// Arrow over the panel, I-beam over editable or selectable text.
+    func cursor(at point: NSPoint) -> NSCursor {
+        if let scroll = textView?.enclosingScrollView, scroll.convert(scroll.bounds, to: self).contains(point) { return .iBeam }
+        // hitTest takes a point in the superview's coordinates.
+        if let parent = superview, let hit = hitTest(convert(point, to: parent)) as? NSTextField, hit.isSelectable { return .iBeam }
+        return .arrow
     }
 
     func focusText() { if let textView { window?.makeFirstResponder(textView) } }

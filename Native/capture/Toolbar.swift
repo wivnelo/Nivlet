@@ -84,7 +84,11 @@ final class PrimaryButton: NSButton {
         attributedTitle = NSAttributedString(string: " " + title, attributes: [.foregroundColor: NSColor.white, .font: NSFont.systemFont(ofSize: 12.5, weight: .semibold)])
         translatesAutoresizingMaskIntoConstraints = false
         heightAnchor.constraint(equalToConstant: 28).isActive = true
-        widthAnchor.constraint(greaterThanOrEqualToConstant: 68).isActive = true
+    }
+    /// 12 pt padding on each side, matching the settings page buttons.
+    override var intrinsicContentSize: NSSize {
+        let base = super.intrinsicContentSize
+        return NSSize(width: base.width + 24, height: 28)
     }
     override func updateLayer() { layer?.backgroundColor = accentColor.cgColor }
 }
