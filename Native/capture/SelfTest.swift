@@ -1,5 +1,6 @@
 #if NIVLET_SELFTEST
 import AppKit
+import CoreImage
 
 /// Test-only hook (compiled with -D NIVLET_SELFTEST, never in release builds): selects a region,
 /// adds one annotation of each kind, renders it to `path`, and exercises copy and the size limits.
@@ -22,8 +23,27 @@ extension Session {
         let k = Annotation(tool: .mosaic, color: .black, width: 0, start: CGPoint(x: sel.midX, y: sel.midY - 120))
         k.points[1] = CGPoint(x: sel.midX + 260, y: sel.midY - 40); k.mosaicMode = .blackout
         testAnnotate([r, a, p, t, m, k])
-        testShowTextEditing(in: v, at: CGPoint(x: sel.minX + 32, y: sel.minY + 126))
+        if ProcessInfo.processInfo.environment["NIVLET_SELFTEST_PANEL"] == "ocr" { testRecognize() }
+        else { testShowTextEditing(in: v, at: CGPoint(x: sel.minX + 32, y: sel.minY + 126)) }
         testSaveRender(to: path)
+    }
+}
+
+/// Decodes a generated QR code and reads text from a generated image, independent of the screen.
+func selfTestRecognition(_ done: @escaping ([String: Any]) -> Void) {
+    let filter = CIFilter(name: "CIQRCodeGenerator", parameters: ["inputMessage": Data("https://wivnelo.github.io/Nivlet/".utf8), "inputCorrectionLevel": "M"])!
+    let qr = filter.outputImage!.transformed(by: CGAffineTransform(scaleX: 10, y: 10))
+    let qrImage = CIContext().createCGImage(qr, from: qr.extent)!
+    let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: 1200, pixelsHigh: 300, bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
+    NSGraphicsContext.saveGraphicsState(); NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
+    NSColor.white.setFill(); NSRect(x: 0, y: 0, width: 1200, height: 300).fill()
+    ("截图识别自检 Screenshot OCR 2026" as NSString).draw(at: NSPoint(x: 40, y: 180), withAttributes: [.font: NSFont.systemFont(ofSize: 48), .foregroundColor: NSColor.black])
+    ("設定を保存しました" as NSString).draw(at: NSPoint(x: 40, y: 80), withAttributes: [.font: NSFont.systemFont(ofSize: 48), .foregroundColor: NSColor.black])
+    NSGraphicsContext.restoreGraphicsState()
+    Recognition.codes(in: qrImage) { codes in
+        Recognition.text(in: rep.cgImage!, interface: "zh-Hans") { lines in
+            done(["qr": (try? codes.get().map(\.payload)) ?? [], "ocr": (try? lines.get()) ?? []])
+        }
     }
 }
 #endif

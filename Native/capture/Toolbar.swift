@@ -5,10 +5,14 @@ var strings: [String: String] = [
     "rect": "矩形", "arrow": "箭头", "pen": "画笔", "text": "文字", "mosaic": "马赛克",
     "undo": "撤销", "redo": "重做", "save": "保存", "cancel": "取消", "copy": "复制",
     "pixelate": "像素化", "blackout": "涂黑", "copyColorHint": "C 复制颜色",
+    "ocr": "识别文字", "qr": "识别二维码", "recognizing": "正在识别…", "preparing": "首次使用需要准备识别模型，请稍候…",
+    "ocrTitle": "识别到的文字", "qrTitle": "二维码", "noText": "没有识别到文字", "noCode": "没有找到二维码",
+    "recognizeFailed": "识别失败，请重试", "copyClose": "复制并关闭", "openLink": "打开链接", "close": "关闭",
+    "joinLines": "合并为一行", "copied": "已复制",
 ]
 func t(_ key: String) -> String { strings[key] ?? key }
 
-enum ToolbarAction { case tool(Tool), undo, redo, save, cancel, copy }
+enum ToolbarAction { case tool(Tool), undo, redo, ocr, qr, save, cancel, copy }
 
 /// A small button that shows an SF Symbol and a pressed state, sized for a 30 pt toolbar.
 final class ToolButton: NSButton {
@@ -106,6 +110,9 @@ final class Toolbar: NSView {
         stack.addArrangedSubview(ToolButton(symbol: "arrow.uturn.backward", tooltip: "\(t("undo"))  ⌘Z", target: self, action: #selector(undo)))
         stack.addArrangedSubview(ToolButton(symbol: "arrow.uturn.forward", tooltip: "\(t("redo"))  ⇧⌘Z", target: self, action: #selector(redo)))
         stack.addArrangedSubview(separator())
+        stack.addArrangedSubview(ToolButton(symbol: "text.viewfinder", tooltip: "\(t("ocr"))  O", target: self, action: #selector(ocr)))
+        stack.addArrangedSubview(ToolButton(symbol: "qrcode.viewfinder", tooltip: "\(t("qr"))  Q", target: self, action: #selector(qr)))
+        stack.addArrangedSubview(separator())
         stack.addArrangedSubview(ToolButton(symbol: "square.and.arrow.down", tooltip: "\(t("save"))  ⌘S", target: self, action: #selector(save)))
         stack.addArrangedSubview(ToolButton(symbol: "xmark", tooltip: "\(t("cancel"))  Esc", target: self, action: #selector(cancel)))
         let copy = PrimaryButton(title: t("copy"), target: self, action: #selector(copyPressed))
@@ -133,6 +140,8 @@ final class Toolbar: NSView {
     @objc private func toolPressed(_ sender: NSButton) { if let id = sender.identifier?.rawValue, let tool = Tool(rawValue: id) { onAction(.tool(tool)) } }
     @objc private func undo() { onAction(.undo) }
     @objc private func redo() { onAction(.redo) }
+    @objc private func ocr() { onAction(.ocr) }
+    @objc private func qr() { onAction(.qr) }
     @objc private func save() { onAction(.save) }
     @objc private func cancel() { onAction(.cancel) }
     @objc private func copyPressed() { onAction(.copy) }

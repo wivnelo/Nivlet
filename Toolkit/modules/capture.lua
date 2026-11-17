@@ -59,7 +59,10 @@ local function notify(message)
 end
 
 local function strings()
-    local keys={rect='矩形',arrow='箭头',pen='画笔',text='文字',mosaic='马赛克',undo='撤销',redo='重做',save='保存',cancel='取消',copy='复制',pixelate='像素化',blackout='涂黑',copyColorHint='C 复制颜色'}
+    local keys={rect='矩形',arrow='箭头',pen='画笔',text='文字',mosaic='马赛克',undo='撤销',redo='重做',save='保存',cancel='取消',copy='复制',pixelate='像素化',blackout='涂黑',copyColorHint='C 复制颜色',
+        ocr='识别文字',qr='识别二维码',recognizing='正在识别…',preparing='首次使用需要准备识别模型，请稍候…',
+        ocrTitle='识别到的文字',qrTitle='二维码',noText='没有识别到文字',noCode='没有找到二维码',recognizeFailed='识别失败，请重试',
+        copyClose='复制并关闭',openLink='打开链接',close='关闭',joinLines='合并为一行',copied='已复制'}
     local result={}
     for k,v in pairs(keys) do result[k]=i18n.t(v) end
     return result
@@ -67,7 +70,7 @@ end
 
 local function sendConfig()
     local c=M.config
-    send({cmd='config',saveDirectory=c.saveDirectory,format=c.format,snapWindows=c.snapWindows,loupe=c.loupe,strings=strings(),appearance=M.appearance and M.appearance() or 'system'})
+    send({cmd='config',saveDirectory=c.saveDirectory,format=c.format,snapWindows=c.snapWindows,loupe=c.loupe,strings=strings(),appearance=M.appearance and M.appearance() or 'system',language=i18n.language()})
 end
 
 local function handleEvent(event)
@@ -77,7 +80,7 @@ local function handleEvent(event)
         if type(event.permission)=='boolean' then M.permission=event.permission end
         sendConfig()
         if M.pending then M.pending=false;send({cmd='capture'}) end
-    elseif kind=='copied' then
+    elseif kind=='copied' or kind=='textCopied' then
         if M.onCopied then M.onCopied() end
     elseif kind=='saved' then
         notify(i18n.t('截图已保存：')..(event.path or ''):match('[^/]*$'))

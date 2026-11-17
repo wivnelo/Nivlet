@@ -32,6 +32,7 @@ final class Helper {
             if let v = command["format"] as? String { config.format = v }
             if let v = command["snapWindows"] as? Bool { config.snapWindows = v }
             if let v = command["loupe"] as? Bool { config.loupe = v }
+            if let v = command["language"] as? String { config.language = v }
             if let v = command["strings"] as? [String: String] { strings.merge(v) { _, new in new } }
             if let v = command["appearance"] as? String {
                 NSApp.appearance = v == "dark" ? NSAppearance(named: .darkAqua) : v == "light" ? NSAppearance(named: .aqua) : nil
@@ -42,6 +43,8 @@ final class Helper {
         case "selftest":
             selfTestPath = command["path"] as? String
             capture()
+        case "selftest-recognition":
+            selfTestRecognition { emit(["event": "selftest-recognition"].merging($0) { a, _ in a }) }
         #endif
         case "quit":
             session?.cancel(); exit(0)
@@ -66,6 +69,7 @@ final class Helper {
             do {
                 let frozen = try await capturer.captureAll()
                 let s = Session(frozen: frozen, config: config)
+                s.onEvent = { event in emit(event) }
                 s.onFinish = { event in
                     emit(event)
                     self.session = nil
@@ -104,5 +108,6 @@ Thread.detachNewThread {
 Task { @MainActor in
     if CGPreflightScreenCaptureAccess() { await helper.capturer.prewarm() }
     emit(["event": "ready", "permission": CGPreflightScreenCaptureAccess()])
+    Recognition.prewarm()
 }
 app.run()

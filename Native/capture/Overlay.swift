@@ -62,12 +62,15 @@ struct SessionConfig {
     var format = "png"
     var snapWindows = true
     var loupe = true
+    var language = "zh-Hans"
 }
 
 /// One capture from freeze to output. Owns the overlay windows and all editing state.
 @MainActor
 final class Session: NSObject, NSTextFieldDelegate {
     var onFinish: (_ event: [String: Any]) -> Void = { _ in }
+    /// Events that do not end the capture, such as copying recognised text.
+    var onEvent: (_ event: [String: Any]) -> Void = { _ in }
     private let config: SessionConfig
     private let frozen: [FrozenScreen]
     private var windows: [OverlayWindow] = []
@@ -90,6 +93,9 @@ final class Session: NSObject, NSTextFieldDelegate {
     private var editor: NSTextField?
     private var editorPoint: CGPoint = .zero
     private var finished = false
+    private var resultPanel: ResultPanel?
+    private var codeBoxes: [CGRect] = []
+    private var recognition = 0
 
     init(frozen: [FrozenScreen], config: SessionConfig) {
         self.frozen = frozen; self.config = config
@@ -142,6 +148,10 @@ final class Session: NSObject, NSTextFieldDelegate {
             if case .annotate(let a) = drag { a.draw(frozen: view.frozen.image, viewHeight: bounds.height, pixelScale: view.frozen.pixelScale) }
             NSGraphicsContext.restoreGraphicsState()
             drawSelectionChrome(selection, bounds: bounds, scale: view.frozen.pixelScale)
+            for box in codeBoxes {
+                NSColor(srgbRed: 0.2, green: 0.78, blue: 0.35, alpha: 1).setStroke()
+                let p = NSBezierPath(roundedRect: box.insetBy(dx: -3, dy: -3), xRadius: 4, yRadius: 4); p.lineWidth = 2.5; p.stroke()
+            }
         } else if let focus, phase == .choosing {
             accentColor.setStroke()
             let p = NSBezierPath(rect: focus.insetBy(dx: 1, dy: 1)); p.lineWidth = 2; p.stroke()
@@ -280,7 +290,7 @@ final class Session: NSObject, NSTextFieldDelegate {
         case .selected:
             guard view.index == activeIndex else { return }
             if tool == nil, let h = handleRects(selection).firstIndex(where: { $0.insetBy(dx: -4, dy: -4).contains(p) }) {
-                drag = .resize(handle: h, original: selection, start: p); hideBars()
+                drag = .resize(handle: h, original: selection, start: p); hideBars(); closeResults()
             } else if selection.contains(p) {
                 if event.clickCount == 2 && tool == nil { copyAndFinish(); return }
                 if let tool {
@@ -300,7 +310,7 @@ final class Session: NSObject, NSTextFieldDelegate {
                     a.mosaicMode = properties.mosaicMode; a.mosaicBlock = mosaicBlocks[properties.sizeIndex]
                     drag = .annotate(a)
                 } else {
-                    drag = .move(original: selection, start: p); hideBars(); NSCursor.closedHand.set()
+                    drag = .move(original: selection, start: p); hideBars(); closeResults(); NSCursor.closedHand.set()
                 }
             } else if annotations.isEmpty && tool == nil {
                 phase = .choosing; drag = .newSelection(start: p); hideBars()
@@ -364,6 +374,7 @@ final class Session: NSObject, NSTextFieldDelegate {
     }
 
     private func resetToChoosing() {
+        closeResults()
         phase = .choosing; selection = .zero; annotations.removeAll(); redoStack.removeAll(); tool = nil
         hideBars(); toolbar.select(nil)
         if let mouse { updateHover(mouse.index, mouse.point) }
@@ -402,6 +413,8 @@ final class Session: NSObject, NSTextFieldDelegate {
         case .tool(let t): setTool(tool == t ? nil : t)
         case .undo: undo()
         case .redo: redo()
+        case .ocr: recognizeText()
+        case .qr: recognizeCodes()
         case .save: saveAndFinish()
         case .cancel: cancel()
         case .copy: copyAndFinish()
@@ -513,6 +526,8 @@ final class Session: NSObject, NSTextFieldDelegate {
         guard mods.isEmpty else { return false }
         if phase == .choosing && key == "c" { copyColor(); return true }
         guard phase == .selected else { return false }
+        if key == "o" { recognizeText(); return true }
+        if key == "q" { recognizeCodes(); return true }
         let shortcuts: [String: Tool] = ["r": .rect, "a": .arrow, "b": .pen, "t": .text, "m": .mosaic]
         if let t = shortcuts[key] { setTool(tool == t ? nil : t); return true }
         if let n = Int(key), (1...palette.count).contains(n) { properties.colorIndex = n - 1; showBars(); return true }
@@ -541,7 +556,7 @@ final class Session: NSObject, NSTextFieldDelegate {
             r.origin.x = min(max(0, r.minX), bounds.width - r.width)
             r.origin.y = min(max(0, r.minY), bounds.height - r.height)
         }
-        selection = r.intersection(bounds); showBars(); redraw()
+        selection = r.intersection(bounds); closeResults(); showBars(); redraw()
     }
 
     private func copyColor() {
@@ -597,10 +612,99 @@ final class Session: NSObject, NSTextFieldDelegate {
 
     func cancel() { finish(["event": "cancelled"]) }
 
+    // MARK: Recognition
+
+    /// Recognition runs on the rendered selection, so mosaic and blackout keep hidden text out of the results.
+    private func recognizeText() {
+        guard phase == .selected, let image = render() else { return }
+        if editor != nil { commitText() }
+        codeBoxes = []
+        let token = beginRecognition(title: t("ocrTitle"))
+        Recognition.text(in: image, interface: config.language) { [weak self] result in
+            guard let self, token == self.recognition, let panel = self.resultPanel else { return }
+            switch result {
+            case .success(let lines) where !lines.isEmpty:
+                panel.show(title: t("ocrTitle"), content: .text(lines)); self.placeResults(); panel.focusText()
+            case .success: panel.show(title: t("ocrTitle"), content: .message(t("noText"))); self.placeResults()
+            case .failure: panel.show(title: t("ocrTitle"), content: .message(t("recognizeFailed"))); self.placeResults()
+            }
+        }
+    }
+
+    private func recognizeCodes() {
+        guard phase == .selected, let image = render() else { return }
+        if editor != nil { commitText() }
+        let token = beginRecognition(title: t("qrTitle"))
+        let sel = selection
+        Recognition.codes(in: image) { [weak self] result in
+            guard let self, token == self.recognition, let panel = self.resultPanel else { return }
+            switch result {
+            case .success(let codes) where !codes.isEmpty:
+                self.codeBoxes = codes.map { CGRect(x: sel.minX + $0.box.minX * sel.width, y: sel.minY + $0.box.minY * sel.height, width: $0.box.width * sel.width, height: $0.box.height * sel.height) }
+                panel.show(title: t("qrTitle"), content: .codes(codes))
+            case .success: self.codeBoxes = []; panel.show(title: t("qrTitle"), content: .message(t("noCode")))
+            case .failure: self.codeBoxes = []; panel.show(title: t("qrTitle"), content: .message(t("recognizeFailed")))
+            }
+            self.placeResults(); self.redraw()
+        }
+    }
+
+    private func beginRecognition(title: String) -> Int {
+        recognition += 1
+        let token = recognition
+        let panel = resultPanel ?? ResultPanel()
+        panel.onClose = { [weak self] in self?.closeResults() }
+        panel.onCopy = { [weak self] text, close in self?.copyRecognized(text, close: close) }
+        panel.onOpen = { [weak self] url in self?.openLink(url) }
+        resultPanel = panel
+        if let i = activeIndex, panel.superview !== views[i] { views[i].addSubview(panel) }
+        panel.show(title: title, content: .working(t("recognizing")))
+        placeResults()
+        // The first recognition on a Mac can take many seconds while the system prepares its model.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            guard let self, token == self.recognition, let panel = self.resultPanel, panel.isWorking else { return }
+            panel.show(title: title, content: .working(t("preparing"))); self.placeResults()
+        }
+        return token
+    }
+
+    private func placeResults() {
+        guard let panel = resultPanel, let i = activeIndex else { return }
+        let bounds = views[i].bounds, size = panel.frame.size, gap: CGFloat = 10
+        var origin = CGPoint(x: selection.maxX + gap, y: selection.maxY - size.height)
+        if origin.x + size.width > bounds.maxX - 6 { origin.x = selection.minX - gap - size.width }
+        if origin.x < 6 { origin.x = max(6, selection.maxX - size.width - 8); origin.y = selection.maxY - size.height - 8 }
+        origin.y = min(max(6, origin.y), bounds.maxY - size.height - 6)
+        panel.setFrameOrigin(origin)
+    }
+
+    private func closeResults() {
+        recognition += 1
+        resultPanel?.removeFromSuperview(); resultPanel = nil
+        if !codeBoxes.isEmpty { codeBoxes = []; redraw() }
+        if let i = activeIndex, i < windows.count { windows[i].makeFirstResponder(views[i]) }
+    }
+
+    private func copyRecognized(_ text: String, close: Bool) {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(trimmed, forType: .string)
+        if close { finish(["event": "textCopied"]) } else { onEvent(["event": "textCopied"]) }
+    }
+
+    /// Close the overlay first so the browser appears in front; the link goes to the default browser
+    /// (Nivlet's routing applies when Nivlet is the default browser).
+    private func openLink(_ url: URL) {
+        finish(["event": "linkOpened"])
+        NSWorkspace.shared.open(url)
+    }
+
     #if NIVLET_SELFTEST
     var testView: OverlayView? { views.first }
     func testSelect(_ r: CGRect, index: Int) { activeIndex = index; selection = r; phase = .selected; showBars(); redraw() }
     func testAnnotate(_ list: [Annotation]) { annotations = list; redraw() }
+    func testRecognize() { recognizeText() }
     /// Selects the text tool and clicks the existing text so the editor and property bar are visible.
     func testShowTextEditing(in view: OverlayView, at p: CGPoint) {
         setTool(.text)
@@ -626,6 +730,7 @@ final class Session: NSObject, NSTextFieldDelegate {
         finished = true
         windows.forEach { $0.orderOut(nil) }
         views.forEach { $0.session = nil }
+        resultPanel = nil
         windows.removeAll(); views.removeAll()
         previousApp?.activate()
         onFinish(event)
