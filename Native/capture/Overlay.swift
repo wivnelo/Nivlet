@@ -50,6 +50,8 @@ final class OverlayView: NSView {
 private enum Drag {
     case none
     case newSelection(start: CGPoint)
+    /// Mouse went down outside an existing selection; it only becomes a new selection once dragged.
+    case maybeReselect(start: CGPoint)
     case move(original: CGRect, start: CGPoint)
     case resize(handle: Int, original: CGRect, start: CGPoint)
     case annotate(Annotation)
@@ -317,9 +319,9 @@ final class Session: NSObject, NSTextFieldDelegate {
                     drag = .move(original: selection, start: p); hideBars(); closeResults(); NSCursor.closedHand.set()
                 }
             } else if annotations.isEmpty && tool == nil {
-                // Selecting somewhere else drops the old recognition result with the old selection.
+                // A plain click keeps the selection; dragging outside starts a new one (see mouseDragged).
                 closeResults()
-                phase = .choosing; drag = .newSelection(start: p); hideBars()
+                drag = .maybeReselect(start: p)
             } else {
                 // A click outside the selection dismisses the result panel, like clicking off a popover.
                 closeResults()
@@ -333,6 +335,11 @@ final class Session: NSObject, NSTextFieldDelegate {
         mouse = (view.index, p)
         let bounds = view.bounds
         switch drag {
+        case .maybeReselect(let start):
+            guard hypot(p.x - start.x, p.y - start.y) > 4 else { return }
+            phase = .choosing; hideBars()
+            drag = .newSelection(start: start)
+            selection = CGRect(x: min(start.x, p.x), y: min(start.y, p.y), width: abs(p.x - start.x), height: abs(p.y - start.y)).intersection(bounds)
         case .newSelection(let start):
             guard view.index == activeIndex else { return }
             selection = CGRect(x: min(start.x, p.x), y: min(start.y, p.y), width: abs(p.x - start.x), height: abs(p.y - start.y)).intersection(bounds)
@@ -354,6 +361,8 @@ final class Session: NSObject, NSTextFieldDelegate {
 
     func mouseUp(_ view: OverlayView, _ event: NSEvent) {
         switch drag {
+        case .maybeReselect:
+            break
         case .newSelection:
             if selection.width < 4 || selection.height < 4 { selection = hover?.index == view.index ? hover!.rect : view.bounds }
             phase = .selected; showBars()
@@ -368,8 +377,11 @@ final class Session: NSObject, NSTextFieldDelegate {
         redraw()
     }
 
+    /// Right-click leaves the capture, like Esc. Going back to window choosing drew a large box that
+    /// looked like a new selection.
     func rightMouseDown(_ view: OverlayView) {
-        if phase == .selected && annotations.isEmpty { resetToChoosing() } else if phase == .choosing { cancel() }
+        if editor != nil { cancelText(); return }
+        cancel()
     }
 
     private func resized(_ r: CGRect, handle: Int, dx: CGFloat, dy: CGFloat) -> CGRect {
@@ -713,6 +725,28 @@ final class Session: NSObject, NSTextFieldDelegate {
     var testView: OverlayView? { views.first }
     func testSelect(_ r: CGRect, index: Int) { activeIndex = index; selection = r; phase = .selected; showBars(); redraw() }
     func testAnnotate(_ list: [Annotation]) { annotations = list; redraw() }
+    /// Simulates clicks around a plain selection (no annotations) and reports what happened.
+    func testClicks() {
+        guard let view = views.first else { return }
+        let b = view.bounds
+        let sel = CGRect(x: b.width * 0.3, y: b.height * 0.3, width: b.width * 0.3, height: b.height * 0.3).integral
+        testSelect(sel, index: view.index)
+        func event(_ type: NSEvent.EventType, _ p: CGPoint) -> NSEvent {
+            NSEvent.mouseEvent(with: type, location: view.convert(p, to: nil), modifierFlags: [], timestamp: 0, windowNumber: view.window?.windowNumber ?? 0, context: nil, eventNumber: 0, clickCount: 1, pressure: 1)!
+        }
+        let outside = CGPoint(x: sel.minX - 80, y: sel.minY - 80)
+        mouseDown(view, event(.leftMouseDown, outside)); mouseUp(view, event(.leftMouseUp, outside))
+        let clickKeeps = phase == .selected && selection == sel
+        let end = CGPoint(x: outside.x - 120, y: outside.y - 90)
+        mouseDown(view, event(.leftMouseDown, outside))
+        mouseDragged(view, event(.leftMouseDragged, CGPoint(x: outside.x - 60, y: outside.y - 40)))
+        mouseDragged(view, event(.leftMouseDragged, end))
+        mouseUp(view, event(.leftMouseUp, end))
+        let dragReselects = phase == .selected && abs(selection.width - 120) < 1 && abs(selection.height - 90) < 1
+        onEvent(["event": "clicks", "clickKeepsSelection": clickKeeps, "dragStartsNewSelection": dragReselects])
+        rightMouseDown(view)
+    }
+
     func testRecognize() {
         recognizeText()
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) { [self] in MainActor.assumeIsolated {

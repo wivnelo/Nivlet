@@ -24,6 +24,7 @@ final class Helper {
     var session: Session?
     var busy = false
     var selfTestPath: String?
+    var clickTest = false
 
     func handle(_ command: [String: Any]) {
         switch command["cmd"] as? String {
@@ -42,6 +43,9 @@ final class Helper {
         #if NIVLET_SELFTEST
         case "selftest":
             selfTestPath = command["path"] as? String
+            capture()
+        case "selftest-clicks":
+            clickTest = true
             capture()
         case "selftest-recognition":
             selfTestRecognition { emit(["event": "selftest-recognition"].merging($0) { a, _ in a }) }
@@ -78,6 +82,7 @@ final class Helper {
                 s.show()
                 #if NIVLET_SELFTEST
                 if let path = selfTestPath { selfTestPath = nil; s.runSelfTest(path: path) }
+                if clickTest { clickTest = false; s.testClicks() }
                 #endif
                 emit(["event": "shown", "ms": Int((DispatchTime.now().uptimeNanoseconds - started) / 1_000_000)])
             } catch {
