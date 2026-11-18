@@ -23,7 +23,7 @@
 <br>
 
 <p align="center">
-  <a href="docs/assets/demos/overview-zh.gif"><img src="docs/assets/demos/overview-zh.gif" alt="Nivlet 动态演示：窗口布局、剪贴板搜索、浏览器分流与应用快捷键" width="720"></a><br>
+  <a href="docs/assets/demos/overview-zh.gif"><img src="docs/assets/demos/overview-zh.gif" alt="Nivlet 动态演示：窗口布局、剪贴板搜索、截图与翻译设置、浏览器分流与应用快捷键" width="720"></a><br>
   <sub>设置界面演示，使用合成数据与模拟原生回执。</sub>
 </p>
 
@@ -63,7 +63,7 @@ macOS 13.0 及以上，Apple Silicon。正式版均使用 Developer ID 签名并
 ## 界面预览
 
 <details>
-<summary>展开全部 8 张截图</summary>
+<summary>展开全部 10 张截图</summary>
 
 <br>
 
@@ -73,6 +73,10 @@ macOS 13.0 及以上，Apple Silicon。正式版均使用 Developer ID 签名并
 <tr>
 <td width="50%"><strong>窗口管理</strong><br><a href="docs/assets/screenshots/windows.jpg"><img src="docs/assets/screenshots/windows.jpg" alt="窗口管理——合成示例" width="480"></a></td>
 <td width="50%"><strong>剪贴板历史</strong><br><a href="docs/assets/screenshots/clipboard.jpg"><img src="docs/assets/screenshots/clipboard.jpg" alt="剪贴板历史——合成示例" width="480"></a></td>
+</tr>
+<tr>
+<td><strong>截图</strong><br><a href="docs/assets/screenshots/capture.jpg"><img src="docs/assets/screenshots/capture.jpg" alt="截图设置——合成示例" width="480"></a></td>
+<td><strong>系统翻译</strong><br><a href="docs/assets/screenshots/translate.jpg"><img src="docs/assets/screenshots/translate.jpg" alt="系统翻译设置——合成示例" width="480"></a></td>
 </tr>
 <tr>
 <td><strong>通用</strong><br><a href="docs/assets/screenshots/general.jpg"><img src="docs/assets/screenshots/general.jpg" alt="通用设置——合成示例" width="480"></a></td>

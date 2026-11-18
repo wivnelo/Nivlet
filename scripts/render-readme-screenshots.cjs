@@ -7,12 +7,12 @@ const {execFileSync} = require('node:child_process');
 const {pathToFileURL} = require('node:url');
 const {chromium} = require('playwright');
 const root = path.resolve(__dirname, '..');
-const sourceCommit = 'c9716b37c55c2e6f38abc2accc0f293226b6fb67';
-const version = '2.0.5';
-const build = process.env.NIVLET_SCREENSHOT_BUILD || '65';
-if (build !== '65') throw Error('This media set illustrates 2.0.5 / Build 65');
+const sourceCommit = '7e2577f632c1a1ab9d670d7b77868f9f778a19b7';
+const version = '2.1.0';
+const build = process.env.NIVLET_SCREENSHOT_BUILD || '67';
+if (build !== '67') throw Error('This media set illustrates 2.1.0 / Build 67');
 const viewport = {width:1280,height:900};
-const pages = {windows:'windowSection',clipboard:'clipSection',general:'generalSection',input:'inputSection',browser:'browserSection',launcher:'launcherSection',system:'systemSection',about:'aboutSection'};
+const pages = {windows:'windowSection',clipboard:'clipSection',capture:'captureSection',translate:'translateSection',general:'generalSection',input:'inputSection',browser:'browserSection',launcher:'launcherSection',system:'systemSection',about:'aboutSection'};
 const sha256 = value => crypto.createHash('sha256').update(value).digest('hex');
 function verifySource() {
 
@@ -54,6 +54,8 @@ function makeFixture(language='en') {
         ]},
         excludedAppNames:{},appIcons:Object.fromEntries([['com.apple.Safari','safari'],['com.google.Chrome','chrome']].map(([id,name])=>[id,'data:image/png;base64,'+fs.readFileSync(path.join(root,'docs/assets/browser-icons',name+'.png')).toString('base64')])),applicationStates:Object.fromEntries(ids.map((id,i)=>[id,{installed:true,name:names[i]}])),
         popupShortcut:{key:'V',mods:['cmd','shift']},popupShortcutDefault:{key:'V',mods:['cmd','shift']},
+        capture:{enabled:true,shortcut:{key:'F1',mods:[]},saveDirectory:'~/Pictures/Nivlet',format:'png',snapWindows:true,loupe:true},capturePermission:true,
+        translate:{enabled:true,selectionTrigger:'doubleAlt',screenshotTrigger:'doubleCtrl',mode:'auto',remember:true,showSource:true,autoCopy:false},translateSupported:true,translateRemembered:{},
         system:Object.fromEntries(['network','cpu','memory','disk','ipv4','ipv6','date','lunar'].map(id=>[id,true])),
         browser:{enabled:true,defaultBrowser:'com.apple.Safari',rules:[{domain:'example.com',browser:'com.google.Chrome',subdomains:true}],appRules:[{bundleID:ids[0],name:names[0],browser:'com.apple.Safari'}]},
         browserStatus:{active:true},browsers:[{id:'com.apple.Safari',name:'Safari',capabilities:{clearBrowsingData:true}},{id:'com.google.Chrome',name:'Google Chrome',capabilities:{clearBrowsingData:true}}],

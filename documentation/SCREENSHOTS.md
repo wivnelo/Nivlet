@@ -1,27 +1,27 @@
 # 公开截图与更新方式
 
-## 当前媒体 · 2.0.5 / Build 65 · 2026-11-14
+## 当前媒体 · 2.1.0 / Build 67 · 2026-11-18
 
-中英文 README 的 16 张截图与 2 个 GIF 均使用与 commit `c9716b3` 一致的真实 `Toolkit/settings.html`，展示新应用图标与版本 2.0.5 / Build 65，版本元数据独立核对当前 `VERSION`。官网首屏按页面语言嵌入对应 GIF，`docs/screenshots.html` 使用同一套中文截图。此次没有独立视频文件或视频嵌入。
+中英文 README 的 20 张截图与 2 个 GIF 均使用与产品源码 `7e2577f` 一致的真实 `Toolkit/settings.html`，展示版本 2.1.0 / Build 67 和新增的“截图”“翻译”页，版本元数据独立核对当前 `VERSION`。官网首屏按页面语言嵌入对应 GIF，`docs/screenshots.html` 使用同一套中文截图。此次没有独立视频文件或视频嵌入。
 
-上一套媒体（2.0.1 / Build 61，commit `9ddcbf9`，旧蓝色图标）已被替换，生成方式相同。
+上一套媒体（2.0.5 / Build 65，commit `c9716b3`，8 页、28 秒 GIF，不含截图与翻译页）已被替换，生成方式相同。
 
 这些是隔离浏览器中的真实前端演示，不是原生 App 端到端录像。图内持续标注“示例数据 / UI demo”；权限、默认浏览器、应用安装状态、剪贴板和系统数值都是演示值，不代表默认配置或实际检测结果。应用名/Bundle ID、规则、文本和网络地址使用虚构或文档示例；图片预览使用仓库公开 Nivlet 图标，不读取个人图片。
 
-- 中文静态图：`docs/assets/screenshots/*.jpg`，8 页。
-- 英文静态图：`docs/assets/screenshots/en/*.jpg`，8 页。
+- 中文静态图：`docs/assets/screenshots/*.jpg`，10 页（含 `capture.jpg`、`translate.jpg`）。
+- 英文静态图：`docs/assets/screenshots/en/*.jpg`，10 页。
 - 两套静态图均为 2560 × 1800；真实 UI 为 1280 × 872 CSS 像素，上方另有 28 像素媒体说明，2× 输出。
-- 动态演示：`docs/assets/demos/overview-en.gif` 与 `overview-zh.gif`，1120 × 850、28 秒、224 帧、平均 8 帧/秒，无声循环。GIF 时间单位为 10 毫秒，因此帧延迟交替为 120 / 130 毫秒。
+- 动态演示：`docs/assets/demos/overview-en.gif` 与 `overview-zh.gif`，1120 × 850、42 秒、336 帧、平均 8 帧/秒，无声循环。GIF 时间单位为 10 毫秒，因此帧延迟交替为 120 / 130 毫秒。
 
-GIF 逐帧捕捉真实 DOM 操作：侧边栏导航、三分区与九宫格、点击缩略图放大/点击外部关闭、剪贴板搜索、修改默认浏览器与应用快捷键，最后用全局保存一起提交两页草稿。保存前后的 dirty 状态、批量请求内容和确认后的状态由脚本断言；预览返回和保存确认由隔离夹具模拟，图内明确标注。没有调用原生窗口操作、系统剪贴板、应用启动或真实持久化。
+GIF 逐帧捕捉真实 DOM 操作：侧边栏导航、三分区与九宫格、点击缩略图放大/点击外部关闭、剪贴板搜索、浏览截图设置页、把选词翻译改为左侧 ⌥、修改默认浏览器与应用快捷键，最后用全局保存一起提交三页草稿。截图浮层、识别面板和翻译卡片是原生窗口，不在这套前端演示中。保存前后的 dirty 状态、批量请求内容和确认后的状态由脚本断言；预览返回和保存确认由隔离夹具模拟，图内明确标注。没有调用原生窗口操作、系统剪贴板、应用启动或真实持久化。
 
 ### 可重复生成
 
-需要 Node.js、Lua、Playwright、本机 Chromium / Chrome，以及 macOS Swift / ImageIO（GIF 编码不需要 Pillow）。浏览器使用临时独立配置，拦截所有非本地网络请求，原生桥仅处理明确的模拟演示。生成前后会校验 `settings.html`、英文翻译与固定 UI 源码一致，并独立校验 `VERSION` 为 2.0.5。
+需要 Node.js、Lua、Playwright、本机 Chromium / Chrome，以及 macOS Swift / ImageIO（GIF 编码不需要 Pillow）。浏览器使用临时独立配置，拦截所有非本地网络请求，原生桥仅处理明确的模拟演示。生成前后会校验 `settings.html`、英文翻译与固定 UI 源码一致，并独立校验 `VERSION` 为 2.1.0。
 
 ```sh
-NIVLET_SCREENSHOT_BUILD=65 node scripts/render-readme-screenshots.cjs
-NIVLET_SCREENSHOT_BUILD=65 node scripts/render-readme-demo.cjs
+NIVLET_SCREENSHOT_BUILD=67 node scripts/render-readme-screenshots.cjs
+NIVLET_SCREENSHOT_BUILD=67 node scripts/render-readme-demo.cjs
 python3 scripts/encode-readme-demo.py
 # Inspect build/media-final/overview-*-contactsheet.png, then publish the reviewed GIFs.
 cp build/media-final/overview-en.gif build/media-final/overview-zh.gif docs/assets/demos/

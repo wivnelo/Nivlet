@@ -23,7 +23,7 @@
 <br>
 
 <p align="center">
-  <a href="docs/assets/demos/overview-en.gif"><img src="docs/assets/demos/overview-en.gif" alt="Nivlet demo: window layouts, clipboard search, browser routing and app shortcuts" width="720"></a><br>
+  <a href="docs/assets/demos/overview-en.gif"><img src="docs/assets/demos/overview-en.gif" alt="Nivlet demo: window layouts, clipboard search, screenshot and translation settings, browser routing and app shortcuts" width="720"></a><br>
   <sub>Settings UI demo with synthetic data and simulated native responses.</sub>
 </p>
 
@@ -63,7 +63,7 @@ macOS 13.0 or later on Apple Silicon. Every release is Developer ID signed and n
 ## Screenshots
 
 <details>
-<summary>Show all 8 screenshots</summary>
+<summary>Show all 10 screenshots</summary>
 
 <br>
 
@@ -73,6 +73,10 @@ Rendered from the settings frontend with synthetic data. They illustrate the int
 <tr>
 <td width="50%"><strong>Window management</strong><br><a href="docs/assets/screenshots/en/windows.jpg"><img src="docs/assets/screenshots/en/windows.jpg" alt="Window management — synthetic demonstration" width="480"></a></td>
 <td width="50%"><strong>Clipboard history</strong><br><a href="docs/assets/screenshots/en/clipboard.jpg"><img src="docs/assets/screenshots/en/clipboard.jpg" alt="Clipboard history — synthetic demonstration" width="480"></a></td>
+</tr>
+<tr>
+<td><strong>Screenshot</strong><br><a href="docs/assets/screenshots/en/capture.jpg"><img src="docs/assets/screenshots/en/capture.jpg" alt="Screenshot settings — synthetic demonstration" width="480"></a></td>
+<td><strong>System translation</strong><br><a href="docs/assets/screenshots/en/translate.jpg"><img src="docs/assets/screenshots/en/translate.jpg" alt="System translation settings — synthetic demonstration" width="480"></a></td>
 </tr>
 <tr>
 <td><strong>General</strong><br><a href="docs/assets/screenshots/en/general.jpg"><img src="docs/assets/screenshots/en/general.jpg" alt="General settings — synthetic demonstration" width="480"></a></td>

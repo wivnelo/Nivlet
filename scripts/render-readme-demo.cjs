@@ -6,12 +6,14 @@ const {pathToFileURL}=require('node:url');
 const {chromium}=require('playwright');
 const {makeFixture,root,source,verifySource,version,build}=require('./render-readme-screenshots.cjs');
 const output=path.join(root,'build/readme-demo');
-const fps=8,seconds=28,width=1120,height=850,scale=.875,headerHeight=90;
+const fps=8,seconds=42,width=1120,height=850,scale=.875,headerHeight=90;
 const scenes=[
  {section:'windowSection',en:['Window layouts','Browse layout groups in the new sidebar interface.'],zh:['窗口布局','在统一侧边栏中切换布局分组。']},
  {section:'clipSection',en:['Clipboard history','Click an image to preview it, then search saved text.'],zh:['剪贴板历史','点击图片放大预览，再搜索已记录的文字。']},
+ {section:'captureSection',en:['Screenshot','Freeze the screen, annotate, recognize text and QR codes, pin to the desktop.'],zh:['截图','冻结屏幕后标注，识别文字与二维码，钉在桌面。']},
+ {section:'translateSection',en:['System translation','Double-tap a modifier to translate; choose the left or right key.'],zh:['系统翻译','双击修饰键即可翻译，可指定左侧或右侧按键。']},
  {section:'browserSection',en:['Browser routing','Change the fallback browser; keep the draft when navigating.'],zh:['浏览器分流','修改未匹配时使用的浏览器，切换页面仍保留草稿。']},
- {section:'launcherSection',en:['Save changes across pages','Edit an app shortcut, then save both pages together.'],zh:['跨页面一起保存','再修改应用快捷键，一次保存两个页面的修改。']}
+ {section:'launcherSection',en:['Save changes across pages','Edit an app shortcut, then save all three pages together.'],zh:['跨页面一起保存','再修改应用快捷键，一次保存三个页面的修改。']}
 ];
 (async()=>{
  fs.mkdirSync(output,{recursive:true});
@@ -73,32 +75,44 @@ const scenes=[
      }
      if(sceneIndex===1){
       if(tick===6)await moveTo('#clipHistory [data-clip-action="preview"]');
-      if(tick===10){await moveTo('#clipHistory [data-clip-action="preview"]',true);click=true;events.push({frame:56+tick,action:'thumbnail-preview'});}
-      if(tick===24){pointer={x:width-30,y:height-60};await page.mouse.click(pointer.x,pointer.y);click=true;if(await frame.locator('#imageDialog').evaluate(el=>el.open))throw Error('Preview did not close');events.push({frame:56+tick,action:'outside-dismiss'});}
+      if(tick===10){await moveTo('#clipHistory [data-clip-action="preview"]',true);click=true;events.push({frame:sceneIndex*56+tick,action:'thumbnail-preview'});}
+      if(tick===24){pointer={x:width-30,y:height-60};await page.mouse.click(pointer.x,pointer.y);click=true;if(await frame.locator('#imageDialog').evaluate(el=>el.open))throw Error('Preview did not close');events.push({frame:sceneIndex*56+tick,action:'outside-dismiss'});}
       if(tick===30)await moveTo('#clipSearch',true);
       const query=language==='en'?'design':'设计';
-      if(tick>=34&&tick<34+query.length*2&&tick%2===0){await frame.locator('#clipSearch').pressSequentially(query[(tick-34)/2]);events.push({frame:56+tick,action:'search-input'});}
+      if(tick>=34&&tick<34+query.length*2&&tick%2===0){await frame.locator('#clipSearch').pressSequentially(query[(tick-34)/2]);events.push({frame:sceneIndex*56+tick,action:'search-input'});}
       if(tick===50){const count=await frame.locator('#clipHistory .clip-card').count();if(count!==1)throw Error('Search should show exactly one synthetic text result');}
      }
      if(sceneIndex===2){
-      if(tick===10)await moveTo('#browserDefault');
-      if(tick===20){await frame.locator('#browserDefault').selectOption('com.google.Chrome');click=true;events.push({frame:112+tick,action:'browser-draft'});}
-      if(tick===42){const dirty=await frame.evaluate(()=>dirtyPages());if(dirty.join(',')!=='browserSection')throw Error('Expected only browser draft: '+dirty);}
+      if(tick===8)await moveTo('#captureEnabled');
+      if(tick===22)await moveTo('#captureFormat');
+      if(tick===36)await moveTo('#captureLoupe');
+      if(tick===50){const dirty=await frame.evaluate(()=>dirtyPages());if(dirty.length)throw Error('Screenshot scene must not create drafts: '+dirty);}
      }
      if(sceneIndex===3){
+      if(tick===8)await moveTo('#translateTrigger');
+      if(tick===18){await frame.locator('#translateTrigger').selectOption('doubleLeftAlt');click=true;events.push({frame:sceneIndex*56+tick,action:'translate-draft'});}
+      if(tick===30)await moveTo('#translateMode');
+      if(tick===44){const dirty=await frame.evaluate(()=>dirtyPages());if(dirty.join(',')!=='translateSection')throw Error('Expected only translation draft: '+dirty);}
+     }
+     if(sceneIndex===4){
+      if(tick===10)await moveTo('#browserDefault');
+      if(tick===20){await frame.locator('#browserDefault').selectOption('com.google.Chrome');click=true;events.push({frame:sceneIndex*56+tick,action:'browser-draft'});}
+      if(tick===42){const dirty=await frame.evaluate(()=>dirtyPages()).then(d=>d.sort());if(dirty.join(',')!=='browserSection,translateSection')throw Error('Expected translation and browser drafts: '+dirty);}
+     }
+     if(sceneIndex===5){
       if(tick===6)await moveTo('.launcher-key',true);
-      if(tick===12){await frame.locator('.launcher-key').first().fill('N');events.push({frame:168+tick,action:'launcher-draft'});}
-      if(tick===22){const dirty=await frame.evaluate(()=>dirtyPages());if(dirty.join(',')!=='browserSection,launcherSection')throw Error('Missing cross-page drafts: '+dirty);await moveTo('#saveSettings');}
-      if(tick===28){await moveTo('#saveSettings',true);click=true;const request=await frame.evaluate(()=>window.mediaPendingSave);if(!request||Object.keys(request.pages).join(',')!=='browserSection,launcherSection')throw Error('Save All did not collect both pages');events.push({frame:168+tick,action:'save-all-request',pages:Object.keys(request.pages)});}
+      if(tick===12){await frame.locator('.launcher-key').first().fill('N');events.push({frame:sceneIndex*56+tick,action:'launcher-draft'});}
+      if(tick===22){const dirty=await frame.evaluate(()=>dirtyPages()).then(d=>d.sort());if(dirty.join(',')!=='browserSection,launcherSection,translateSection')throw Error('Missing cross-page drafts: '+dirty);await moveTo('#saveSettings');}
+      if(tick===28){await moveTo('#saveSettings',true);click=true;const request=await frame.evaluate(()=>window.mediaPendingSave);if(!request||Object.keys(request.pages).sort().join(',')!=='browserSection,launcherSection,translateSection')throw Error('Save All did not collect all three pages');events.push({frame:sceneIndex*56+tick,action:'save-all-request',pages:Object.keys(request.pages)});}
       if(tick===34){
        await frame.evaluate(()=>{
         const request=window.mediaPendingSave;if(!request)throw Error('No simulated save pending');
-        const fixture=window.mediaFixture;fixture.browser=request.pages.browserSection.config;fixture.launcher=request.pages.launcherSection.config;
+        const fixture=window.mediaFixture;fixture.browser=request.pages.browserSection.config;fixture.launcher=request.pages.launcherSection.config;fixture.translate=request.pages.translateSection.config;
         window.receive({...fixture,action:'saveAllSettings',requestID:request.requestID,ok:true,message:'',saveBatch:{ok:true,results:Object.keys(request.pages).map(page=>({page,status:'saved'}))}});
         window.mediaPendingSave=null;
-       });events.push({frame:168+tick,action:'simulated-save-ack'});
+       });events.push({frame:sceneIndex*56+tick,action:'simulated-save-ack'});
       }
-      if(tick===48){const state=await frame.evaluate(()=>({dirty:dirtyPages(),disabled:document.getElementById('saveSettings').disabled,status:document.getElementById('status').textContent}));if(state.dirty.length||!state.disabled)throw Error('Save acknowledgement did not clear drafts');events.push({frame:168+tick,action:'saved-state',status:state.status});}
+      if(tick===48){const state=await frame.evaluate(()=>({dirty:dirtyPages(),disabled:document.getElementById('saveSettings').disabled,status:document.getElementById('status').textContent}));if(state.dirty.length||!state.disabled)throw Error('Save acknowledgement did not clear drafts');events.push({frame:sceneIndex*56+tick,action:'saved-state',status:state.status});}
      }
      await page.evaluate(({x,y,progress,click})=>{const p=document.getElementById('pointer');p.style.left=x+'px';p.style.top=y+'px';p.style.background=click?'#92c7ffbb':'#007aff33';document.getElementById('progress').style.width=progress+'%'},{...pointer,progress:(sceneIndex*56+tick+1)/(fps*seconds)*100,click});
      await page.screenshot({path:path.join(dir,String(sceneIndex*56+tick).padStart(4,'0')+'.png'),animations:'disabled'});
