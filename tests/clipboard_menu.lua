@@ -42,3 +42,12 @@ c.entries={{id=5,kind="image",time=1000,path="/nowhere/clip_1_5.png",preview=pre
 menu=c.menuItems();assert(menu[3].title:find("2560×1440",1,true) and menu[3].menu[1].image==preview)
 assert(c.entries[1].image==nil,'The full image stays on disk until it is copied, pinned or opened')
 print("Restored images use the stored preview and size without loading the full image passed")
+
+-- Long entries: only the start is measured, and the label is cached on the entry.
+local measured,longest=0,0
+hs.drawing.getTextDrawingSize=function(text) measured=measured+1;longest=math.max(longest,utf8.len(text));return {w=utf8.len(text)*7} end
+c.entries={{id=9,kind="text",time=1000,text=string.rep("长文本 ",20000)}}
+menu=c.menuItems();assert(menu[3].title:sub(-3)=="…" and longest<=101,"Only the first 100 characters are measured")
+local first=measured;c.menuItems();assert(measured==first,"Menu labels are cached per entry")
+c.entries[1].menuLabel=nil;c.prepare(c.entries[1]);assert(c.entries[1].menuLabel==menu[3].title)
+print("Long text labels measure at most 100 characters and are cached passed")

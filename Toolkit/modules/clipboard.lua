@@ -381,16 +381,13 @@ local function menuThumbnail(image,kind)
     canvas[2]=image and {type="image",image=image,imageAlignment="center",imageScaling="scaleToFit",frame={x=2,y=2,w=20,h=20}} or {type="text",text=kind=="image" and "▧" or "T",textAlignment="center",textColor={white=.6},textSize=14,frame={x=0,y=3,w="100%",h=18}}
     local result=canvas:imageFromCanvas();canvas:delete();return result
 end
--- Draws an image entry's small copies ahead of time (called a few at a time while Nivlet is idle).
-function M.prepare(entry)
-    if entry.kind~="image" then return end
-    sizeOf(entry)
-    entry.menuThumb=entry.menuThumb or menuThumbnail(thumbOf(entry),"image")
-    M.thumbURL(entry)
-end
+-- At most ~70 characters fit in 240 pt, so only the first 100 are measured; measuring whole entries
+-- (up to 64 KB) made every ⌘⇧V menu slower as history grew.
 local function menuLabel(text)
+    if #text>1200 then text=text:sub(1,1200):gsub("[\192-\255][\128-\191]*$","") end
     text=text:gsub("%s+"," "):gsub("^%s+",""):gsub("%s+$","")
     local length=utf8.len(text)
+    if length and length>100 then text=text:sub(1,utf8.offset(text,101)-1);length=100 end
     if not length then return text:sub(1,40)..(#text>40 and "…" or "") end
     if hs.drawing and hs.drawing.getTextDrawingSize then
         local function fits(value) return hs.drawing.getTextDrawingSize(value,{size=14}).w<=240 end
@@ -404,6 +401,13 @@ local function menuLabel(text)
         return best.."…"
     end
     return length>40 and text:sub(1,utf8.offset(text,41)-1).."…" or text
+end
+-- Prepares an entry's menu label and small copies ahead of time (called a few at a time while Nivlet is idle).
+function M.prepare(entry)
+    if entry.kind~="image" then if entry.text and not entry.menuLabel then entry.menuLabel=menuLabel(entry.text) end;return end
+    sizeOf(entry)
+    entry.menuThumb=entry.menuThumb or menuThumbnail(thumbOf(entry),"image")
+    M.thumbURL(entry)
 end
 function M.menuItems()
     M.prune()
@@ -419,7 +423,8 @@ function M.menuItems()
     for index,entry in ipairs(ordered) do
         if imageCount>0 and index==imageCount+1 then table.insert(menu,{title="-"}) end
         local isImage=entry.kind=="image"
-        local text=entry.text and menuLabel(entry.text) or i18n.t("图片 ")..os.date("%H:%M:%S",math.floor(entry.time))
+        if entry.text and not entry.menuLabel then entry.menuLabel=menuLabel(entry.text) end
+        local text=entry.menuLabel or i18n.t("图片 ")..os.date("%H:%M:%S",math.floor(entry.time))
         local width,height
         if isImage then width,height=sizeOf(entry) end
         if width then

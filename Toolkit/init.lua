@@ -455,12 +455,12 @@ local function configuredAppIcons()
 end
 -- Encoding every configured app icon took ~250 ms the first time the settings window opened. They are
 -- prepared a few at a time while Nivlet is idle after launch, so no single step blocks key handling.
--- The clipboard menu's image thumbnails are drawn the same way.
+-- The clipboard menu's labels and image thumbnails are prepared the same way.
 local function warmCaches()
     local jobs={}
     for _,id in ipairs(configuredBundleIDs()) do table.insert(jobs,function() appIcons.get(id) end) end
     for _,entry in ipairs(clipboard.entries) do
-        if entry.kind=="image" then table.insert(jobs,function() clipboard.prepare(entry) end) end
+        table.insert(jobs,function() clipboard.prepare(entry) end)
     end
     local index=1
     app.cacheWarmer=hs.timer.doEvery(0.05,function()
@@ -823,6 +823,8 @@ if profile.enabled then
         profile.mark("idle; history entries",#clipboard.entries.." ("..images.." images)")
         profile.time("clipboard menu build (first)",clipboard.menuItems)
         profile.time("clipboard menu build (again)",clipboard.menuItems)
+        profile.time("probe: dock icon show",hs.dockicon.show)
+        profile.time("probe: activate Nivlet",function() local me=hs.application.frontmostApplication and hs.application.applicationForPID and hs.application.applicationForPID(hs.processInfo.processID);if me then me:activate() end end)
         profile.mark("openSettings")
         app.profileSettingsOpened=true
         app.openSettings("generalSection")
