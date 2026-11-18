@@ -52,6 +52,9 @@ window.runCapturePageRegression=function(){
   document.getElementById('saveSettings').click();
   const batch=sent.find(item=>item.action==='saveAllSettings');
   check(batch&&batch.pages.captureSection&&batch.pages.captureSection.config.shortcut.key==='5','Save All sends the Screenshot page');
+  // Window focus sends one request (it used to send two, each answered with full state).
+  sent.length=0;window.dispatchEvent(new Event('focus'));
+  check(sent.length===1&&sent[0].action==='focusRefresh'&&Array.isArray(sent[0].bundleIDs),'Focus sends a single refresh request');
   return 'Screenshot page layout, F-key and ⌘⇧5 capture, page and global save payloads';
  }finally{send=oldSend}
 };

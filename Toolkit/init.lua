@@ -459,7 +459,6 @@ local function excludedAppNames()
     return names
 end
 local function reply(ok, message, action, requestID, saveBatch)
-    if action=="refreshApplications" or action=="refreshBrowserStatus" or action=="refreshPermissionsSilent" or action=="prepareBrowserData" or action==nil then appIcons.clear() end
     local permission=permissionState()
     local icons=app.settings and configuredAppIcons()
     if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.translations(),general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),capture=capture.config,capturePermission=capture.permissionGranted(),translate=translate.config,translateSupported=translate.supported(),translateRemembered=translate.memory,excludedAppNames=excludedAppNames(),appIcons=icons,applicationStates=applicationStates(icons),popupShortcut=app.popupShortcut or false,popupShortcutDefault=defaultPopup(),popupShortcutError=app.popupShortcutError and i18n.t(app.popupShortcutError) or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}) .. ")") end
@@ -539,6 +538,15 @@ function app.openSettings(section, focus)
             reply(true,"",body.action);return
         end
         if body.action=="refreshBrowserStatus" then reply(true,"",body.action);return end
+        -- Window focus: refresh app states and both permissions with a single reply.
+        if body.action=="focusRefresh" then
+            requestedApps={}
+            if type(body.bundleIDs)=="table" then for _,id in ipairs(body.bundleIDs) do
+                if #requestedApps<500 and bundleIDs.valid(id) then table.insert(requestedApps,id) end
+            end end
+            capture.checkPermission(function() reply(true,"","refreshPermissionsSilent") end)
+            return
+        end
         if body.action=="requestScreenRecording" then
             capture.requestPermission(function(granted)
                 if not granted then permissions.openScreenRecording() end

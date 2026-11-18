@@ -139,10 +139,37 @@ function M.scan()
     if M.task then M.task:start() end
 end
 function M.schedule()
+    if M.paused then return end
     local interval=M.config.network and 2 or 60
     if M.timer and M.interval==interval then return end
     if M.timer then M.timer:stop() end
     M.interval=interval;M.timer=hs.timer.doEvery(interval,M.scan)
+end
+
+-- Nobody can see the menu bar while the screen is locked or the display sleeps, so sampling
+-- (a short-lived probe process every 2 s with network speed on) stops until it wakes again.
+function M.pause()
+    M.paused=true
+    if M.timer then M.timer:stop();M.timer=nil end
+end
+function M.resume()
+    if not M.paused then return end
+    M.paused=false;M.interval=nil
+    M.scan();M.schedule()
+end
+local function watchPower()
+    if not (hs.caffeinate and hs.caffeinate.watcher) then return end
+    local w=hs.caffeinate.watcher
+    M.powerWatcher=w.new(function(event)
+        if event==w.screensDidLock or event==w.screensDidSleep or event==w.systemWillSleep then M.pause()
+        elseif event==w.screensDidUnlock or event==w.screensDidWake or event==w.systemDidWake then
+            -- Waking the display while still locked keeps sampling paused until unlock.
+            if event==w.screensDidWake and M.locked then return end
+            M.resume()
+        end
+        if event==w.screensDidLock then M.locked=true elseif event==w.screensDidUnlock then M.locked=false end
+    end)
+    M.powerWatcher:start()
 end
 function M.start(openSettings)
     M.openSettings=openSettings
@@ -155,5 +182,6 @@ function M.start(openSettings)
     M.menu=hs.menubar.new(true,"NivletSystemInfo"):setTitle("▲ — / ▼ —"):setTooltip(i18n.t("Nivlet 系统信息"))
     M.menu:setMenu(M.menuItems)
     M.draw();M.scan();M.schedule()
+    watchPower()
 end
 return M

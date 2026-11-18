@@ -6,7 +6,21 @@ local i18n=require('modules.i18n')
 local M={memory={}}
 local settingsKey='desktoptoolkit.translate.v1'
 local memoryKey='desktoptoolkit.translate.memory.v1'
-local triggers={doubleAlt='alt',doubleCmd='cmd',doubleCtrl='ctrl',off=false}
+-- Trigger → modifier and side. Key codes tell left from right: ⌘ 55/54, ⌥ 58/61, ⌃ 59/62.
+local triggers={off=false}
+local keyCodes={cmd={left=55,right=54},alt={left=58,right=61},ctrl={left=59,right=62}}
+for _,mod in ipairs({'Alt','Cmd','Ctrl'}) do
+    local m=mod:lower()
+    triggers['double'..mod]={mod=m}
+    triggers['doubleLeft'..mod]={mod=m,side='left'}
+    triggers['doubleRight'..mod]={mod=m,side='right'}
+end
+-- Two triggers clash when they use the same modifier and either accepts that side.
+function M.triggersOverlap(a,b)
+    local x,y=triggers[a],triggers[b]
+    if not x or not y or x.mod~=y.mod then return false end
+    return not x.side or not y.side or x.side==y.side
+end
 local modes={auto=true,['zh-Hans']=true,['zh-Hant']=true,en=true,ja=true,ko=true}
 local tapWindow,pressWindow=0.4,0.35
 
@@ -20,7 +34,7 @@ function M.validate(value)
     if triggers[trigger]==nil then return nil,i18n.t('翻译设置格式无效') end
     local shot=value.screenshotTrigger or 'doubleCtrl'
     if triggers[shot]==nil then return nil,i18n.t('翻译设置格式无效') end
-    if shot~='off' and shot==trigger then return nil,i18n.t('选词翻译和截图翻译不能使用同一个按键') end
+    if M.triggersOverlap(trigger,shot) then return nil,i18n.t('选词翻译和截图翻译不能使用同一个按键') end
     local mode=value.mode or 'auto'
     if not modes[mode] then return nil,i18n.t('翻译设置格式无效') end
     for _,field in ipairs({'remember','showSource','autoCopy'}) do
@@ -112,14 +126,16 @@ end
 
 -- Double tap: the modifier alone, pressed and released twice within tapWindow, with no other key
 -- or modifier in between. Holding it, or using it in a shortcut, never triggers.
-function M.newTapDetector(modifier,onDoubleTap,clock)
+-- `side` limits the trigger to the left or right key (nil: either).
+function M.newTapDetector(modifier,onDoubleTap,clock,side)
+    local wanted=side and keyCodes[modifier] and keyCodes[modifier][side]
     local state={down=false,clean=false,downAt=0,lastTap=nil}
     local detector={}
-    function detector.flags(flags)
+    function detector.flags(flags,keyCode)
         local now=clock()
         local count,only=0,false
         for name,on in pairs(flags) do if on and name~='fn' then count=count+1 end end
-        only=count==1 and flags[modifier]==true
+        only=count==1 and flags[modifier]==true and (not wanted or keyCode==wanted)
         if only and not state.down then
             state.down=true;state.clean=true;state.downAt=now
         elseif count==0 and state.down then
@@ -146,15 +162,15 @@ local function startWatcher(config)
     stopWatcher()
     local detectors={}
     for _,item in ipairs({{config.selectionTrigger,M.translateSelection},{config.screenshotTrigger,M.translateScreenshot}}) do
-        local modifier=triggers[item[1]]
+        local trigger=triggers[item[1]]
         local action=item[2]
-        if modifier then table.insert(detectors,M.newTapDetector(modifier,function() hs.timer.doAfter(0,action) end,hs.timer.secondsSinceEpoch)) end
+        if trigger then table.insert(detectors,M.newTapDetector(trigger.mod,function() hs.timer.doAfter(0,action) end,hs.timer.secondsSinceEpoch,trigger.side)) end
     end
     if #detectors==0 then return end
     local types=hs.eventtap.event.types
     M.watcher=hs.eventtap.new({types.flagsChanged,types.keyDown},function(event)
         if event:getType()==types.keyDown then for _,d in ipairs(detectors) do d.key() end
-        else local flags=event:getFlags();for _,d in ipairs(detectors) do d.flags(flags) end end
+        else local flags,code=event:getFlags(),event:getKeyCode();for _,d in ipairs(detectors) do d.flags(flags,code) end end
         return false
     end)
     M.watcher:start()

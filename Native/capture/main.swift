@@ -65,6 +65,8 @@ final class Helper {
                 autoCopy: command["autoCopy"] as? Bool ?? false,
                 editable: command["editable"] as? Bool ?? false,
                 interface: config.language))
+        case "permissionStatus":
+            emit(["event": "permissionStatus", "granted": CGPreflightScreenCaptureAccess()])
         case "prewarmTranslation":
             if #available(macOS 15.0, *) { SystemTranslator.shared.prewarm() }
         case "pinFile":

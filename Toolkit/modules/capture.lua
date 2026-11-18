@@ -2,7 +2,7 @@
 -- while the module is enabled; this module owns the shortcut, settings and output feedback.
 local i18n=require('modules.i18n')
 local preferences=require('modules.preferences')
-local M={bindings={},buffer='',users={},handlers={}}
+local M={bindings={},buffer='',users={},handlers={},permissionWaiters={}}
 local settingsKey='desktoptoolkit.capture.v1'
 local formats={png=true,jpg=true}
 
@@ -93,6 +93,10 @@ local function handleEvent(event)
     elseif kind=='color' then
         if M.onCopied then M.onCopied() end
         notify(i18n.t('已复制颜色 ')..tostring(event.value))
+    elseif kind=='permissionStatus' then
+        local query=M.permissionQuery
+        M.permissionQuery=nil
+        if query then query(event.granted==true) end
     elseif M.handlers[kind] then
         M.handlers[kind](event)
     elseif kind=='pinned' or kind=='pinnedCapture' then
@@ -223,17 +227,38 @@ end
 -- nil means not checked yet.
 function M.permissionGranted() return M.permission end
 
+-- Every caller gets exactly one callback; overlapping checks share one result.
+-- A running helper answers directly (no new process). Only a "denied" answer is confirmed by a
+-- fresh process, because a long-running one may not see access granted after it started.
 function M.checkPermission(callback)
-    if M.permissionTask and M.permissionTask:isRunning() then return end
-    local path=helperPath()
-    if not hs.fs.attributes(path) then return end
-    M.permissionTask=hs.task.new(path,function(_,stdout)
-        M.permissionTask=nil
-        local answer=stdout and stdout:match('(%a+)')
-        if answer=='granted' then M.permission=true elseif answer=='denied' then M.permission=false end
-        if callback then callback(M.permission) end
-    end,{'--permission'})
-    if not M.permissionTask or not M.permissionTask:start() then M.permissionTask=nil end
+    if callback then table.insert(M.permissionWaiters,callback) end
+    if M.checking then return end
+    M.checking=true
+    local function deliver(value)
+        if value~=nil then M.permission=value end
+        M.checking=false
+        local waiters=M.permissionWaiters
+        M.permissionWaiters={}
+        for _,waiter in ipairs(waiters) do waiter(M.permission) end
+    end
+    local function fresh()
+        local path=helperPath()
+        if not hs.fs.attributes(path) then deliver(nil);return end
+        M.permissionTask=hs.task.new(path,function(_,stdout)
+            M.permissionTask=nil
+            local answer=stdout and stdout:match('(%a+)')
+            local granted
+            if answer=='granted' then granted=true elseif answer=='denied' then granted=false end
+            deliver(granted)
+        end,{'--permission'})
+        if not M.permissionTask or not M.permissionTask:start() then M.permissionTask=nil;deliver(nil) end
+    end
+    if M.task and M.task:isRunning() and M.ready then
+        M.permissionQuery=function(granted) if granted then deliver(true) else fresh() end end
+        send({cmd='permissionStatus'})
+    else
+        fresh()
+    end
 end
 
 -- Shows the system prompt the first time (it lists Nivlet); afterwards macOS only allows changes in System Settings.

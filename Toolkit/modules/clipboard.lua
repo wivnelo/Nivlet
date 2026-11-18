@@ -46,9 +46,16 @@ function M.persist()
         if entry.kind=="image" then
             if not entry.path then
                 local path=directory()..string.format("clip_%.0f_%d.png",entry.time*1000,entry.id)
-                if not entry.image:saveToFile(path,true,"PNG") then return false,i18n.t("图片缓存写入失败") end
+                -- The clipboard's own PNG is written as is; re-encoding only for images that had none.
+                if entry.png then
+                    local file=io.open(path,"wb")
+                    local written=file and file:write(entry.png)
+                    if file then file:close() end
+                    if not written then return false,i18n.t("图片缓存写入失败") end
+                elseif not entry.image:saveToFile(path,true,"PNG") then return false,i18n.t("图片缓存写入失败") end
                 entry.path=path
             end
+            entry.png=nil
             -- Fingerprint and size are stored so startup never has to decode and re-encode images.
             table.insert(saved,{id=entry.id,kind="image",time=entry.time,path=entry.path,source=entry.source,fingerprint=entry.fingerprint,bytes=entry.menuBytes})
         else table.insert(saved,{id=entry.id,kind="text",time=entry.time,text=entry.text}) end
@@ -152,7 +159,7 @@ function M.load()
                 if attr and attr.mode=="file" and attr.size<=10485760 then
                     -- Restoring used to re-encode every image to PNG/base64 for a fingerprint, which
                     -- pushed startup past 2 GB with full-screen captures. Saved records now carry the
-                    -- fingerprint; older ones get theirs lazily, only when a copied image needs comparing.
+                    -- fingerprint; older ones simply are not de-duplicated against new copies.
                     local image=hs.image.imageFromPath(entry.path)
                     local fingerprint=type(entry.fingerprint)=="string" and entry.fingerprint or nil
                     local bytes=type(entry.bytes)=="number" and entry.bytes or attr.size
@@ -202,14 +209,24 @@ function M.poll()
         if kind==captureMarker then source="capture" end
     end
     local image=M.config.images and hs.pasteboard.readImage() or nil
-    local value,thumb,fingerprint,bytes
+    local value,thumb,fingerprint,bytes,png
     if image then
         local size=image:size()
         if size.w<=0 or size.h<=0 or size.w*size.h>25000000 then return end
-        local encoded=image:encodeAsURLString(true,"PNG")
-        if not encoded or #encoded>13981070 then return end
-        fingerprint=hs.hash.SHA256(encoded)
-        bytes=pngBytes(encoded)
+        -- Fingerprint and size come from the clipboard's own PNG bytes. Re-encoding the image to
+        -- PNG/base64 for this pushed memory past 2 GB for a single full-screen capture.
+        png=hs.pasteboard.readDataForUTI and hs.pasteboard.readDataForUTI("public.png") or nil
+        if type(png)=="string" and #png>0 then
+            if #png>10485760 then return end
+            fingerprint="png:"..hs.hash.SHA256(png)
+            bytes=#png
+        else
+            png=nil
+            local encoded=image:encodeAsURLString(true,"PNG")
+            if not encoded or #encoded>13981070 then return end
+            fingerprint=hs.hash.SHA256(encoded)
+            bytes=pngBytes(encoded)
+        end
         thumb=thumbnail(image)
     else
         value=hs.pasteboard.getContents()
@@ -218,13 +235,11 @@ function M.poll()
     if hs.pasteboard.changeCount()~=count then return end
     for i=#M.entries,1,-1 do
         local entry=M.entries[i]
-        if fingerprint and entry.kind=="image" and not entry.fingerprint and entry.image then
-            entry.fingerprint=hs.hash.SHA256(entry.image:encodeAsURLString(true,"PNG"))
-        end
         if value and entry.text==value or fingerprint and entry.fingerprint==fingerprint then remove(entry);table.remove(M.entries,i) end
     end
     M.nextID=M.nextID+1
-    table.insert(M.entries,1,{id=M.nextID,kind=image and "image" or "text",source=image and source or nil,text=value,image=image,thumb=thumb,fingerprint=fingerprint,menuBytes=bytes,time=hs.timer.secondsSinceEpoch()})
+    -- PNG bytes are kept only until the history file is written (persistent history only).
+    table.insert(M.entries,1,{id=M.nextID,kind=image and "image" or "text",source=image and source or nil,text=value,image=image,thumb=thumb,fingerprint=fingerprint,menuBytes=bytes,png=M.config.persistent and png or nil,time=hs.timer.secondsSinceEpoch()})
 
 
     M.pendingHistoryWrite=true

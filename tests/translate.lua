@@ -29,3 +29,17 @@ assert(translate.validate({enabled=true}).screenshotTrigger=='doubleCtrl','Scree
 assert(not translate.validate({enabled=true,selectionTrigger='doubleCtrl',screenshotTrigger='doubleCtrl'}),'Both triggers cannot share a key')
 assert(translate.validate({enabled=true,selectionTrigger='off',screenshotTrigger='off'}))
 print('translate module: settings validation and double-tap detection')
+-- Left and right modifier keys.
+local t2=require('modules.translate')
+assert(t2.validate({enabled=true,selectionTrigger='doubleLeftAlt',screenshotTrigger='doubleRightAlt'}),'Left and right Option can be split')
+assert(not t2.validate({enabled=true,selectionTrigger='doubleAlt',screenshotTrigger='doubleRightAlt'}),'Either-side Option overlaps right Option')
+assert(not t2.validate({enabled=true,selectionTrigger='doubleLeftCmd',screenshotTrigger='doubleLeftCmd'}))
+assert(t2.validate({enabled=true,selectionTrigger='doubleLeftCmd',screenshotTrigger='doubleRightCtrl'}))
+local n2,f2=0,0
+local function dt(side) return t2.newTapDetector('alt',function() f2=f2+1 end,function() return n2 end,side) end
+local function tapKey(d,code) n2=n2+0.1;d.flags({alt=true},code);n2=n2+0.05;d.flags({},code) end
+local L=dt('left');tapKey(L,58);tapKey(L,58);assert(f2==1,'Left Option twice fires the left trigger')
+f2=0;L=dt('left');tapKey(L,61);tapKey(L,61);assert(f2==0,'Right Option does not fire the left trigger')
+f2=0;local R=dt('right');tapKey(R,61);tapKey(R,61);assert(f2==1,'Right Option fires the right trigger')
+f2=0;local A=dt(nil);tapKey(A,58);tapKey(A,61);assert(f2==1,'Either-side trigger accepts both keys')
+print('translate module: left and right modifier triggers')

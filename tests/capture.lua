@@ -99,4 +99,27 @@ assert(answered==false and capture.permissionGranted()==false)
 capture.checkPermission(function(value) answered=value end)
 tasks[#tasks].exit(0,'granted\n','')
 assert(answered==true and capture.permissionGranted()==true)
+-- Overlapping checks share one answer; every caller is called back once.
+local calls=0
+capture.checkPermission(function() calls=calls+1 end)
+capture.checkPermission(function() calls=calls+1 end)
+local before=#tasks
+tasks[#tasks].exit(0,'granted\n','')
+assert(calls==2 and #tasks==before, 'Two overlapping checks run one process and answer both')
+-- A running helper answers without starting a process; "granted" is trusted directly.
+assert(capture.startHelper())
+local helperTask=tasks[#tasks]
+helperTask.stream(nil,'{"event":"ready","permission":true}\n')
+local count=#tasks;local result
+capture.checkPermission(function(v) result=v end)
+assert(#tasks==count and helperTask.input[#helperTask.input]:match('cmd=permissionStatus'), 'Asks the running helper')
+helperTask.stream(nil,'{"event":"permissionStatus","granted":"true"}\n')
+assert(result==true and #tasks==count, 'Granted from the helper needs no new process')
+-- "denied" from the helper is confirmed by a fresh process.
+capture.checkPermission(function(v) result=v end)
+helperTask.stream(nil,'{"event":"permissionStatus","granted":"false"}\n')
+assert(#tasks==count+1 and tasks[#tasks].stream[1]=='--permission', 'Denied is re-checked in a fresh process')
+tasks[#tasks].exit(0,'denied\n','')
+assert(result==false)
+capture.stopHelper()
 print('capture module: F-key validation, binding, helper lifecycle and events')
