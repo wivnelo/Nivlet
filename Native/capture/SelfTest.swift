@@ -49,4 +49,20 @@ func selfTestRecognition(_ done: @escaping ([String: Any]) -> Void) {
         }
     }
 }
+
+@MainActor
+func selfTestSnapshotCard(path: String) -> Bool {
+    guard let window = NSApp.windows.first(where: { $0 is TranslatePanelWindow && $0.isVisible }), let view = window.contentView else { return false }
+    let scale = window.backingScaleFactor
+    let size = view.bounds.size
+    guard let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: Int(size.width * scale), pixelsHigh: Int(size.height * scale), bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0) else { return false }
+    rep.size = size
+    NSGraphicsContext.saveGraphicsState()
+    NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
+    window.effectiveAppearance.performAsCurrentDrawingAppearance {
+        view.layer?.render(in: NSGraphicsContext.current!.cgContext)
+    }
+    NSGraphicsContext.restoreGraphicsState()
+    return (try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: path))) != nil
+}
 #endif

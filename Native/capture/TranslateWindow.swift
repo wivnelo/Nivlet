@@ -34,7 +34,9 @@ final class TranslateCard: NSView {
     var onEvent: ([String: Any]) -> Void = { _ in }
     private let background = makeHUD()
     private let stack = NSStackView()
-    private let width: CGFloat = 360
+    private let width: CGFloat = 380
+    private let gutter: CGFloat = 14
+    private let maxTranslationHeight: CGFloat = 280
     private var request: TranslateRequest!
     private var source = "en", target = "zh-Hans"
     private var result = ""
@@ -44,10 +46,10 @@ final class TranslateCard: NSView {
     private var pinButton: ToolButton?
 
     init() {
-        super.init(frame: NSRect(x: 0, y: 0, width: 360, height: 100))
+        super.init(frame: NSRect(x: 0, y: 0, width: 380, height: 100))
         addSubview(background)
-        stack.orientation = .vertical; stack.alignment = .leading; stack.spacing = 10
-        stack.edgeInsets = NSEdgeInsets(top: 10, left: 14, bottom: 12, right: 10)
+        stack.orientation = .vertical; stack.alignment = .leading; stack.spacing = 0
+        stack.edgeInsets = NSEdgeInsets()
         background.addSubview(stack)
     }
     required init?(coder: NSCoder) { fatalError() }
@@ -111,61 +113,76 @@ final class TranslateCard: NSView {
 
     private func render(state: State) {
         stack.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        // Header: direction menu, pin, close.
-        let header = NSStackView(); header.orientation = .horizontal; header.spacing = 4
-        let direction = FlatButton(title: "\(languageName(source, interface: request.interface)) → \(languageName(target, interface: request.interface))  ▾", target: self, action: #selector(showDirectionMenu(_:)))
-        header.addArrangedSubview(direction)
-        let spacer = NSView(); spacer.setContentHuggingPriority(.defaultLow, for: .horizontal); header.addArrangedSubview(spacer)
-        let pin = ToolButton(symbol: "pin", tooltip: t("pinCard"), target: self, action: #selector(togglePin))
-        pin.selectedState = pinned; pinButton = pin
-        header.addArrangedSubview(pin)
-        header.addArrangedSubview(ToolButton(symbol: "xmark", tooltip: t("close"), target: self, action: #selector(closePressed)))
-        add(header, inset: 0)
-
-        if request.showSource {
-            let src = NSTextField(wrappingLabelWithString: request.text)
-            src.font = .systemFont(ofSize: 12.5); src.textColor = .secondaryLabelColor
-            src.maximumNumberOfLines = 4; src.lineBreakMode = .byWordWrapping; src.isSelectable = true
-            src.cell?.truncatesLastVisibleLine = true
-            add(src)
-        }
-        switch state {
-        case .working:
-            let note = NSTextField(labelWithString: t("translating")); note.font = .systemFont(ofSize: 14); note.textColor = .secondaryLabelColor
-            add(note)
-        case .failed(let message):
-            let note = NSTextField(wrappingLabelWithString: message); note.font = .systemFont(ofSize: 13); note.textColor = .secondaryLabelColor
-            add(note)
-            let row = NSStackView(); row.spacing = 8
-            row.addArrangedSubview(FlatButton(title: t("openLanguageSettings"), target: self, action: #selector(openSettings)))
-            add(row)
-        case .partial:
-            let out = NSTextField(wrappingLabelWithString: result + "\n…")
-            out.font = .systemFont(ofSize: 15); out.textColor = .labelColor; out.isSelectable = true
-            add(out)
-        case .done:
-            let out = NSTextField(wrappingLabelWithString: result)
-            out.font = .systemFont(ofSize: 15); out.textColor = .labelColor; out.isSelectable = true
-            add(out)
-            if plan?.truncated == true {
-                let note = NSTextField(wrappingLabelWithString: t("translateTruncated"))
-                note.font = .systemFont(ofSize: 12); note.textColor = .secondaryLabelColor
-                add(note)
-            }
-            let row = NSStackView(); row.spacing = 8
-            if request.editable { row.addArrangedSubview(FlatButton(title: t("replaceSource"), target: self, action: #selector(replacePressed))) }
-            let gap = NSView(); gap.setContentHuggingPriority(.defaultLow, for: .horizontal); row.addArrangedSubview(gap)
-            row.addArrangedSubview(FlatButton(title: t("copySource"), target: self, action: #selector(copySourcePressed(_:))))
-            row.addArrangedSubview(PrimaryButton(title: t("copyTranslation"), target: self, action: #selector(copyResultPressed(_:))))
-            add(row, inset: 4)
+        add(header())
+        add(CardDivider())
+        add(body(state))
+        if case .done = state {
+            add(CardDivider())
+            add(footer())
         }
         layoutCard()
     }
 
-    private func add(_ view: NSView, inset: CGFloat = 4) {
+    private func header() -> NSView {
+        let row = NSStackView(); row.orientation = .horizontal; row.spacing = 2
+        row.edgeInsets = NSEdgeInsets(top: 8, left: gutter - 4, bottom: 8, right: 8)
+        let direction = DirectionButton(title: "\(languageName(source, interface: request.interface)) → \(languageName(target, interface: request.interface))", target: self, action: #selector(showDirectionMenu(_:)))
+        row.addArrangedSubview(direction)
+        let spacer = NSView(); spacer.setContentHuggingPriority(.defaultLow, for: .horizontal); row.addArrangedSubview(spacer)
+        let pin = ToolButton(symbol: "pin", tooltip: t("pinCard"), target: self, action: #selector(togglePin))
+        pin.selectedState = pinned; pinButton = pin
+        row.addArrangedSubview(pin)
+        row.addArrangedSubview(ToolButton(symbol: "xmark", tooltip: t("close"), target: self, action: #selector(closePressed)))
+        return row
+    }
+
+    private func body(_ state: State) -> NSView {
+        let column = NSStackView(); column.orientation = .vertical; column.alignment = .leading; column.spacing = 12
+        column.edgeInsets = NSEdgeInsets(top: 12, left: gutter, bottom: 14, right: gutter)
+        let inner = width - gutter * 2
+        func place(_ view: NSView) {
+            column.addArrangedSubview(view)
+            view.translatesAutoresizingMaskIntoConstraints = false
+            view.widthAnchor.constraint(equalToConstant: inner).isActive = true
+        }
+        if request.showSource { place(SourceBlock(text: request.text, width: inner)) }
+        switch state {
+        case .working:
+            place(label(t("translating"), size: 14, color: .secondaryLabelColor))
+        case .failed(let message):
+            place(label(message, size: 13, color: .secondaryLabelColor))
+            let row = NSStackView(); row.spacing = 8
+            row.addArrangedSubview(FlatButton(title: t("openLanguageSettings"), target: self, action: #selector(openSettings)))
+            column.addArrangedSubview(row)
+        case .partial:
+            place(TranslationText(text: result + "\n…", width: inner, maxHeight: maxTranslationHeight))
+        case .done:
+            place(TranslationText(text: result, width: inner, maxHeight: maxTranslationHeight))
+            if plan?.truncated == true { place(label(t("translateTruncated"), size: 11.5, color: .tertiaryLabelColor)) }
+        }
+        return column
+    }
+
+    private func footer() -> NSView {
+        let row = NSStackView(); row.orientation = .horizontal; row.spacing = 8
+        row.edgeInsets = NSEdgeInsets(top: 10, left: gutter, bottom: 10, right: gutter)
+        if request.editable { row.addArrangedSubview(FlatButton(title: t("replaceSource"), target: self, action: #selector(replacePressed))) }
+        let gap = NSView(); gap.setContentHuggingPriority(.defaultLow, for: .horizontal); row.addArrangedSubview(gap)
+        row.addArrangedSubview(FlatButton(title: t("copySource"), target: self, action: #selector(copySourcePressed(_:))))
+        row.addArrangedSubview(PrimaryButton(title: t("copyTranslation"), target: self, action: #selector(copyResultPressed(_:))))
+        return row
+    }
+
+    private func label(_ text: String, size: CGFloat, color: NSColor) -> NSTextField {
+        let field = NSTextField(wrappingLabelWithString: text)
+        field.font = .systemFont(ofSize: size); field.textColor = color
+        return field
+    }
+
+    private func add(_ view: NSView) {
         stack.addArrangedSubview(view)
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.widthAnchor.constraint(equalToConstant: width - 24 - inset).isActive = true
+        view.widthAnchor.constraint(equalToConstant: width).isActive = true
     }
 
     private func layoutCard() {
@@ -174,7 +191,6 @@ final class TranslateCard: NSView {
         stack.layoutSubtreeIfNeeded()
         let size = NSSize(width: width, height: stack.fittingSize.height)
         guard let window else { frame.size = size; background.frame = bounds; stack.frame = background.bounds; return }
-        // Keep the top edge where it is while the content grows.
         var f = window.frame
         f.origin.y += f.height - size.height
         f.size = size
@@ -267,4 +283,103 @@ final class TranslateController {
         window?.orderOut(nil)
         window = nil; card = nil
     }
+}
+
+final class CardDivider: NSView {
+    override var wantsUpdateLayer: Bool { true }
+    override init(frame: NSRect) {
+        super.init(frame: frame)
+        wantsLayer = true
+        translatesAutoresizingMaskIntoConstraints = false
+        heightAnchor.constraint(equalToConstant: 1).isActive = true
+    }
+    required init?(coder: NSCoder) { fatalError() }
+    override func updateLayer() { layer?.backgroundColor = barBorder.cgColor }
+}
+
+let sourceFill = dynamicColor(light: NSColor(srgbRed: 0.95, green: 0.95, blue: 0.97, alpha: 1), dark: NSColor(srgbRed: 0.21, green: 0.21, blue: 0.22, alpha: 1))
+
+final class SourceBlock: NSView {
+    override var wantsUpdateLayer: Bool { true }
+    init(text: String, width: CGFloat) {
+        super.init(frame: .zero)
+        wantsLayer = true
+        layer?.cornerRadius = 8
+        let field = NSTextField(wrappingLabelWithString: text)
+        field.font = .systemFont(ofSize: 12.5); field.textColor = .secondaryLabelColor
+        field.maximumNumberOfLines = 3; field.lineBreakMode = .byWordWrapping; field.isSelectable = true
+        field.cell?.truncatesLastVisibleLine = true
+        field.preferredMaxLayoutWidth = width - 20
+        field.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(field)
+        NSLayoutConstraint.activate([
+            field.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
+            field.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+            field.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+            field.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
+        ])
+    }
+    required init?(coder: NSCoder) { fatalError() }
+    override func updateLayer() { layer?.backgroundColor = sourceFill.cgColor }
+}
+
+final class TranslationText: NSView {
+    init(text: String, width: CGFloat, maxHeight: CGFloat) {
+        let paragraph = NSMutableParagraphStyle(); paragraph.lineSpacing = 3
+        let attributed = NSAttributedString(string: text, attributes: [.font: NSFont.systemFont(ofSize: 15), .foregroundColor: NSColor.labelColor, .paragraphStyle: paragraph])
+        let storage = NSTextStorage(attributedString: attributed)
+        let layout = NSLayoutManager()
+        storage.addLayoutManager(layout)
+        let container = NSTextContainer(size: NSSize(width: width, height: .greatestFiniteMagnitude))
+        container.lineFragmentPadding = 0
+        layout.addTextContainer(container)
+        layout.ensureLayout(for: container)
+        let used = ceil(layout.usedRect(for: container).height)
+        let height = min(used, maxHeight)
+        super.init(frame: NSRect(x: 0, y: 0, width: width, height: height))
+        translatesAutoresizingMaskIntoConstraints = false
+        heightAnchor.constraint(equalToConstant: height).isActive = true
+        let view = NSTextView(frame: NSRect(x: 0, y: 0, width: width, height: used))
+        view.isEditable = false; view.isSelectable = true; view.drawsBackground = false
+        view.textContainerInset = .zero
+        view.textContainer?.lineFragmentPadding = 0
+        view.textStorage?.setAttributedString(attributed)
+        if used > maxHeight {
+            let scroll = NSScrollView(frame: bounds)
+            scroll.drawsBackground = false; scroll.hasVerticalScroller = true; scroll.autohidesScrollers = true
+            scroll.scrollerStyle = .overlay
+            scroll.documentView = view
+            addSubview(scroll)
+        } else {
+            addSubview(view)
+        }
+    }
+    required init?(coder: NSCoder) { fatalError() }
+}
+
+final class DirectionButton: NSButton {
+    override var wantsUpdateLayer: Bool { true }
+    private var hovering = false { didSet { needsDisplay = true } }
+    convenience init(title: String, target: AnyObject, action: Selector) {
+        self.init(frame: .zero)
+        isBordered = false
+        self.target = target; self.action = action
+        wantsLayer = true
+        layer?.cornerRadius = 7
+        image = NSImage(systemSymbolName: "chevron.down", accessibilityDescription: nil)?.withSymbolConfiguration(.init(pointSize: 9, weight: .semibold))
+        imagePosition = .imageTrailing
+        imageHugsTitle = true
+        contentTintColor = .secondaryLabelColor
+        attributedTitle = NSAttributedString(string: title + " ", attributes: [.foregroundColor: NSColor.labelColor, .font: NSFont.systemFont(ofSize: 13, weight: .semibold)])
+        translatesAutoresizingMaskIntoConstraints = false
+        heightAnchor.constraint(equalToConstant: 28).isActive = true
+        addTrackingArea(NSTrackingArea(rect: .zero, options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect], owner: self))
+    }
+    override var intrinsicContentSize: NSSize {
+        let base = super.intrinsicContentSize
+        return NSSize(width: base.width + 16, height: 28)
+    }
+    override func mouseEntered(with event: NSEvent) { hovering = true }
+    override func mouseExited(with event: NSEvent) { hovering = false }
+    override func updateLayer() { layer?.backgroundColor = hovering ? secondaryFill.cgColor : NSColor.clear.cgColor }
 }
