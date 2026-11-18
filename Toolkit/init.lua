@@ -837,6 +837,11 @@ if profile.enabled then
         app.profileSettingsOpened=true
         app.openSettings("generalSection")
         profile.mark("openSettings returned (window created)")
+        local me=hs.application.applicationForPID(hs.processInfo.processID)
+        profile.time("probe: own allWindows (again)",function() return me:allWindows() end)
+        profile.time("probe: hswindow (again)",function() return app.settings:hswindow() end)
+        profile.time("probe: show (again)",function() app.settings:show() end)
+        profile.time("probe: activate (again)",function() me:activate() end)
         app.profileTimers[2]=hs.timer.doAfter(4,function()
             if app.settings then app.settings:hide();hs.dockicon.hide() end
             profile.mark("done");profile.flush()
