@@ -762,7 +762,8 @@ print("Nivlet ready", hs.configdir, hs.settings.bundleID, "bindings", #app.bindi
 profile.mark("ready (menu bar items created)")
 if profile.enabled then
     -- Measure the clipboard menu and the settings window once startup has settled.
-    hs.timer.doAfter(3,function()
+    app.profileTimers={}
+    app.profileTimers[1]=hs.timer.doAfter(3,function()
         local images=0;for _,e in ipairs(clipboard.entries) do if e.kind=="image" then images=images+1 end end
         profile.mark("idle; history entries",#clipboard.entries.." ("..images.." images)")
         profile.time("clipboard menu build (first)",clipboard.menuItems)
@@ -771,7 +772,7 @@ if profile.enabled then
         app.profileSettingsOpened=true
         app.openSettings("generalSection")
         profile.mark("openSettings returned (window created)")
-        hs.timer.doAfter(4,function()
+        app.profileTimers[2]=hs.timer.doAfter(4,function()
             if app.settings then app.settings:hide();hs.dockicon.hide() end
             profile.mark("done");profile.flush()
         end)

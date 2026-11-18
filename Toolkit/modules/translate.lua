@@ -23,6 +23,14 @@ function M.triggersOverlap(a,b)
 end
 local modes={auto=true,['zh-Hans']=true,['zh-Hant']=true,en=true,ja=true,ko=true}
 local tapWindow,pressWindow=0.4,0.35
+-- hs.timer objects without a reference can be collected before they fire, so pending ones are kept here.
+local pending={}
+local function after(seconds,fn)
+    local timer
+    timer=hs.timer.doAfter(seconds,function() pending[timer]=nil;fn() end)
+    pending[timer]=true
+    return timer
+end
 
 function M.defaults()
     return {enabled=false,selectionTrigger='doubleAlt',screenshotTrigger='doubleCtrl',mode='auto',remember=true,showSource=true,autoCopy=false}
@@ -97,7 +105,7 @@ local function selectionFromCopy(done)
     local attempts=0
     local function finish(text)
         if saved and next(saved) then hs.pasteboard.writeAllData(saved) else hs.pasteboard.clearContents() end
-        if clipboard then hs.timer.doAfter(0.6,clipboard.resume) end
+        if clipboard then after(0.6,clipboard.resume) end
         done(text)
     end
     local function check()
@@ -105,10 +113,10 @@ local function selectionFromCopy(done)
         if hs.pasteboard.changeCount()~=before then
             local text=hs.pasteboard.getContents()
             finish(type(text)=='string' and not text:match('^%s*$') and text or nil)
-        elseif attempts<8 then hs.timer.doAfter(0.04,check)
+        elseif attempts<8 then after(0.04,check)
         else finish(nil) end
     end
-    hs.timer.doAfter(0.04,check)
+    after(0.04,check)
 end
 
 local function send(text,anchor,editable)
@@ -164,7 +172,7 @@ local function startWatcher(config)
     for _,item in ipairs({{config.selectionTrigger,M.translateSelection},{config.screenshotTrigger,M.translateScreenshot}}) do
         local trigger=triggers[item[1]]
         local action=item[2]
-        if trigger then table.insert(detectors,M.newTapDetector(trigger.mod,function() hs.timer.doAfter(0,action) end,hs.timer.secondsSinceEpoch,trigger.side)) end
+        if trigger then table.insert(detectors,M.newTapDetector(trigger.mod,function() after(0,action) end,hs.timer.secondsSinceEpoch,trigger.side)) end
     end
     if #detectors==0 then return end
     local types=hs.eventtap.event.types
@@ -181,7 +189,7 @@ local function apply(config)
         startWatcher(config)
         M.capture.setUser('translate',true)
         -- Start the helper and load the common models once, so the first translation is quick.
-        if not M.prewarmed then M.prewarmed=true;hs.timer.doAfter(3,function() M.capture.dispatch({cmd='prewarmTranslation'}) end) end
+        if not M.prewarmed then M.prewarmed=true;after(3,function() M.capture.dispatch({cmd='prewarmTranslation'}) end) end
     else
         stopWatcher()
         M.capture.setUser('translate',false)
@@ -228,9 +236,9 @@ local function replace(event)
     if M.clipboard then M.clipboard.suspend(2) end
     hs.pasteboard.setContents(event.text)
     hs.eventtap.keyStroke({'cmd'},'v',0)
-    hs.timer.doAfter(0.3,function()
+    after(0.3,function()
         if saved and next(saved) then hs.pasteboard.writeAllData(saved) else hs.pasteboard.clearContents() end
-        if M.clipboard then hs.timer.doAfter(0.6,M.clipboard.resume) end
+        if M.clipboard then after(0.6,M.clipboard.resume) end
     end)
 end
 
