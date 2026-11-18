@@ -3,18 +3,19 @@ assert(hs.settings.bundleID == "dev.local.DesktopToolkit", "Unexpected settings 
 assert(not hs.configdir:find(".hammerspoon", 1, true), "Personal configuration detected")
 local root = hs.processInfo.bundlePath .. "/Contents/Resources/Toolkit/"
 package.path = root .. "?.lua;" .. package.path
+local profile = require("modules.profile")
 local i18n = require("modules.i18n")
 local bundleIDs = require("modules.bundle_id")
 local preferences = require("modules.preferences")
 local windows = require("modules.windows")
 local input = require("modules.input_method")
-input.start()
+profile.time("input.start",input.start)
 local clipboard = require("modules.clipboard")
 local system = require("modules.sys_info")
 local browser = require("modules.browser")
 local browserData=require("modules.browser_data")
-browser.start()
-clipboard.start()
+profile.time("browser.start",browser.start)
+profile.time("clipboard.start (history restore)",clipboard.start)
 local capture=require("modules.capture")
 local translate=require("modules.translate")
 local keepAwake=require("modules.keep_awake")
@@ -461,7 +462,7 @@ end
 local function reply(ok, message, action, requestID, saveBatch)
     local permission=permissionState()
     local icons=app.settings and configuredAppIcons()
-    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.translations(),general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),capture=capture.config,capturePermission=capture.permissionGranted(),translate=translate.config,translateSupported=translate.supported(),translateRemembered=translate.memory,excludedAppNames=excludedAppNames(),appIcons=icons,applicationStates=applicationStates(icons),popupShortcut=app.popupShortcut or false,popupShortcutDefault=defaultPopup(),popupShortcutError=app.popupShortcutError and i18n.t(app.popupShortcutError) or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}) .. ")") end
+    if app.settings then local payload=profile.time("reply encode "..tostring(action),hs.json.encode,{ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.translations(),general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),capture=capture.config,capturePermission=capture.permissionGranted(),translate=translate.config,translateSupported=translate.supported(),translateRemembered=translate.memory,excludedAppNames=excludedAppNames(),appIcons=icons,applicationStates=applicationStates(icons),popupShortcut=app.popupShortcut or false,popupShortcutDefault=defaultPopup(),popupShortcutError=app.popupShortcutError and i18n.t(app.popupShortcutError) or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()});profile.mark("reply "..tostring(action).." bytes",#payload);app.settings:evaluateJavaScript("window.receive("..payload..")") end
 end
 local function showSettingsWindow(view)
     hs.dockicon.show()
@@ -597,6 +598,7 @@ function app.openSettings(section, focus)
             reply(validated~=nil,message or "",body.action)
         end
         if body.action == "load" then
+            profile.mark("settings page sent load")
             reply(true, "", "load")
             if app.settingsSection then app.settings:evaluateJavaScript("window.showSection(" .. hs.json.encode({app.settingsSection}) .. "[0])") end
             if app.settingsFocus then app.settings:evaluateJavaScript("document.getElementById("..hs.json.encode({app.settingsFocus}).."[0]).focus()") end
@@ -735,13 +737,15 @@ else
         hs.alert.show(errorMessage)
     elseif popupLoadError then hs.alert.show(i18n.t(app.popupShortcutError)) end
 end
+profile.mark("before launcher.start")
 launcher.start(function(shortcut) if batchCandidates then return batchShortcutConflicts(shortcut,"launcherSection") end;return sleep.conflicts(shortcut) or sameShortcut(shortcut,app.popupShortcut) or (shortcut and popupConflicts(shortcut,app.config)) or capture.conflicts(shortcut) end)
-system.start(function() app.openSettings("systemSection") end)
+profile.time("system.start",system.start,function() app.openSettings("systemSection") end)
 capture.start(function(shortcut)
     if batchCandidates then return batchShortcutConflicts(shortcut,"captureSection") end
     return sleep.conflicts(shortcut) or sameShortcut(shortcut,app.popupShortcut) or popupConflicts(shortcut,app.config) or launcher.conflicts(shortcut)
 end,{copied=function() clipboard.poll() end,permission=function() reply(true,"","refreshPermissionsSilent") end,appearance=function() return app.general.appearance end})
-translate.start(capture,clipboard)
+profile.mark("capture.start")
+profile.time("translate.start",translate.start,capture,clipboard)
 
 function app.arrangeMenus()
     clipboard.menu:removeFromMenuBar():returnToMenuBar():setTitle("")
@@ -755,6 +759,24 @@ hs.dockIconClickCallback = function()
     if app.settings then app.openSettings() else app.openSettings("generalSection") end
 end
 print("Nivlet ready", hs.configdir, hs.settings.bundleID, "bindings", #app.bindings)
+profile.mark("ready (menu bar items created)")
+if profile.enabled then
+    -- Measure the clipboard menu and the settings window once startup has settled.
+    hs.timer.doAfter(3,function()
+        local images=0;for _,e in ipairs(clipboard.entries) do if e.kind=="image" then images=images+1 end end
+        profile.mark("idle; history entries",#clipboard.entries.." ("..images.." images)")
+        profile.time("clipboard menu build (first)",clipboard.menuItems)
+        profile.time("clipboard menu build (again)",clipboard.menuItems)
+        profile.mark("openSettings")
+        app.profileSettingsOpened=true
+        app.openSettings("generalSection")
+        profile.mark("openSettings returned (window created)")
+        hs.timer.doAfter(4,function()
+            if app.settings then app.settings:hide();hs.dockicon.hide() end
+            profile.mark("done");profile.flush()
+        end)
+    end)
+end
 
 
 hs.openPreferences=function() app.openSettings("generalSection") end
