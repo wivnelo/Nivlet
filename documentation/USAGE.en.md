@@ -58,7 +58,9 @@ Enable and save it in Settings → Translation; it is off by default and needs m
 - **Screenshot translation**: press the other modifier key twice (⌃ by default), select an area, and the text is recognized and translated when you release. Needs Screen Recording.
 - Left and right ⌃, ⌥ and ⌘ can be set separately; the two triggers cannot share a key. Pressing another key in between or holding the key does not trigger. Turn off the same double-tap trigger in other tools to avoid two windows.
 - **Direction**: automatic by default (Chinese to English, other languages to Simplified Chinese), or always Simplified Chinese, Traditional Chinese, English, Japanese or Korean. With "Remember my last choice" on, a direction you change in the card is reused for that language; Clear resets it.
-- The card can copy the translation or replace the selected text (editable text only), and can show the original and copy the translation automatically.
+- The card has a header (direction, pin, close), the original in a tinted block, the translation, and an action bar: copy the translation or replace the selected text (editable text only). It can show the original and copy the translation automatically.
+- Translation is meant for quick look-ups: up to about 600 Latin characters or about 200 Chinese, Japanese or Korean characters at a time; for longer text only the first part is translated and the card says so. Several sentences show the first one first; lines that recognition split are rejoined into paragraphs.
+- The system model stays loaded for 50 seconds after a translation, so follow-ups usually take under half a second; the first one after a long pause takes about 1.5 s while macOS reloads it.
 
 ### Window management and app launching
 

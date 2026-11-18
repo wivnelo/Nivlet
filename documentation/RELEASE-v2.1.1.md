@@ -1,0 +1,66 @@
+# Nivlet 2.1.1 · Build 68
+
+macOS 13.0+ · Apple Silicon (arm64) only · Developer ID signed and Apple notarized.
+
+## 简体中文
+
+本版改进系统翻译的速度和翻译卡片的样式，不新增功能。
+
+**翻译更快、更轻**
+- 翻译后 50 秒内保持系统翻译模型已加载：连续翻译时，几个单词从约 1.4 秒缩短到约 0.4–0.5 秒。之后自动停止，空闲时不占资源。
+- 多句文字先显示第一句，其余随后补上：三句话的段落约 0.7 秒就能看到第一句。
+- 截图识别出的、被窗口边缘折断的句子先接成段落再翻译，短标签和列表项仍分开。
+- 翻译定位为随手查看：每次最多约 600 个英文字符或约 200 个中日韩文字，较长内容只翻译前面一部分，卡片上会提示。
+- 去掉了启动后实际不起作用的预热。很久没用后的第一次翻译仍约 1.5 秒，这是系统重新加载模型的时间。
+
+**翻译卡片重新排版**
+- 顶部是翻译方向、钉住和关闭；原文放在浅色底块里，译文为主体，内容较长时可滚动；底部是单独的操作栏。
+- 浅色、深色和四种界面语言均已适配。
+
+**其他**
+- 通用设置的权限说明补上了用途：辅助功能也用于选词翻译，屏幕录制也用于截图翻译。
+
+设置项、配置格式和权限不变。
+
+## English
+
+This release makes system translation faster and redesigns the translation card. It adds no features.
+
+**Faster, lighter translation**
+- The system translation model stays loaded for 50 seconds after each translation, so follow-up translations of a few words take about 0.4–0.5 s instead of 1.4 s. It then stops, using nothing while idle.
+- Text with several sentences shows the first sentence first, then the rest: a three-sentence paragraph shows its first sentence in about 0.7 s.
+- Sentences that recognition split across lines are rejoined into paragraphs before translating; short labels and list items stay separate.
+- Translation is meant for quick look-ups: up to about 600 Latin characters or about 200 Chinese, Japanese or Korean characters at a time. For longer text only the first part is translated, and the card says so.
+- The launch-time warm-up, which had no lasting effect, is gone. The first translation after a long pause still takes about 1.5 s while macOS reloads its model.
+
+**Redesigned translation card**
+- A header with the direction menu, pin and close; the original text in a quiet tinted block; the translation as the main content, scrolling when long; and a separate action bar at the bottom.
+- Works in light and dark mode and all four interface languages.
+
+**Other**
+- The permission descriptions in General now also list selection translation (Accessibility) and screenshot translation (Screen Recording).
+
+Settings, configuration format and permissions are unchanged.
+
+## Downloads / 下载
+
+Choose either the DMG or ZIP. Both contain the same signed, stapled Build 68 app. Use the `.sha256` attachment to verify downloads. Version 1.0.8 / Build 55 remains the final Intel release; historical assets are retained.
+
+## Verification / 验证
+
+All command-line regression files (including a new translation text test for the length cap, line merging and first-sentence split), the privacy scan and the runtime patch check passed locally and in CI. The settings UI suites passed in Simplified Chinese, Traditional Chinese, English and Japanese, light and dark, at 980 and 620 points wide. The translation card was rendered and reviewed in light and dark mode in all four languages. Translation timings were measured on one Apple Silicon Mac (macOS 27.2) with the macOS 26+ translation path; the faster translation was tried by the user on a signed test build. The final app and DMG passed notarization, stapling and Gatekeeper checks; all embedded Mach-O files are arm64.
+
+Translation on macOS 15–25 (SwiftUI path), other Mac/macOS combinations and a live Sparkle installation of Build 68 have not been claimed as tested.
+
+## Source and artifacts / 源码与产物
+
+Product source: `9667db6e375abfdbe7fa858e86caad24cf4a5f63`. The release tag adds public documentation and refreshed media; it does not change product files. The notarized package was built from this commit in a neutral temporary directory, with the Hammerspoon runtime rebuilt from the pinned upstream commit and `patches/series`, then trimmed by `scripts/trim-runtime.py`.
+
+| Asset | SHA-256 |
+| --- | --- |
+| `Nivlet-2.1.1-build68-arm64.zip` | `6ea27629280f26bcb4cdf0ee0faa04319f1f02f4e1a97331f2d49d6e62a3a2fa` |
+| `Nivlet-2.1.1-build68-arm64.dmg` | `64d7c0c94c6b54ecdd79ff530d76c1967f2309dd9bbbca11fd1d02e912e75fb9` |
+
+ZIP: 8,192,092 bytes (2.1.0: 8,175,613); DMG: 9,365,881 bytes (2.1.0: 9,353,727). App notarization `32144453-73a2-4bb0-a313-da77f164a394` and DMG notarization `aab8495a-8b7a-46f4-b776-2b8c192ff402` were Accepted.
+
+[Release](https://github.com/wivnelo/Nivlet/releases/tag/v2.1.1) · [Installation](INSTALLATION.en.md) · [使用指南](USAGE.md)

@@ -1,6 +1,15 @@
 # Nivlet 会话交接 · 2026-11-18
 
-## 当前状态 · 2.1.0 / Build 67
+## 当前状态 · 2.1.1 / Build 68
+
+翻译提速与卡片重排的补丁版，不新增功能。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.1.1 版本说明](documentation/RELEASE-v2.1.1.md)。产品源码 `9667db6`，仅 Apple Silicon。
+
+- `Native/capture/TranslationPlan.swift`：合并折行、按权重截断（拉丁字符 1、中日韩 3，上限 600）、首句单独成段；`tests/translation_plan.py` 编译并运行 `tests/translation_plan.swift`。
+- `SystemTranslator`：语言对可用性只查一次，翻译后 50 秒内每 4 秒翻译一个字母保持模型加载，之后停止；启动预热已删除。调研数据：系统翻译模型空闲约 5–8 秒卸载，冷启动 1.3–1.75 秒，热 0.36 秒，并行无收益。
+- 翻译卡片分为顶部栏、内容区（原文浅色底块、译文可滚动）和底部操作栏；自测版（`-D NIVLET_SELFTEST`）有 `selftest-card` 命令把卡片渲染成 PNG，用于逐语言、深浅色检查。
+- 通用规则（`011_Codes/AGENTS.md`）新增“代码不写注释”。发版及发布后收尾（官网、README、媒体、本机正式版、知识库、清理）见本机 skill `nivlet-release`。
+
+## 历史 · 2.1.0 / Build 67
 
 功能版：截图（C3 S1 及贴图）与系统翻译（C6 T1、T2）随本版发布，并做了一轮速度与内存优化。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.1.0 版本说明](documentation/RELEASE-v2.1.0.md)。产品源码 `7e2577f`，仅 Apple Silicon。
 

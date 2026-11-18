@@ -1,4 +1,12 @@
-# 当前验收：2.1.0 / Build 67
+# 当前验收：2.1.1 / Build 68
+
+64 项命令行回归本地与 CI 通过，新增 `tests/translation_plan.py`（长度上限、折行合并、标签与列表分开、首句拆分、拼接与部分结果）。37 组设置页 UI 测试在简中、繁中、英文、日文 × 浅色/深色，980 与 620 点宽各运行一遍，全部通过。翻译卡片用自测命令在四语言 × 深浅色下渲染为图片并逐张查看，包括长文截断提示。
+
+候选包：版本 2.1.1 / 68，Toolkit 与源码 `9667db6` 一致（另含 LICENSE、THIRD-PARTY-NOTICES.md、nivlet-icon.png、system-probe、capture-helper），67 个 Mach-O 均为 arm64，`strings` 无个人路径，`docs.json` 为 `[]`，发行版 capture-helper 不含 selftest 字符串，`release_architecture` 与 `signing_preflight` 通过。本机 Developer ID 签名副本替换安装：启动完成并创建菜单栏项，设置窗口 `document.hasFocus()` 为 true。App 公证 `32144453-73a2-4bb0-a313-da77f164a394`、DMG 公证 `aab8495a-8b7a-46f4-b776-2b8c192ff402` 均 Accepted，票据与 Gatekeeper 通过；appcast 候选通过版本、SHA-256、EdDSA 签名与篡改拒绝检查。
+
+翻译实测（单台 Apple Silicon Mac，macOS 27.2，独立运行同源助手）：首次 3 个单词 1.64 s；20 s 后 0.48 s；3 s 后 0.40 s；三句段落首句 0.65 s、全部 1.70 s；5 行首行 0.48 s；长文截断首句 0.69 s、全部 2.63 s；空闲 70 s 后 1.52 s（保温已停止）。用户在测试包上试用了提速后的翻译。未覆盖：macOS 15–25 翻译路径、Sparkle 实际升级。
+
+## 历史验收：2.1.0 / Build 67
 
 63 项命令行回归（Lua、Python、非 UI JS、隐私扫描、运行时补丁一致性、运行时裁剪、版本中性）本地通过；37 组设置页 UI 测试在隔离浏览器中以简中、繁中、英文、日文 × 浅色/深色，980 与 620 点宽各运行一遍，全部通过。新增回归覆盖截图配置与保存、助手调度与权限检查、翻译触发键（含左右侧）与重叠校验、剪贴板原始 PNG 指纹、小预览图持久化与原图释放、菜单文字截断缓存、网速采样暂停、设置窗口不做窗口查找等。
 
