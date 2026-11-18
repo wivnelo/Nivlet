@@ -41,3 +41,10 @@ c.entries={};c.start();assert(not c.config.enabled and not c.timer and #c.entrie
 assert(c.copy(c.entries[1].id));assert(c.pause==nil)
 c.clear();assert(#stored['desktoptoolkit.clipboard.history.v1']==0 and not io.open(kept,'rb'))
 print('Image cap, thumbnail snapshot, cache reload/expiry and Option paste permission guard passed')
+
+-- Memory: once written, the full image is not kept; it is read from disk for each use.
+cfg.enabled=true;cfg.persistent=true;assert(c.save(cfg));c.entries={};image=imageMock;variant=99;count=count+1;c.poll();assert(c.persist())
+local e=c.entries[1];assert(e.path and e.previewPath and e.width==20 and e.image==nil,'Written images drop the full image')
+assert(c.copy(e.id) and e.image==nil,'Copying reads the file without keeping it')
+cfg.enabled=true;cfg.persistent=false;assert(c.save(cfg));assert(e.image==imageMock and not e.path,'Turning history off keeps the image for this session')
+print('Full images are released after writing and restored when history stops being saved passed')

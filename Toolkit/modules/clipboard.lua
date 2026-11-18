@@ -40,10 +40,11 @@ local function shrink(image,maxW,maxH)
     local small=canvas:imageFromCanvas();canvas:delete()
     return small
 end
--- Full image: kept in memory for new copies, read from the history file for restored ones.
+-- Full image: held in memory only until the history file is written; after that it is read from
+-- disk for each use and not kept, so ten restored screenshots do not hold ~250 MB.
 function M.imageOf(entry)
-    if not entry.image and entry.kind=="image" and managed(entry.path) then entry.image=hs.image.imageFromPath(entry.path) end
-    return entry.image
+    if entry.image then return entry.image end
+    if entry.kind=="image" and managed(entry.path) then return hs.image.imageFromPath(entry.path) end
 end
 -- Menu-sized preview (≤360×260), stored next to the history file. Older records get one on first use.
 local function previewOf(entry)
@@ -64,7 +65,8 @@ local function thumbOf(entry)
 end
 local function sizeOf(entry)
     if not entry.width then
-        local size=M.imageOf(entry) and entry.image:size()
+        local image=M.imageOf(entry)
+        local size=image and image:size()
         if size then
             entry.width,entry.height=size.w,size.h
             if entry.path then M.pendingHistoryWrite=true end
@@ -84,7 +86,11 @@ end
 function M.persist()
     if not M.config.persistent then
         hs.settings.clear(historyKey)
-        for _,entry in ipairs(M.entries) do remove(entry) end
+        -- Entries stay in memory for this session, so images are read back before their files go.
+        for _,entry in ipairs(M.entries) do
+            if entry.kind=="image" and not entry.image then entry.image=M.imageOf(entry) end
+            remove(entry)
+        end
         historyPersisted()
         return true
     end
@@ -108,6 +114,9 @@ function M.persist()
                 local previewPath=entry.path:gsub("%.png$",".preview.png")
                 if preview.saveToFile and preview:saveToFile(previewPath,true,"PNG") then entry.previewPath=previewPath end
             end
+            if entry.preview and not entry.width and entry.image then local size=entry.image:size();entry.width,entry.height=size.w,size.h end
+            -- Written to disk: the full image is read back only when it is copied, pinned or opened.
+            if entry.preview and entry.width then entry.image=nil end
             -- Fingerprint and size are stored so startup never has to decode and re-encode images.
             table.insert(saved,{id=entry.id,kind="image",time=entry.time,path=entry.path,previewPath=entry.previewPath,width=entry.width,height=entry.height,source=entry.source,fingerprint=entry.fingerprint,bytes=entry.menuBytes})
         else table.insert(saved,{id=entry.id,kind="text",time=entry.time,text=entry.text}) end
