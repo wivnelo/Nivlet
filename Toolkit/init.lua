@@ -464,6 +464,13 @@ local function reply(ok, message, action, requestID, saveBatch)
     local icons=app.settings and configuredAppIcons()
     if app.settings then local payload=profile.time("reply encode "..tostring(action),hs.json.encode,{ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.translations(),general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),capture=capture.config,capturePermission=capture.permissionGranted(),translate=translate.config,translateSupported=translate.supported(),translateRemembered=translate.memory,excludedAppNames=excludedAppNames(),appIcons=icons,applicationStates=applicationStates(icons),popupShortcut=app.popupShortcut or false,popupShortcutDefault=defaultPopup(),popupShortcutError=app.popupShortcutError and i18n.t(app.popupShortcutError) or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()});profile.mark("reply "..tostring(action).." bytes",#payload);app.settings:evaluateJavaScript("window.receive("..payload..")") end
 end
+-- Background status refreshes (window focus, permission checks, helper events) often arrive together;
+-- they are merged into one reply, since each reply re-sends and re-renders the whole settings state.
+local silentTimer
+local function silentRefresh()
+    if silentTimer or not app.settings then return end
+    silentTimer=hs.timer.doAfter(0.08,function() silentTimer=nil;reply(true,"","refreshPermissionsSilent") end)
+end
 local function showSettingsWindow(view)
     hs.dockicon.show()
     view:level(hs.drawing.windowLevels.normal):show()
@@ -545,7 +552,7 @@ function app.openSettings(section, focus)
             if type(body.bundleIDs)=="table" then for _,id in ipairs(body.bundleIDs) do
                 if #requestedApps<500 and bundleIDs.valid(id) then table.insert(requestedApps,id) end
             end end
-            capture.checkPermission(function() reply(true,"","refreshPermissionsSilent") end)
+            capture.checkPermission(function() silentRefresh() end)
             return
         end
         if body.action=="requestScreenRecording" then
@@ -575,12 +582,12 @@ function app.openSettings(section, focus)
             reply(ok,ok and "" or i18n.t("无法打开登录项设置，请手动打开系统设置"),body.action)
             return
         end
-        if body.action=="refreshPermissions" or body.action=="load" then capture.checkPermission(function() reply(true,"","refreshPermissionsSilent") end) end
+        if body.action=="refreshPermissions" or body.action=="load" then capture.checkPermission(function() silentRefresh() end) end
         if body.action=="refreshPermissions" then
             local permission=permissionState()
             local state=permission.accessibility
             local message=state=="granted" and i18n.t("检测完成：辅助功能权限已开启") or state=="denied" and i18n.t("检测完成：辅助功能权限未开启") or i18n.t("权限检测失败，请重新检测")
-            reply(state~="error",body.silent and "" or message,body.silent and "refreshPermissionsSilent" or body.action)
+            if body.silent then silentRefresh() else reply(state~="error",message,body.action) end
         end
         if body.action=="openAccessibility" then
             local opened=permissions.openSettings()
@@ -656,9 +663,10 @@ function app.openSettings(section, focus)
             for _,item in ipairs(clipboard.entries) do if item.id==body.id and item.kind=="image" then entry=item end end
             if not entry then reply(false,i18n.t("图片已过期或被清除"),body.action);return end
             local path=os.tmpname()..".png"
-            if not entry.image:saveToFile(path,true,"PNG") then reply(false,i18n.t("无法钉住这张图片"),body.action);return end
+            local image=clipboard.imageOf(entry)
+            if not image or not image:saveToFile(path,true,"PNG") then reply(false,i18n.t("无法钉住这张图片"),body.action);return end
             -- The saved file loses its Retina DPI, so pass the on-screen size along with it.
-            local ok,message=capture.pinFile(path,entry.image:size())
+            local ok,message=capture.pinFile(path,image:size())
             if not ok then os.remove(path) end
             reply(ok,ok and "" or message,body.action)
             return
@@ -743,7 +751,7 @@ profile.time("system.start",system.start,function() app.openSettings("systemSect
 capture.start(function(shortcut)
     if batchCandidates then return batchShortcutConflicts(shortcut,"captureSection") end
     return sleep.conflicts(shortcut) or sameShortcut(shortcut,app.popupShortcut) or popupConflicts(shortcut,app.config) or launcher.conflicts(shortcut)
-end,{copied=function() clipboard.poll() end,permission=function() reply(true,"","refreshPermissionsSilent") end,appearance=function() return app.general.appearance end})
+end,{copied=function() clipboard.poll() end,permission=function() silentRefresh() end,appearance=function() return app.general.appearance end})
 profile.mark("capture.start")
 profile.time("translate.start",translate.start,capture,clipboard)
 
@@ -794,7 +802,7 @@ function app.showUpdateRecovery()
     end
 end
 app.showUpdateRecovery()
-permissions.watch(function() reply(true,"","refreshPermissionsSilent") end)
+permissions.watch(function() silentRefresh() end)
 
 local powerStarted,powerMessage=keepAwake.configure(app.general.keepAwake,app.general.keepDisplayOn)
 if not powerStarted then

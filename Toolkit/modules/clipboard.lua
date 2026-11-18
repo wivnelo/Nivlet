@@ -20,10 +20,53 @@ end
 local historyKey="desktoptoolkit.clipboard.history.v1"
 local function directory() return hs.configdir.."/clipboard-history/" end
 local function managed(path)
-    return type(path)=="string" and path:sub(1,#directory())==directory() and path:sub(#directory()+1):match("^clip_%d+_%d+%.png$")
+    local name=type(path)=="string" and path:sub(1,#directory())==directory() and path:sub(#directory()+1)
+    return name and (name:match("^clip_%d+_%d+%.png$") or name:match("^clip_%d+_%d+%.preview%.png$")) and true or false
 end
 local function remove(entry)
     if managed(entry.path) then os.remove(entry.path);entry.path=nil end
+    if managed(entry.previewPath) then os.remove(entry.previewPath);entry.previewPath=nil end
+end
+-- Small copies of an image, drawn once. Image objects only carry a display size, so the menu and the
+-- settings page used to decode full screenshots (820 ms for the first ⌘⇧V menu with ten captures,
+-- 1.6 MB per settings refresh). Now the full image is read only to copy, pin or open it.
+local function shrink(image,maxW,maxH)
+    local size=image and image:size()
+    if not size or size.w<=0 or size.h<=0 then return nil end
+    local scale=math.min(1,maxW/size.w,maxH/size.h)
+    local w,h=math.max(1,math.floor(size.w*scale+.5)),math.max(1,math.floor(size.h*scale+.5))
+    local canvas=hs.canvas.new({x=0,y=0,w=w,h=h})
+    canvas[1]={type="image",image=image,imageScaling="scaleToFit",frame={x=0,y=0,w=w,h=h}}
+    local small=canvas:imageFromCanvas();canvas:delete()
+    return small
+end
+-- Full image: kept in memory for new copies, read from the history file for restored ones.
+function M.imageOf(entry)
+    if not entry.image and entry.kind=="image" and managed(entry.path) then entry.image=hs.image.imageFromPath(entry.path) end
+    return entry.image
+end
+-- Menu-sized preview (≤360×260), stored next to the history file. Older records get one on first use.
+local function previewOf(entry)
+    if not entry.preview and entry.kind=="image" then
+        local image=M.imageOf(entry)
+        entry.preview=image and shrink(image,360,260)
+        if entry.preview and entry.path and not entry.previewPath then M.pendingHistoryWrite=true end
+    end
+    return entry.preview
+end
+local function thumbOf(entry)
+    if not entry.thumb and entry.kind=="image" then
+        local preview=previewOf(entry)
+        entry.thumb=preview and shrink(preview,120,120)
+    end
+    return entry.thumb
+end
+local function sizeOf(entry)
+    if not entry.width then
+        local size=M.imageOf(entry) and entry.image:size()
+        if size then entry.width,entry.height=size.w,size.h end
+    end
+    return entry.width,entry.height
 end
 local function ensureDirectory()
     local path=directory():sub(1,-2)
@@ -56,8 +99,13 @@ function M.persist()
                 entry.path=path
             end
             entry.png=nil
+            local preview=entry.preview or entry.previewPath==nil and previewOf(entry)
+            if preview and not entry.previewPath then
+                local previewPath=entry.path:gsub("%.png$",".preview.png")
+                if preview.saveToFile and preview:saveToFile(previewPath,true,"PNG") then entry.previewPath=previewPath end
+            end
             -- Fingerprint and size are stored so startup never has to decode and re-encode images.
-            table.insert(saved,{id=entry.id,kind="image",time=entry.time,path=entry.path,source=entry.source,fingerprint=entry.fingerprint,bytes=entry.menuBytes})
+            table.insert(saved,{id=entry.id,kind="image",time=entry.time,path=entry.path,previewPath=entry.previewPath,width=entry.width,height=entry.height,source=entry.source,fingerprint=entry.fingerprint,bytes=entry.menuBytes})
         else table.insert(saved,{id=entry.id,kind="text",time=entry.time,text=entry.text}) end
     end
     if hs.settings.set(historyKey,saved)==false then return false,i18n.t("保存失败，请检查设置") end
@@ -137,11 +185,6 @@ local function pngBytes(encoded)
     local base64=encoded and encoded:match("base64,(.*)")
     return base64 and math.floor(#base64*3/4)-(base64:match("==$") and 2 or base64:match("=$") and 1 or 0) or 0
 end
-local function thumbnail(image)
-    local size=image:size()
-    local scale=math.min(1,120/math.max(size.w,size.h))
-    return image:setSize({w=size.w*scale,h=size.h*scale})
-end
 function M.load()
     if not M.config.persistent then return end
     local saved=hs.settings.get(historyKey)
@@ -160,10 +203,16 @@ function M.load()
                     -- Restoring used to re-encode every image to PNG/base64 for a fingerprint, which
                     -- pushed startup past 2 GB with full-screen captures. Saved records now carry the
                     -- fingerprint; older ones simply are not de-duplicated against new copies.
-                    local image=hs.image.imageFromPath(entry.path)
+                    -- The full image stays on disk until it is copied, pinned or opened; the menu and the
+                    -- settings page use the small stored preview.
                     local fingerprint=type(entry.fingerprint)=="string" and entry.fingerprint or nil
                     local bytes=type(entry.bytes)=="number" and entry.bytes or attr.size
-                    if image then item={id=entry.id,time=entry.time,kind="image",image=image,path=entry.path,source=entry.source=="capture" and "capture" or nil,thumb=thumbnail(image),fingerprint=fingerprint,menuBytes=bytes} end
+                    local previewPath=managed(entry.previewPath) and entry.previewPath or nil
+                    local preview=previewPath and hs.fs.symlinkAttributes(previewPath) and hs.image.imageFromPath(previewPath) or nil
+                    local width=type(entry.width)=="number" and entry.width>0 and entry.width or nil
+                    local height=width and type(entry.height)=="number" and entry.height>0 and entry.height or nil
+                    item={id=entry.id,time=entry.time,kind="image",path=entry.path,previewPath=preview and previewPath or nil,preview=preview,width=height and width,height=height,source=entry.source=="capture" and "capture" or nil,fingerprint=fingerprint,menuBytes=bytes}
+                    if not preview and not M.imageOf(item) then item=nil end
                 end
             end
         end
@@ -209,7 +258,7 @@ function M.poll()
         if kind==captureMarker then source="capture" end
     end
     local image=M.config.images and hs.pasteboard.readImage() or nil
-    local value,thumb,fingerprint,bytes,png
+    local value,fingerprint,bytes,png,width,height
     if image then
         local size=image:size()
         if size.w<=0 or size.h<=0 or size.w*size.h>25000000 then return end
@@ -227,7 +276,7 @@ function M.poll()
             fingerprint=hs.hash.SHA256(encoded)
             bytes=pngBytes(encoded)
         end
-        thumb=thumbnail(image)
+        width,height=size.w,size.h
     else
         value=hs.pasteboard.getContents()
         if type(value)~="string" or value=="" or #value>65536 then return end
@@ -239,7 +288,7 @@ function M.poll()
     end
     M.nextID=M.nextID+1
     -- PNG bytes are kept only until the history file is written (persistent history only).
-    table.insert(M.entries,1,{id=M.nextID,kind=image and "image" or "text",source=image and source or nil,text=value,image=image,thumb=thumb,fingerprint=fingerprint,menuBytes=bytes,png=M.config.persistent and png or nil,time=hs.timer.secondsSinceEpoch()})
+    table.insert(M.entries,1,{id=M.nextID,kind=image and "image" or "text",source=image and source or nil,text=value,image=image,width=width,height=height,fingerprint=fingerprint,menuBytes=bytes,png=M.config.persistent and png or nil,time=hs.timer.secondsSinceEpoch()})
 
 
     M.pendingHistoryWrite=true
@@ -278,7 +327,7 @@ function M.copy(id,target)
         if entry.id==id then
             if target and not require("modules.permissions").isGranted() then return false,i18n.t("直接粘贴需要辅助功能权限，请前往通用设置检查") end
             local ok
-            if entry.kind=="image" then ok=hs.pasteboard.writeObjects(entry.image) else ok=hs.pasteboard.setContents(entry.text) end
+            if entry.kind=="image" then local image=M.imageOf(entry);ok=image and hs.pasteboard.writeObjects(image) else ok=hs.pasteboard.setContents(entry.text) end
             if not ok then return false,i18n.t("复制失败") end
             M.lastCount=hs.pasteboard.changeCount()
             if target then hs.timer.doAfter(0.15,function() if target:isRunning() then hs.eventtap.keyStroke({"cmd"},"v",0,target) end end) end
@@ -300,7 +349,8 @@ function M.preview(id)
     M.prune()
     for _,entry in ipairs(M.entries) do
         if entry.id==id and entry.kind=="image" then
-            local url=entry.image:encodeAsURLString(true,"PNG")
+            local image=M.imageOf(entry)
+            local url=image and image:encodeAsURLString(true,"PNG")
             if not url or #url>13981070 then return nil,i18n.t("图片无法预览或超出容量限制") end
             return {id=entry.id,time=entry.time,url=url}
         end
@@ -308,7 +358,8 @@ function M.preview(id)
     return nil,i18n.t("图片已过期或被清除")
 end
 function M.thumbURL(entry)
-    if entry.thumb and not entry.thumbURL then entry.thumbURL=entry.thumb:encodeAsURLString(false,"PNG") end
+    local thumb=not entry.thumbURL and thumbOf(entry)
+    if thumb then entry.thumbURL=thumb:encodeAsURLString(false,"PNG") end
     return entry.thumbURL
 end
 function M.snapshot()
@@ -358,26 +409,22 @@ function M.menuItems()
         if imageCount>0 and index==imageCount+1 then table.insert(menu,{title="-"}) end
         local isImage=entry.kind=="image"
         local text=entry.text and menuLabel(entry.text) or i18n.t("图片 ")..os.date("%H:%M:%S",math.floor(entry.time))
-        if isImage and entry.image then
-            local size=entry.image:size()
-            entry.menuBytes=entry.menuBytes or pngBytes(entry.image:encodeAsURLString(true,"PNG"))
+        local width,height
+        if isImage then width,height=sizeOf(entry) end
+        if width then
+            entry.menuBytes=entry.menuBytes or pngBytes(M.imageOf(entry):encodeAsURLString(true,"PNG"))
             local bytes=entry.menuBytes
             local amount=bytes<1048576 and string.format("%.0f KB",bytes/1024) or string.format("%.1f MB",bytes/1048576)
-            text=string.format("%s %.0f×%.0f · %s · %s",i18n.t("图片"),size.w,size.h,amount,os.date("%m-%d %H:%M",math.floor(entry.time)))
+            text=string.format("%s %.0f×%.0f · %s · %s",i18n.t("图片"),width,height,amount,os.date("%m-%d %H:%M",math.floor(entry.time)))
         end
         local icon
-        if isImage then entry.menuThumb=entry.menuThumb or menuThumbnail(entry.image or entry.thumb,"image");icon=entry.menuThumb
+        if isImage then entry.menuThumb=entry.menuThumb or menuThumbnail(thumbOf(entry),"image");icon=entry.menuThumb
         else textMenuIcon=textMenuIcon or menuThumbnail(nil,"text");icon=textMenuIcon end
         local function select(mods) local ok,message=M.copy(entry.id,mods and mods.alt and target or nil);if not ok then hs.alert.show(message) end end
         local submenu
-        if isImage and entry.image then
-            if not entry.menuPreview then
-                local size=entry.image:size();local scale=math.min(1,360/size.w,260/size.h)
-                local canvas=hs.canvas.new({x=0,y=0,w=size.w*scale,h=size.h*scale})
-                canvas[1]={type="image",image=entry.image,imageScaling="scaleToFit",frame={x=0,y=0,w="100%",h="100%"}}
-                entry.menuPreview=canvas:imageFromCanvas();canvas:delete()
-            end
-            submenu={{title="",image=entry.menuPreview,tooltip=text,fn=select}}
+        local preview=isImage and previewOf(entry)
+        if preview then
+            submenu={{title="",image=preview,tooltip=text,fn=select}}
         end
         table.insert(menu,{title=text,image=icon,tooltip=entry.text or text,menu=submenu,fn=select})
     end

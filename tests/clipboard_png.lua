@@ -15,7 +15,7 @@ hs={hash={SHA256=function(v) return 'sha('..#v..')' end},configdir=directory,
  timer={secondsSinceEpoch=function() return now end,doEvery=function() return {stop=function() end} end,doAfter=function() return {stop=function() end} end},
  pasteboard={changeCount=function() return count end,contentTypes=function() return {'public.png'} end,readImage=function() return imageMock end,
   readDataForUTI=function(_,uti) return png..count end,getContents=function() return nil end}}
-hs.canvas={new=function() return {imageFromCanvas=function() return {} end,delete=function() end} end}
+hs.canvas={new=function() return {imageFromCanvas=function() return {size=function() return {w=10,h=5} end,encodeAsURLString=function() return 'data:image/png;base64,small' end,saveToFile=function(_,path) local f=io.open(path,'wb');if not f then return false end;f:write('small');f:close();return true end} end,delete=function() end} end}
 local c=require('modules.clipboard');c.start();local cfg=c.defaults();cfg.enabled=true;cfg.persistent=true;assert(c.save(cfg))
 -- readDataForUTI is called as hs.pasteboard.readDataForUTI("public.png"): first argument is the UTI.
 hs.pasteboard.readDataForUTI=function(uti) assert(uti=='public.png');return png..count end

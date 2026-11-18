@@ -12,7 +12,7 @@ hs={hash={SHA256=function(value) return value end},configdir=directory,settings=
  application={frontmostApplication=function() return {bundleID=function() return 'org.test.app' end,isRunning=function() return true end} end},
  eventtap={keyStroke=function() keys=keys+1 end},timer={secondsSinceEpoch=function() return now end,doEvery=function() return {stop=function() end} end,doAfter=function(delay,fn) if delay==0.15 then fn() end;return {stop=function() end} end},
  pasteboard={changeCount=function() return count end,contentTypes=function() return {'public.png'} end,readImage=function() return image end,getContents=function() return nil end,writeObjects=function(v) assert(v==imageMock);writes=writes+1;count=count+1;return true end}}
-hs.canvas={new=function() return {imageFromCanvas=function() return {} end,delete=function() end} end}
+hs.canvas={new=function() return {imageFromCanvas=function() return {size=function() return {w=10,h=5} end,encodeAsURLString=function() return 'data:image/png;base64,small' end,saveToFile=function(_,path) local f=io.open(path,'wb');if not f then return false end;f:write('small');f:close();return true end} end,delete=function() end} end}
 local c=require('modules.clipboard');c.start();local cfg=c.defaults();cfg.enabled=true;cfg.persistent=true;assert(c.save(cfg))
 image=imageMock;for i=1,12 do variant=i;count=count+1;c.poll() end
 assert(#c.entries==10 and #stored['desktoptoolkit.clipboard.history.v1']==10)
@@ -21,6 +21,7 @@ local path=c.entries[1].path;assert(path and io.open(path,'rb'))
 assert(c.preview(c.entries[1].id).url:find('data:image/png',1,true));assert(not c.preview(-1))
 local snap=c.snapshot();assert(snap.entries[1].preview and not snap.entries[1].image)
 c.entries={};c.load();assert(#c.entries==10 and c.entries[1].kind=='image')
+assert(c.entries[1].previewPath and io.open(c.entries[1].previewPath,'rb') and c.entries[1].image==nil and c.entries[1].width==20,'Restored images load only the stored preview')
 assert(c.entries[1].fingerprint=='data:image/png;base64,fixture12','Restored images keep their saved fingerprint without re-encoding')
 count=count+1;c.poll()
 local same=0;for _,e in ipairs(c.entries) do if e.fingerprint=='data:image/png;base64,fixture12' then same=same+1 end end
@@ -29,7 +30,9 @@ c.entries={c.entries[1]}
 assert(c.copy(c.entries[1].id));assert(writes==1)
 local menu=c.menuItems();menu[3].fn({alt=true});assert(writes==2 and keys==1)
 hs.accessibilityState=function() return false end;assert(not c.copy(c.entries[1].id,hs.application.frontmostApplication()) and writes==2)
+local previewPath=c.entries[1].previewPath
 now=now+cfg.minutes*60;c.prune();assert(#c.entries==0 and not io.open(path,'rb'))
+assert(not io.open(previewPath,'rb'),'Expired images remove their preview file too')
 assert(#stored['desktoptoolkit.clipboard.history.v1']==0 and not c.preview(1))
 image=imageMock;count=count+1;c.poll();local kept=c.entries[1].path
 cfg.enabled=false;assert(c.save(cfg));assert(#c.entries==1 and not c.timer and io.open(kept,'rb'))

@@ -42,7 +42,7 @@ local function fixture(saved,failSettings)
     },application={frontmostApplication=function() return {bundleID=function() return state.bundle end} end},
     fs={symlinkAttributes=function() return state.allowDirectory and {mode='directory'} or nil end,mkdir=function() return false end},
     alert={show=function() state.alerts=state.alerts+1 end},
-    canvas={new=function() return {imageFromCanvas=function() return {} end,delete=function() end} end}}
+    canvas={new=function() return {imageFromCanvas=function() return {size=function() return {w=10,h=5} end,encodeAsURLString=function() return 'data:image/png;base64,small' end,saveToFile=function(_,path) local f=io.open(path,'wb');if not f then return false end;f:write('small');f:close();return true end} end,delete=function() end} end}}
     package.loaded['modules.clipboard']=nil
     local module=require('modules.clipboard');module.start()
     return module,state

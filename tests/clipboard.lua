@@ -6,7 +6,7 @@ hs={settings={clear=function() end,get=function() return saved end,set=function(
  application={frontmostApplication=function() return {bundleID=function() return bundle end} end},
  pasteboard={readImage=function() return nil end,changeCount=function() return count end,contentTypes=function() return types end,
  getContents=function() reads=reads+1;return text end,setContents=function(v) text=v;count=count+1;return true end}}
-hs.canvas={new=function() return {imageFromCanvas=function() return {} end,delete=function() end} end}
+hs.canvas={new=function() return {imageFromCanvas=function() return {size=function() return {w=10,h=5} end,encodeAsURLString=function() return 'data:image/png;base64,small' end,saveToFile=function(_,path) local f=io.open(path,'wb');if not f then return false end;f:write('small');f:close();return true end} end,delete=function() end} end}
 local m=require('modules.clipboard');m.start();assert(starts==0 and reads==0)
 local config=m.defaults();config.enabled=true;config.limit=10;config.minutes=1;config.excluded={'org.test.passwords'}
 assert(m.save(config));m.poll();assert(#m.entries==0 and reads==0)
