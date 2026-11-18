@@ -520,13 +520,18 @@ local function ownWindow(view)
     return view:hswindow()
 end
 local function showSettingsWindow(view)
+    local mark=profile and profile.mark or function() end
     hs.dockicon.show()
     view:level(hs.drawing.windowLevels.normal):show()
+    mark("  window: show")
     local window=ownWindow(view)
+    mark("  window: found")
     if window then
         local owner=window:application()
         if owner then owner:activate() end
+        mark("  window: activated")
         window:focus()
+        mark("  window: focused")
     end
 end
 function app.requestLeave(intent)
