@@ -38,6 +38,7 @@ final class TranslateCard: NSView {
     private var request: TranslateRequest!
     private var source = "en", target = "zh-Hans"
     private var result = ""
+    private var plan: TranslationPlan?
     private var token = 0
     private(set) var pinned = false
     private var pinButton: ToolButton?
@@ -80,39 +81,24 @@ final class TranslateCard: NSView {
         token += 1
         let current = token
         guard #available(macOS 15.0, *) else { render(state: .failed(t("needsMacOS15"))); return }
-        let text = request.text, from = source, to = target
-        let lines = text.split(whereSeparator: \.isNewline).map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
-        if lines.count > 1 {
-            Task { @MainActor in
-                var parts = [String?](repeating: nil, count: lines.count)
-                let started = Date()
-                do {
-                    try await SystemTranslator.shared.translateLines(lines, from: from, to: to) { index, line in
-                        guard current == self.token else { return }
-                        if index < 0 { parts = [line] } else if parts.indices.contains(index) { parts[index] = line }
-                        self.result = parts.compactMap { $0 }.joined(separator: "\n")
-                        self.render(state: parts.contains(where: { $0 == nil }) ? .partial : .done)
-                    }
-                    guard current == token else { return }
-                    onEvent(["event": "translated", "ms": Int(Date().timeIntervalSince(started) * 1000), "lines": lines.count])
-                    render(state: .done)
-                    if request.autoCopy { copy(result, flash: nil) }
-                } catch {
-                    guard current == token else { return }
-                    if (error as? TranslateError) == .unsupported, retryAsEnglish() { return }
-                    render(state: .failed((error as? TranslateError) == .unsupported ? t("pairUnsupported") : t("translateFailed")))
-                }
-            }
-            return
-        }
+        let plan = TranslationPlan.make(request.text)
+        self.plan = plan
+        guard !plan.segments.isEmpty else { render(state: .failed(t("translateFailed"))); return }
+        let from = source, to = target
         Task { @MainActor in
+            var parts = [String?](repeating: nil, count: plan.segments.count)
+            let started = Date()
+            var firstMs: Int?
             do {
-                let started = Date()
-                let translated = try await SystemTranslator.shared.translate(text, from: from, to: to)
-                let timing = SystemTranslator.shared.lastTiming
-                onEvent(["event": "translated", "ms": Int(Date().timeIntervalSince(started) * 1000), "checkMs": timing.check, "translateMs": timing.translate])
+                try await SystemTranslator.shared.translate(plan.segments.map(\.text), from: from, to: to) { index, text in
+                    guard current == self.token, parts.indices.contains(index) else { return }
+                    parts[index] = text
+                    if firstMs == nil { firstMs = Int(Date().timeIntervalSince(started) * 1000) }
+                    self.result = plan.join(parts, target: to)
+                    self.render(state: parts.contains(where: { $0 == nil }) ? .partial : .done)
+                }
                 guard current == token else { return }
-                result = translated
+                onEvent(["event": "translated", "ms": Int(Date().timeIntervalSince(started) * 1000), "firstMs": firstMs ?? -1, "segments": plan.segments.count, "truncated": plan.truncated])
                 render(state: .done)
                 if request.autoCopy { copy(result, flash: nil) }
             } catch {
@@ -161,6 +147,11 @@ final class TranslateCard: NSView {
             let out = NSTextField(wrappingLabelWithString: result)
             out.font = .systemFont(ofSize: 15); out.textColor = .labelColor; out.isSelectable = true
             add(out)
+            if plan?.truncated == true {
+                let note = NSTextField(wrappingLabelWithString: t("translateTruncated"))
+                note.font = .systemFont(ofSize: 12); note.textColor = .secondaryLabelColor
+                add(note)
+            }
             let row = NSStackView(); row.spacing = 8
             if request.editable { row.addArrangedSubview(FlatButton(title: t("replaceSource"), target: self, action: #selector(replacePressed))) }
             let gap = NSView(); gap.setContentHuggingPriority(.defaultLow, for: .horizontal); row.addArrangedSubview(gap)

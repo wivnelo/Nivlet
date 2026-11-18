@@ -602,6 +602,7 @@ return {
     ["正在翻译…"] = "Translating…",
     ["翻译失败，请重试"] = "Translation failed. Try again.",
     ["系统翻译不支持这两种语言"] = "System translation doesn't support this language pair.",
+    ["内容较长，只翻译了前面一部分。"] = "The text is long, so only the first part was translated.",
     ["打开语言设置"] = "Open Language Settings",
     ["替换原文"] = "Replace Original",
     ["复制原文"] = "Copy Original",

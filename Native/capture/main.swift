@@ -67,8 +67,6 @@ final class Helper {
                 interface: config.language))
         case "permissionStatus":
             emit(["event": "permissionStatus", "granted": CGPreflightScreenCaptureAccess()])
-        case "prewarmTranslation":
-            if #available(macOS 15.0, *) { SystemTranslator.shared.prewarm() }
         case "pinFile":
             if let path = command["path"] as? String {
                 let w = command["width"] as? Double, h = command["height"] as? Double

@@ -12,7 +12,7 @@ var strings: [String: String] = [
     "pin": "钉到桌面", "opacity": "透明度", "actualSize": "原始大小", "closeAllPins": "关闭全部贴图",
     "translating": "正在翻译…", "translateFailed": "翻译失败，请重试", "pairUnsupported": "系统翻译不支持这两种语言",
     "openLanguageSettings": "打开语言设置", "replaceSource": "替换原文", "copySource": "复制原文", "copyTranslation": "复制译文",
-    "pinCard": "钉住", "translateAction": "翻译", "needsMacOS15": "翻译需要 macOS 15 或更高版本",
+    "pinCard": "钉住", "translateTruncated": "内容较长，只翻译了前面一部分。", "translateAction": "翻译", "needsMacOS15": "翻译需要 macOS 15 或更高版本",
 ]
 func t(_ key: String) -> String { strings[key] ?? key }
 

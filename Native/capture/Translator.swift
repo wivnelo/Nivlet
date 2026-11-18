@@ -47,58 +47,63 @@ func languageName(_ code: String, interface: String) -> String {
 @MainActor
 final class SystemTranslator {
     static let shared = SystemTranslator()
+    static let warmWindow: TimeInterval = 50
+    static let warmInterval: UInt64 = 4_000_000_000
     private var host: NSPanel?
     private let model = HostModel()
-    /// One session per installed pair (macOS 26+); reusing it saves 0.1–0.2 s per translation.
     private var sessions: [String: AnyObject] = [:]
+    private var installedPairs: Set<String> = []
+    private var active = 0
+    private var warmTask: Task<Void, Never>?
 
-    /// Milliseconds spent in the last call: availability check, then translation.
-    var lastTiming: (check: Int, translate: Int) = (0, 0)
-
-    func translate(_ text: String, from source: String, to target: String) async throws -> String {
+    func translate(_ texts: [String], from source: String, to target: String, onSegment: @escaping (Int, String) -> Void) async throws {
         let from = Locale.Language(identifier: source), to = Locale.Language(identifier: target)
-        let t0 = Date()
-        let status = await LanguageAvailability().status(from: from, to: to)
-        lastTiming.check = Int(Date().timeIntervalSince(t0) * 1000)
-        defer { lastTiming.translate = Int(Date().timeIntervalSince(t0) * 1000) - lastTiming.check }
-        if status == .unsupported { throw TranslateError.unsupported }
-        if status == .installed, #available(macOS 26.0, *) {
-            let key = "\(source)>\(target)"
-            let session = (sessions[key] as? TranslationSession) ?? TranslationSession(installedSource: from, target: to)
-            sessions[key] = session
-            return try await session.translate(text).targetText
+        let key = "\(source)>\(target)"
+        warmTask?.cancel()
+        active += 1
+        defer {
+            active -= 1
+            if active == 0 { keepWarm(key) }
         }
-        return try await viaSwiftUI(text, from: from, to: to)
-    }
-
-    /// Multi-line text: the engine works line by line (~0.9 s each), so lines are streamed back as
-    /// they finish and the card fills in progressively instead of waiting for the whole block.
-    func translateLines(_ lines: [String], from source: String, to target: String, onLine: @escaping (Int, String) -> Void) async throws {
-        let from = Locale.Language(identifier: source), to = Locale.Language(identifier: target)
-        let status = await LanguageAvailability().status(from: from, to: to)
-        if status == .unsupported { throw TranslateError.unsupported }
-        if status == .installed, #available(macOS 26.0, *) {
-            let key = "\(source)>\(target)"
-            let session = (sessions[key] as? TranslationSession) ?? TranslationSession(installedSource: from, target: to)
-            sessions[key] = session
-            let requests = lines.enumerated().map { TranslationSession.Request(sourceText: $0.element, clientIdentifier: String($0.offset)) }
-            for try await response in session.translate(batch: requests) {
-                if let id = response.clientIdentifier, let index = Int(id) { onLine(index, response.targetText) }
+        do {
+            if try await isInstalled(from, to, key: key), #available(macOS 26.0, *) {
+                let session = (sessions[key] as? TranslationSession) ?? TranslationSession(installedSource: from, target: to)
+                sessions[key] = session
+                let requests = texts.enumerated().map { TranslationSession.Request(sourceText: $0.element, clientIdentifier: String($0.offset)) }
+                for try await response in session.translate(batch: requests) {
+                    if let id = response.clientIdentifier, let index = Int(id) { onSegment(index, response.targetText) }
+                }
+                return
             }
-            return
+            for (index, text) in texts.enumerated() {
+                onSegment(index, try await viaSwiftUI(text, from: from, to: to))
+            }
+        } catch {
+            installedPairs.remove(key)
+            sessions[key] = nil
+            throw error
         }
-        // SwiftUI route: one request for the whole text.
-        let whole = try await viaSwiftUI(lines.joined(separator: "\n"), from: from, to: to)
-        onLine(-1, whole)
     }
 
-    /// Loads the English ↔ Chinese models once so the first double-tap does not wait ~2 s.
-    /// The models live in a system service, so this adds only a few MB to the helper.
-    func prewarm() {
-        guard #available(macOS 26.0, *) else { return }
-        Task(priority: .utility) { @MainActor in
-            _ = try? await translate("Hello", from: "en", to: "zh-Hans")
-            _ = try? await translate("你好", from: "zh-Hans", to: "en")
+    private func isInstalled(_ from: Locale.Language, _ to: Locale.Language, key: String) async throws -> Bool {
+        if installedPairs.contains(key) { return true }
+        let status = await LanguageAvailability().status(from: from, to: to)
+        if status == .unsupported { throw TranslateError.unsupported }
+        if status == .installed { installedPairs.insert(key); return true }
+        return false
+    }
+
+    private func keepWarm(_ key: String) {
+        guard #available(macOS 26.0, *), sessions[key] != nil else { return }
+        warmTask?.cancel()
+        warmTask = Task { @MainActor [weak self] in
+            let end = Date().addingTimeInterval(SystemTranslator.warmWindow)
+            while Date() < end {
+                try? await Task.sleep(nanoseconds: SystemTranslator.warmInterval)
+                guard !Task.isCancelled, let self, self.active == 0 else { return }
+                guard let session = self.sessions[key] as? TranslationSession else { return }
+                _ = try? await session.translate("a")
+            }
         }
     }
 
