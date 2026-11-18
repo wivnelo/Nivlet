@@ -511,10 +511,18 @@ local function silentRefresh()
     if silentTimer or not app.settings then return end
     silentTimer=hs.timer.doAfter(0.08,function() silentTimer=nil;reply(true,"","refreshPermissionsSilent") end)
 end
+-- view:hswindow() searches every window of every running app (~1 s with many apps open), so the
+-- settings window is looked up among Nivlet's own windows by its title first.
+local function ownWindow(view)
+    local me=hs.application and hs.application.applicationForPID and hs.processInfo and hs.application.applicationForPID(hs.processInfo.processID)
+    local title=me and view.windowTitle and view:windowTitle()
+    if title then for _,window in ipairs(me:allWindows()) do if window:title()==title then return window end end end
+    return view:hswindow()
+end
 local function showSettingsWindow(view)
     hs.dockicon.show()
     view:level(hs.drawing.windowLevels.normal):show()
-    local window=view:hswindow()
+    local window=ownWindow(view)
     if window then
         local owner=window:application()
         if owner then owner:activate() end
