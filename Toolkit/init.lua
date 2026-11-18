@@ -466,7 +466,13 @@ local function warmCaches()
     app.cacheWarmer=hs.timer.doEvery(0.05,function()
         for _=1,3 do
             local job=jobs[index]
-            if not job then app.cacheWarmer:stop();app.cacheWarmer=nil;return end
+            if not job then
+                app.cacheWarmer:stop();app.cacheWarmer=nil
+                -- Full images read for older history records are released now rather than whenever
+                -- Lua next collects (each one holds the whole file until then).
+                collectgarbage()
+                return
+            end
             pcall(job);index=index+1
         end
     end)
