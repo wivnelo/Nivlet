@@ -460,9 +460,13 @@ local function excludedAppNames()
     return names
 end
 local function reply(ok, message, action, requestID, saveBatch)
-    local permission=permissionState()
-    local icons=app.settings and configuredAppIcons()
-    if app.settings then local state={ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.translations(),general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),capture=capture.config,capturePermission=capture.permissionGranted(),translate=translate.config,translateSupported=translate.supported(),translateRemembered=translate.memory,excludedAppNames=excludedAppNames(),appIcons=icons,applicationStates=applicationStates(icons),popupShortcut=app.popupShortcut or false,popupShortcutDefault=defaultPopup(),popupShortcutError=app.popupShortcutError and i18n.t(app.popupShortcutError) or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}
+    if not app.settings then return end
+    local permission=profile.time("  state permissions",permissionState)
+    local icons=profile.time("  state appIcons",configuredAppIcons)
+    local states=profile.time("  state applicationStates",applicationStates,icons)
+    local clip=profile.time("  state clipboard",clipboard.snapshot)
+    local browsers=profile.time("  state browsers",browser.installed)
+    do local state={ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.translations(),general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clip,capture=capture.config,capturePermission=capture.permissionGranted(),translate=translate.config,translateSupported=translate.supported(),translateRemembered=translate.memory,excludedAppNames=excludedAppNames(),appIcons=icons,applicationStates=states,popupShortcut=app.popupShortcut or false,popupShortcutDefault=defaultPopup(),popupShortcutError=app.popupShortcutError and i18n.t(app.popupShortcutError) or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browsers,accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}
         local payload=profile.time("reply encode "..tostring(action),hs.json.encode,state);profile.mark("reply "..tostring(action).." bytes",#payload)
         if profile.enabled and not app.profiledFields then
             app.profiledFields=true
