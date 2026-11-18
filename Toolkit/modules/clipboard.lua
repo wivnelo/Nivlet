@@ -50,6 +50,7 @@ local function previewOf(entry)
     if not entry.preview and entry.kind=="image" then
         local image=M.imageOf(entry)
         entry.preview=image and shrink(image,360,260)
+        if image and not entry.width then local size=image:size();entry.width,entry.height=size.w,size.h end
         if entry.preview and entry.path and not entry.previewPath then M.pendingHistoryWrite=true end
     end
     return entry.preview
@@ -64,7 +65,10 @@ end
 local function sizeOf(entry)
     if not entry.width then
         local size=M.imageOf(entry) and entry.image:size()
-        if size then entry.width,entry.height=size.w,size.h end
+        if size then
+            entry.width,entry.height=size.w,size.h
+            if entry.path then M.pendingHistoryWrite=true end
+        end
     end
     return entry.width,entry.height
 end
@@ -376,6 +380,13 @@ local function menuThumbnail(image,kind)
     canvas[1]={type="rectangle",action="strokeAndFill",fillColor={white=.5,alpha=.12},strokeColor={white=.5,alpha=.3},strokeWidth=1,roundedRectRadii={xRadius=5,yRadius=5},frame={x=.5,y=.5,w=23,h=23}}
     canvas[2]=image and {type="image",image=image,imageAlignment="center",imageScaling="scaleToFit",frame={x=2,y=2,w=20,h=20}} or {type="text",text=kind=="image" and "▧" or "T",textAlignment="center",textColor={white=.6},textSize=14,frame={x=0,y=3,w="100%",h=18}}
     local result=canvas:imageFromCanvas();canvas:delete();return result
+end
+-- Draws an image entry's small copies ahead of time (called a few at a time while Nivlet is idle).
+function M.prepare(entry)
+    if entry.kind~="image" then return end
+    sizeOf(entry)
+    entry.menuThumb=entry.menuThumb or menuThumbnail(thumbOf(entry),"image")
+    M.thumbURL(entry)
 end
 local function menuLabel(text)
     text=text:gsub("%s+"," "):gsub("^%s+",""):gsub("%s+$","")

@@ -27,10 +27,12 @@ hs.shutdownCallback=function()
     translate.stop()
     if type(previousShutdown)=="function" then previousShutdown() end
 end
+profile.mark("required capture, translate")
 local launcher=require("modules.launcher")
 local permissions=require("modules.permissions")
 local about=require("modules.about")
 local sleep=require("modules.sleep")
+profile.mark("required launcher, permissions, about, sleep")
 local app = {bindings={}}
 
 local batchCandidates,batchShortcutConflicts
@@ -286,7 +288,8 @@ function app.save(value)
     hs.settings.set(key, config)
     return true, i18n.t("已保存")
 end
-local ok, message = install(app.config)
+profile.mark("general settings applied")
+local ok, message = profile.time("window bindings install",install,app.config)
 if not ok then hs.alert.show(message) end
 local configuration=require("modules.configuration")
 local adapters={
@@ -377,6 +380,7 @@ local function releasePageBindings(group)
         elseif page=="captureSection" then capture.releaseBindings() end
     end
 end
+profile.mark("configuration adapters")
 local saveBatch=require("modules.save_batch").new(pageAdapters,{
     validate=function(plan)
         local seen,owned={},{}
@@ -433,16 +437,39 @@ local function permissionState() return permissions.snapshot() end
 local appIcons=require("modules.app_icons")
 local appNames=require("modules.app_names")
 local requestedApps={}
+local function configuredBundleIDs()
+    local ids={}
+    for _,config in ipairs({input.config,browser.config,launcher.config}) do
+        for _,rule in ipairs(config.rules or {}) do if rule.bundleID then table.insert(ids,rule.bundleID) end end
+    end
+    for _,rule in ipairs(browser.config.appRules or {}) do table.insert(ids,rule.bundleID) end
+    for _,id in ipairs(clipboard.config.excluded) do table.insert(ids,id) end
+    for _,item in ipairs(browser.browsers) do table.insert(ids,item.id) end
+    for _,id in ipairs(requestedApps) do table.insert(ids,id) end
+    return ids
+end
 local function configuredAppIcons()
     local icons={}
-    for _,config in ipairs({input.config,browser.config,launcher.config}) do
-        for _,rule in ipairs(config.rules or {}) do if rule.bundleID then icons[rule.bundleID]=appIcons.get(rule.bundleID) or false end end
-    end
-    for _,rule in ipairs(browser.config.appRules or {}) do icons[rule.bundleID]=appIcons.get(rule.bundleID) or false end
-    for _,id in ipairs(clipboard.config.excluded) do icons[id]=appIcons.get(id) or false end
-    for _,item in ipairs(browser.browsers) do icons[item.id]=appIcons.get(item.id) or false end
-    for _,id in ipairs(requestedApps) do icons[id]=appIcons.get(id) or false end
+    for _,id in ipairs(configuredBundleIDs()) do if icons[id]==nil then icons[id]=appIcons.get(id) or false end end
     return icons
+end
+-- Encoding every configured app icon took ~250 ms the first time the settings window opened. They are
+-- prepared a few at a time while Nivlet is idle after launch, so no single step blocks key handling.
+-- The clipboard menu's image thumbnails are drawn the same way.
+local function warmCaches()
+    local jobs={}
+    for _,id in ipairs(configuredBundleIDs()) do table.insert(jobs,function() appIcons.get(id) end) end
+    for _,entry in ipairs(clipboard.entries) do
+        if entry.kind=="image" then table.insert(jobs,function() clipboard.prepare(entry) end) end
+    end
+    local index=1
+    app.cacheWarmer=hs.timer.doEvery(0.05,function()
+        for _=1,3 do
+            local job=jobs[index]
+            if not job then app.cacheWarmer:stop();app.cacheWarmer=nil;return end
+            pcall(job);index=index+1
+        end
+    end)
 end
 local function applicationStates(icons)
     local states={}
@@ -706,15 +733,20 @@ function app.openSettings(section, focus)
     end)
     local file = assert(io.open(root .. "settings.html", "r"))
     local html = file:read("*a"); file:close()
-    app.settings = hs.webview.new({x=180,y=160,w=980,h=720}, {}, app.controller)
-        :windowStyle({"titled","closable","resizable"}):windowTitle("Nivlet for Mac")
-        :transparent(false):allowTextEntry(true):html(html)
-        :windowCallback(function(event)
+    profile.mark("settings controller ready")
+    app.settings = profile.time("webview new",hs.webview.new,{x=180,y=160,w=980,h=720}, {}, app.controller)
+    profile.mark("webview created")
+    app.settings:windowStyle({"titled","closable","resizable"}):windowTitle("Nivlet for Mac")
+        :transparent(false):allowTextEntry(true)
+    profile.time("webview html",function() app.settings:html(html) end)
+    app.settings:windowCallback(function(event)
             if event=="shouldClose" then app.requestLeave("close");return false end
             if event=="closing" then hs.dockicon.hide() end
         end)
     showSettingsWindow(app.settings)
+    profile.mark("settings window shown")
 end
+profile.mark("settings handlers defined")
 app.menu = hs.menubar.new(true,"NivletMain"):setTitle(""):setTooltip(i18n.t("Nivlet 设置"))
 if hs.image then
     app.mainIcon=assert(hs.image.imageFromPath(root.."assets/nivlet-menu.png")):size({w=18,h=18})
@@ -726,6 +758,7 @@ function app.updateMenu()
 end
 app.updateMenu()
 if not app.general.showMenu then app.menu:removeFromMenuBar() end
+profile.mark("main menu created")
 clipboard.startMenu(function(mode)
     local id=mode=="settings" and "clipEnabled" or "clipSearch"
     app.openSettings("clipSection",id)
@@ -781,6 +814,7 @@ hs.dockIconClickCallback = function()
 end
 print("Nivlet ready", hs.configdir, hs.settings.bundleID, "bindings", #app.bindings)
 profile.mark("ready (menu bar items created)")
+if hs.timer then app.cacheWarmTimer=hs.timer.doAfter(1.5,function() app.cacheWarmTimer=nil;warmCaches() end) end
 if profile.enabled then
     -- Measure the clipboard menu and the settings window once startup has settled.
     app.profileTimers={}

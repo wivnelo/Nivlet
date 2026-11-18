@@ -8,11 +8,11 @@ local function installedPath(bundleID)
     if hs.fs and hs.fs.attributes and hs.fs.attributes(path,"mode")~="directory" then return nil end
     return path
 end
--- Drawn at 48 pt: resizing the image object alone still encoded the 1024 px original (~150 KB per app).
+-- Drawn at the 24 pt the settings page shows (48 px on Retina), about 4 KB per app instead of 15 KB.
 local function small(image)
-    if not (hs.canvas and hs.canvas.new) then return image:setSize({w=48,h=48}) end
-    local canvas=hs.canvas.new({x=0,y=0,w=48,h=48})
-    canvas[1]={type="image",image=image,imageScaling="scaleToFit",frame={x=0,y=0,w=48,h=48}}
+    if not (hs.canvas and hs.canvas.new) then return image:setSize({w=24,h=24}) end
+    local canvas=hs.canvas.new({x=0,y=0,w=24,h=24})
+    canvas[1]={type="image",image=image,imageScaling="scaleToFit",frame={x=0,y=0,w=24,h=24}}
     local result=canvas:imageFromCanvas();canvas:delete()
     return result
 end
