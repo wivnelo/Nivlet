@@ -55,6 +55,26 @@
     "launcher": {
       "enabled": false,
       "rules": []
+    },
+    "capture": {
+      "enabled": false,
+      "shortcut": {
+        "key": "F1",
+        "mods": []
+      },
+      "saveDirectory": "~/Pictures/Nivlet",
+      "format": "png",
+      "snapWindows": true,
+      "loupe": true
+    },
+    "translate": {
+      "enabled": false,
+      "selectionTrigger": "doubleAlt",
+      "screenshotTrigger": "doubleCtrl",
+      "mode": "auto",
+      "remember": true,
+      "showSource": true,
+      "autoCopy": false
     }
   }
 }

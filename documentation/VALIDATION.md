@@ -1,4 +1,12 @@
-# 当前验收：2.0.6 / Build 66
+# 当前验收：2.1.0 / Build 67
+
+63 项命令行回归（Lua、Python、非 UI JS、隐私扫描、运行时补丁一致性、运行时裁剪、版本中性）本地通过；37 组设置页 UI 测试在隔离浏览器中以简中、繁中、英文、日文 × 浅色/深色，980 与 620 点宽各运行一遍，全部通过。新增回归覆盖截图配置与保存、助手调度与权限检查、翻译触发键（含左右侧）与重叠校验、剪贴板原始 PNG 指纹、小预览图持久化与原图释放、菜单文字截断缓存、网速采样暂停、设置窗口不做窗口查找等。
+
+候选包：版本 2.1.0 / 67，Toolkit 与源码 `7e2577f` 一致（另含 LICENSE、THIRD-PARTY-NOTICES.md、nivlet-icon.png、system-probe、capture-helper），67 个 Mach-O 均为 arm64，`strings` 无个人路径，`docs.json` 为 `[]`，`release_architecture` 与 `signing_preflight` 通过。本机 Developer ID 签名副本替换安装：启动完成并创建菜单栏项，进程无窗口（无报错对话框），设置窗口打开后 `document.hasFocus()` 为 true。App 公证 `01a16490-3c10-4699-af06-1336af58388a`、DMG 公证 `0441d125-b13d-43af-8513-6616adc0c029` 均 Accepted，票据与 Gatekeeper 通过；appcast 候选通过版本、SHA-256、EdDSA 签名与篡改拒绝检查。
+
+手工与实测（单台 Apple Silicon Mac，macOS 27.2，单显示器 5K）：截图、标注、文字与二维码识别、贴图、剪贴板图片贴图在同源测试包上使用过；选词翻译双击触发由用户实测正常。性能数字来自 `NIVLET_PROFILE` 与 `footprint`，历史为 60 条含 10 张 5K 截图。未覆盖：macOS 13/14 截图、macOS 15–25 翻译、多显示器与混合缩放、Sparkle 实际升级。
+
+## 历史验收：2.0.6 / Build 66
 
 58 项命令行回归本地与 CI 通过，`tests/signing_preflight.py` 新增“缺少 dmgbuild 时在任何外部工具与输出前停止”的用例。候选包：Toolkit 与源码一致，66 个 Mach-O 均为 arm64，无个人路径，`docs.json` 为 `[]`。本机 Developer ID 签名副本替换安装后启动，屏幕截图确认无报错对话框、网速与剪贴板菜单栏项出现，随后恢复原版本。最终 DMG 由 `scripts/make-dmg.py` 生成，只读挂载复验 `.DS_Store`、背景、`Applications` 链接与内含 App 严格签名通过；`.DS_Store` 不含个人路径。安装窗口观感由用户在同配置的试做 DMG 上目视确认，最终发行 DMG 未再逐像素目视。App/DMG 公证 Accepted、票据与 Gatekeeper 通过；appcast 版本、SHA-256、EdDSA 签名与篡改拒绝通过。见 [2.0.6 版本说明](RELEASE-v2.0.6.md)。
 

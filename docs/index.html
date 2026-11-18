@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Nivlet for Mac brings clipboard history, window management, app shortcuts and browser routing to your Mac menu bar. Free and open source.">
+<meta name="description" content="Nivlet for Mac brings clipboard history, screenshots with annotation and OCR, on-device translation, window management, app shortcuts and browser routing to your Mac menu bar. Free and open source.">
 <meta name="color-scheme" content="light dark">
 <link rel="canonical" href="https://wivnelo.github.io/Nivlet/">
 <title data-zh="Nivlet for Mac — 常用的小事，交给菜单栏">Nivlet for Mac — The little things, taken care of</title>
 <link rel="icon" href="assets/favicon.png">
 <link rel="apple-touch-icon" href="assets/nivlet-icon.webp">
-<link rel="stylesheet" href="style.css?v=c6b1b36ba8">
+<link rel="stylesheet" href="style.css?v=643f95e801">
 </head>
 <body>
 
@@ -36,7 +36,7 @@
   <img class="hero-icon" src="assets/nivlet-icon.webp" alt="Nivlet app icon" width="168" height="168" decoding="async">
   <p class="kicker">Nivlet for Mac</p>
   <h1 data-zh="常用的小事，<br>交给菜单栏。">The little things.<br>Taken care of.</h1>
-  <p class="lead" data-zh="复制过的内容随时找回，窗口一键摆好，常用应用一按就开，链接自动用对的浏览器打开。">Find anything you copied, snap windows into place, open apps with a keystroke and send every link to the right browser — all from the menu bar.</p>
+  <p class="lead" data-zh="复制过的内容随时找回，截图标注、本机翻译随手可用，窗口一键摆好，常用应用一按就开，链接自动用对的浏览器打开。">Find anything you copied, capture and annotate the screen, translate on device, snap windows into place, open apps with a keystroke and send every link to the right browser — all from the menu bar.</p>
   <div class="cta">
     <a class="pill" href="https://github.com/wivnelo/Nivlet/releases/latest" data-zh="下载 Mac 版">Download for Mac</a>
     <a class="more" href="#features" data-zh="了解更多">Learn more</a>
@@ -59,7 +59,7 @@
         <div class="tile-text">
           <p class="label" data-zh="剪贴板">Clipboard</p>
           <h3 data-zh="刚才复制的，还在这儿。">That thing you copied? Still here.</h3>
-          <p data-zh="文字和图片都会记下来，可以搜索、看大图，按住 Option 点一下就能直接粘贴。记多久、哪些应用不记，都由你定，也能随时关掉。">Text and images are saved as you copy. Search them, preview images, or Option-click to paste straight in. You decide how long to keep things and which apps to skip — or switch it off anytime.</p>
+          <p data-zh="文字和图片都会记下来，可以搜索、看大图，按住 Option 点一下就能直接粘贴，图片还能钉在桌面上。记多久、哪些应用不记，都由你定，也能随时关掉。">Text and images are saved as you copy. Search them, preview images, Option-click to paste straight in, or pin an image to the desktop. You decide how long to keep things and which apps to skip — or switch it off anytime.</p>
         </div>
         <div class="visual search"><span>⌕</span><span data-zh="搜一下刚才复制的…">Search what you copied…</span><kbd>⌘⇧V</kbd></div>
       </article>
@@ -91,6 +91,22 @@
         <p data-zh="菜单栏上直接看网速，点开还能看 CPU、内存、磁盘和 IP。还可以给每个应用指定输入法，切过去自动换好。">Network speed sits in the menu bar; CPU, memory, disk and IP addresses are a click away. Pick an input source for each app and it switches for you.</p>
       </article>
 
+      <article class="tile span2 pair">
+        <div class="tile-text">
+          <p class="label" data-zh="截图">Screenshot</p>
+          <h3 data-zh="截下来，标出来，认出来。">Capture it. Mark it up. Read it.</h3>
+          <p data-zh="按一下快捷键，屏幕先定格，再框选区域或窗口。用矩形、箭头、画笔、文字和马赛克标注，然后复制、保存或钉在桌面。截图里的文字和二维码，在本机就能识别出来。">Press a shortcut and the screen freezes so you can select an area or a window. Mark it up with boxes, arrows, pen, text and mosaic, then copy, save or pin it to the desktop. Text and QR codes in the shot are recognized right on your Mac.</p>
+        </div>
+        <div class="visual chips"><span data-zh="矩形">Box</span><span data-zh="箭头">Arrow</span><span data-zh="文字">Text</span><span data-zh="马赛克">Mosaic</span><span>OCR</span><span data-zh="二维码">QR</span></div>
+      </article>
+
+      <article class="tile">
+        <p class="label" data-zh="系统翻译">Translation</p>
+        <h3 data-zh="双击一下，就懂了。">Double-tap. Understood.</h3>
+        <p data-zh="选中文字后双击修饰键，或框选屏幕上的一块区域，用 macOS 自带的翻译在本机完成。中文译成英文、其他译成中文，也会记住你上次的选择。需要 macOS 15 或更高版本。">Select text and double-tap a modifier key, or pick an area of the screen. macOS’s built-in translation does the rest, on device. It picks the direction for you and remembers your last choice. Requires macOS 15 or later.</p>
+        <div class="visual route"><span>Hello</span><b>→</b><span>你好</span></div>
+      </article>
+
       <article class="tile span3 dark">
         <div class="tile-text">
           <p class="label" data-zh="还有更多">And more</p>
@@ -106,7 +122,7 @@
 <section id="privacy" class="band">
   <div class="wrap narrow center">
     <h2 data-zh="你的数据，<br>只在你的 Mac 上。">Your data stays<br>on your Mac.</h2>
-    <p class="sub" data-zh="不用注册账号。设置和剪贴板内容都留在本机，不会上传，断网也照常能用。">No sign-up. Your settings and clipboard never leave your Mac, and the core tools work offline.</p>
+    <p class="sub" data-zh="不用注册账号。设置、剪贴板、截图、文字识别和翻译都在本机完成，不会上传，断网也照常能用。">No sign-up. Your settings, clipboard, screenshots, text recognition and translations never leave your Mac, and the core tools work offline.</p>
     <div class="facts">
       <div><h3 data-zh="退出就清空">Gone when you quit</h3><p data-zh="剪贴板记录默认在退出时清空。如果选择保留，内容会以明文存在本机，复制密码这类敏感信息前，记得先暂停记录。">Clipboard history is cleared when you quit, by default. If you choose to keep it, it’s stored as plain text on your Mac — so pause recording before copying anything sensitive.</p></div>
       <div><h3 data-zh="签名公证，更新你说了算">Signed, notarized, your call</h3><p data-zh="每个正式版都有 Developer ID 签名并经过 Apple 公证。有新版本时，你点了确认才会安装。">Every release is signed with a Developer ID and notarized by Apple. Updates install only when you say so.</p></div>
@@ -120,7 +136,7 @@
     <h2 data-zh="三步，就能用上。">Up and running in three steps.</h2>
     <ol class="steps">
       <li><span>1</span><h3 data-zh="下载">Download</h3><p data-zh="下载 DMG 或 ZIP，把 Nivlet 拖进“应用程序”，然后打开。">Grab the DMG or ZIP, drag Nivlet into Applications and open it.</p></li>
-      <li><span>2</span><h3 data-zh="允许访问">Allow access</h3><p data-zh="摆窗口和 Option 直接粘贴需要“辅助功能”权限，按提示打开即可。不需要关闭 Gatekeeper。">Arranging windows and Option-paste need Accessibility access — just follow the prompt. There’s no need to turn off Gatekeeper.</p></li>
+      <li><span>2</span><h3 data-zh="允许访问">Allow access</h3><p data-zh="摆窗口、Option 直接粘贴和选词翻译需要“辅助功能”权限，截图需要“屏幕录制”权限，按提示打开即可。不需要关闭 Gatekeeper。">Arranging windows, Option-paste and selection translation need Accessibility access; screenshots need Screen Recording. Just follow the prompts — there’s no need to turn off Gatekeeper.</p></li>
       <li><span>3</span><h3 data-zh="按你的习惯设置">Make it yours</h3><p data-zh="点菜单栏里的 N 打开设置，开启想用的功能，再点“保存全部设置”。要用浏览器分流，记得把 Nivlet 设为默认浏览器。">Click the N in the menu bar, open Settings, turn on what you want and click Save All Settings. For browser routing, set Nivlet as your default browser.</p></li>
     </ol>
     <p class="center"><a class="more" id="installGuide" href="https://github.com/wivnelo/Nivlet/blob/main/documentation/INSTALLATION.en.md" data-zh="查看完整安装与升级说明">Full install and upgrade guide</a></p>

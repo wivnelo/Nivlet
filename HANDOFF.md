@@ -1,6 +1,15 @@
-# Nivlet 会话交接 · 2026-11-14
+# Nivlet 会话交接 · 2026-11-18
 
-## 当前状态 · 2.0.6 / Build 66
+## 当前状态 · 2.1.0 / Build 67
+
+功能版：截图（C3 S1 及贴图）与系统翻译（C6 T1、T2）随本版发布，并做了一轮速度与内存优化。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.1.0 版本说明](documentation/RELEASE-v2.1.0.md)。产品源码 `7e2577f`，仅 Apple Silicon。
+
+- 原生辅助程序 `Native/capture`（Swift，`scripts/build-dev.sh` 编译为 `Toolkit/capture-helper`）由 `Toolkit/modules/capture.lua` 按需启动并经标准输入输出 JSON 通信，截图与翻译共用；首次文字识别的模型准备在一次性 `--prewarm` 子进程中完成。说明见 [开发与构建](documentation/DEVELOPMENT.md) 和 [CAPTURE-S0](documentation/CAPTURE-S0.md)、[TRANSLATE-T0](documentation/TRANSLATE-T0.md)。
+- 剪贴板图片：只在写入历史文件前持有原图；菜单与设置页使用历史文件旁的 `.preview.png` 小图，记录保存尺寸与指纹；启动后空闲时分批准备图标、缩略图与菜单文字。
+- 性能排查：启动时设置 `NIVLET_PROFILE=<文件>`（`open --env ... -a /Applications/Nivlet.app`）会记录启动、菜单与设置窗口各步耗时；默认关闭、无开销。Hammerspoon 计时器须保留引用，否则可能被回收而不触发。
+- 未做：S2（椭圆、荧光笔、序号、重复上次区域、延时等）、T3（原位显示译文）；macOS 15–25 的翻译路径与多显示器截图未实测。发版流程见本机 skill `nivlet-release`。
+
+## 历史 · 2.0.6 / Build 66
 
 安装体验更新版，App 功能不变。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.0.6 版本说明](documentation/RELEASE-v2.0.6.md)。产品源码 `386f844`，仅 Apple Silicon。正式 DMG 由 `scripts/make-dmg.py` 生成定制安装窗口，依赖固定版本的 dmgbuild（`scripts/requirements-dmg.txt`，装在 `build/dmg-venv`），`sign-notarize.py` 缺少时在预检阶段停止；设计与注意事项见 [开发与构建](documentation/DEVELOPMENT.md) 的“DMG 安装窗口”。本地 ad-hoc 包仍为普通窗口。发版流程见本机 skill `nivlet-release`。
 

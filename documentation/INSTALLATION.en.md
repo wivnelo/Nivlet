@@ -21,7 +21,9 @@ Do not disable Gatekeeper or remove quarantine as a routine installation step. I
 
 ### Permissions and browser routing
 
-Window management, Option-click paste and opening browser clear-data dialogs need Accessibility. In General, click Open Accessibility Settings and allow `/Applications/Nivlet.app` under Privacy & Security → Accessibility. Return to Nivlet for automatic detection or click Check Again. Clipboard recording, app launching and system information do not need this permission.
+Window management, Option-click paste and opening browser clear-data dialogs need Accessibility. In General, click Open Accessibility Settings and allow `/Applications/Nivlet.app` under Privacy & Security → Accessibility. Return to Nivlet for automatic detection or click Check Again. Selection translation also uses it to read the selected text. Clipboard recording, app launching and system information do not need this permission.
+
+Screenshots and screenshot translation need Screen Recording. In General, click the Screen Recording button and allow Nivlet under Privacy & Security → Screen & System Audio Recording; quit and reopen Nivlet if macOS asks.
 
 For browser routing, save rules first, then choose Nivlet as the system default browser. Nivlet forwards links to the configured real browsers; it does not render webpages. Verify routing by clicking links in another app. The default-browser action requests webpage protocols, without requesting text-file associations.
 

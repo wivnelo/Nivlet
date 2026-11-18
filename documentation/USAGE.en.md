@@ -20,6 +20,7 @@ Enable and save recording in Settings → Clipboard, then copy new content. Open
 | Enlarge an image | Click its settings thumbnail, or focus it and press Enter or Space; press Escape or click outside the image bounds within the Nivlet window to close |
 | Stop recording | Turn off Enable Clipboard History and save; enabling it again captures only new copies |
 | Clear | Clear History… in the menu or settings; confirmation deletes history and cache **and clears the current system clipboard. This cannot be undone** |
+| Pin to desktop | With Screenshot enabled, click Pin to Desktop on an image in the settings history |
 
 Text history defaults to 50 entries, with choices from 10 to 100. Retention defaults to 30 minutes; choose 30 minutes, 1/2/4/8/12/24 hours or forever. Forever still respects the count limit. Image history holds up to 10 images, approximately 10 MiB each. Copied files are not recorded; image paste requires target-app support.
 
@@ -30,6 +31,34 @@ The menu shortcut has an enable switch, displays **⌘⇧ + V** and binds **Comm
 There is no separate Pause/Resume action. Enable Clipboard History is the only recording control; turning it off does not clear history, change retention limits or backfill content when enabled again.
 
 Image previews open directly from thumbnails, with no separate open or close button. Clicking outside the image element’s bounds within the Nivlet window closes the preview; transparent pixels inside those bounds do not. Escape, focus restoration after asynchronous history refresh and prevention of click-through remain in place, without a global mouse permission.
+
+### Screenshot
+
+Enable and save it in Settings → Screenshot; it is off by default. The first time, grant **Screen Recording** in General (the permissions area lists the features that use it). If macOS asks, quit and reopen Nivlet after granting it.
+
+Press the screenshot shortcut (F1 by default — add fn on a built-in keyboard — or a function key or a ⌃/⌥/⌘ combination) to freeze the screen, then drag to select an area. With "Detect windows automatically" on, hovering selects a whole window. With "Show magnifier and color picker" on, a magnifier and the color under the pointer appear while selecting. A keyboard's own screenshot key usually sends ⌘⇧4: to use it, turn that item off in System Settings → Keyboard → Keyboard Shortcuts → Screenshots, then set ⌘⇧4 in Nivlet.
+
+| Action | How |
+| --- | --- |
+| Annotate | Pick rectangle, arrow, pen, text or mosaic in the toolbar; undo and redo are available |
+| Copy | Click Copy, press Return or double-click the selection; copies go into clipboard history per the Clipboard settings, marked as screenshots |
+| Save | Click Save or press ⌘S to save to the chosen folder (default `~/Pictures/Nivlet`) as PNG or JPEG |
+| Recognize text or QR | Click the button (O / Q); results appear in a panel and can be copied. Recognition runs on device |
+| Pin to desktop | Click Pin (P); the image stays on top of the desktop and can be moved, faded or closed |
+| Translate | With System Translation on, a Translate button (L) appears |
+| Exit | Press Escape or right-click |
+
+The first text recognition may take tens of seconds while macOS prepares its model; later ones usually take under a second. With Screenshot enabled, images in the settings history can also be pinned to the desktop.
+
+### System translation
+
+Enable and save it in Settings → Translation; it is off by default and needs macOS 15 or later. It uses only macOS's built-in on-device translation. Some languages ask to download a language pack the first time.
+
+- **Selection translation**: select text and press the chosen modifier key twice within 0.4 seconds (⌥ by default). The card appears below the selection. Reading the selection needs Accessibility; when it cannot be read, Nivlet copies the selection briefly and then restores the clipboard.
+- **Screenshot translation**: press the other modifier key twice (⌃ by default), select an area, and the text is recognized and translated when you release. Needs Screen Recording.
+- Left and right ⌃, ⌥ and ⌘ can be set separately; the two triggers cannot share a key. Pressing another key in between or holding the key does not trigger. Turn off the same double-tap trigger in other tools to avoid two windows.
+- **Direction**: automatic by default (Chinese to English, other languages to Simplified Chinese), or always Simplified Chinese, Traditional Chinese, English, Japanese or Korean. With "Remember my last choice" on, a direction you change in the card is reused for that language; Clear resets it.
+- The card can copy the translation or replace the selected text (editable text only), and can show the original and copy the translation automatically.
 
 ### Window management and app launching
 

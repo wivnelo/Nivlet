@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>The little things. Taken care of.</strong><br>
-  Find anything you copied, snap windows into place, open apps with a keystroke and send every link to the right browser — all from the menu bar.
+  Find anything you copied, capture and annotate the screen, translate on device, snap windows into place, open apps with a keystroke and send every link to the right browser — all from the menu bar.
 </p>
 
 <p align="center">
@@ -31,7 +31,9 @@
 
 | | |
 | --- | --- |
-| **Clipboard history** | Text and images with search, thumbnails, previews and Option-click paste. Set retention, exclude apps or turn recording off. |
+| **Clipboard history** | Text and images with search, thumbnails, previews and Option-click paste. Pin images to the desktop. Set retention, exclude apps or turn recording off. |
+| **Screenshot** | Freeze the screen, select an area or window, annotate with shapes, arrows, pen, text and mosaic, then copy, save or pin it. Recognize text (OCR) and QR codes on device. |
+| **System translation** | Double-tap a modifier key to translate selected text or a screen area with macOS's built-in on-device translation. Automatic direction that remembers your choice (macOS 15+). |
 | **Window management** | 29 actions: halves, quarters, thirds, a 3×3 grid, centering, display moves and restore. |
 | **App shortcuts** | Open or bring forward apps with your own shortcuts, with conflict checks. |
 | **Browser routing** | Pick a browser by source app or website, with a fallback for everything else. |
@@ -46,11 +48,11 @@ Turn on only what you need. No coding and no separate Hammerspoon installation r
 2. Open it, click the **N** in the menu bar and choose **Settings…**.
 3. Turn on the tools you need and click **Save All Settings**.
 
-Window actions and Option-paste need **Accessibility** permission. Browser routing needs Nivlet set as the **default browser**. Never disable Gatekeeper; if macOS reports malware or damage, stop and report the exact message. See the [installation and upgrade guide](documentation/INSTALLATION.en.md).
+Window actions, Option-paste and selection translation need **Accessibility** permission; screenshots need **Screen Recording** permission. Browser routing needs Nivlet set as the **default browser**. Never disable Gatekeeper; if macOS reports malware or damage, stop and report the exact message. See the [installation and upgrade guide](documentation/INSTALLATION.en.md).
 
 ## Privacy
 
-No account. Settings, clipboard history and system information are processed on your Mac and never uploaded; core tools work offline. Clipboard history is cleared on quit by default. Optional persistence uses a **local plaintext cache**, so turn recording off before copying sensitive content. The app goes online only to check for updates or open links.
+No account. Settings, clipboard history, screenshots, text recognition, translation and system information are processed on your Mac and never uploaded; core tools work offline. Clipboard history is cleared on quit by default. Optional persistence uses a **local plaintext cache**, so turn recording off before copying sensitive content. The app goes online only to check for updates or open links.
 
 ## Requirements
 

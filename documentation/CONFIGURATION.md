@@ -6,7 +6,7 @@
 在 **设置 → 通用 → 配置备份与迁移** 中操作。
 
 - **导出配置…**：选择文件夹，生成带时间戳的 `Nivlet-config-*.json`，包含各功能当前已保存的设置。不会保存界面中的草稿。
-- **导出默认示例…**：生成同格式的 `Nivlet-defaults-*.json`，各功能提供完整默认值；窗口、输入法、剪贴板历史、浏览器分流和应用启动默认关闭。剪贴板菜单快捷键独立默认启用 ⌘⇧V，窗口和应用启动不预设快捷键。
+- **导出默认示例…**：生成同格式的 `Nivlet-defaults-*.json`，各功能提供完整默认值；窗口、输入法、剪贴板历史、浏览器分流、应用启动、截图和翻译默认关闭。剪贴板菜单快捷键独立默认启用 ⌘⇧V，窗口和应用启动不预设快捷键。
 - **导入配置…**：选择 JSON，校验后显示将替换的模块配置；点击 **确认导入** 才应用。取消不修改配置。
 
 也可以下载 [默认示例](../examples/configuration.json)，用文本编辑器修改后导入。JSON 不支持注释或末尾多余逗号。
@@ -84,3 +84,10 @@
 ## 2.0.1 通用电源选项与旧 MAC 字段
 
 `general.keepAwake` 和 `general.keepDisplayOn` 均为可选布尔值，缺省关闭。`keepDisplayOn` 只有在 `keepAwake` 为 `true` 时才生效；导入沿用确认、校验及失败回滚。旧配置的 `system.mac` 仍可被接受并忽略；新导出不包含该字段，不会全局重置其他配置。
+
+## 截图与翻译
+
+配置中的 `capture`（截图）和 `translate`（翻译）模块与其他模块一样可单独导入导出，默认均为关闭。
+
+- `capture`：`enabled`、`shortcut`（默认 `{"key":"F1","mods":[]}`；F1–F19 可不带修饰键，其他键需 ⌃/⌥/⌘）、`saveDirectory`（默认 `~/Pictures/Nivlet`）、`format`（`png` 或 `jpg`）、`snapWindows`、`loupe`。截图快捷键参与与窗口、应用启动、剪贴板菜单快捷键的冲突检查。旧配置中的 `pinShortcut` 仍可导入，但会被忽略。
+- `translate`：`enabled`、`selectionTrigger` 与 `screenshotTrigger`（`doubleAlt`、`doubleCmd`、`doubleCtrl`，加 `Left`/`Right` 限定一侧，如 `doubleLeftAlt`；`off` 表示不使用；两者不能使用同一侧的同一按键）、`mode`（`auto`、`zh-Hans`、`zh-Hant`、`en`、`ja`、`ko`）、`remember`、`showSource`、`autoCopy`。记住的翻译方向不在导出范围内。
