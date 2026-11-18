@@ -519,7 +519,7 @@ local function showSettingsWindow(view)
     hs.dockicon.show()
     view:level(hs.drawing.windowLevels.normal):show()
     mark("  window: show")
-    local me=hs.application.applicationForPID(hs.processInfo.processID)
+    local me=hs.application.applicationForPID and hs.processInfo and hs.application.applicationForPID(hs.processInfo.processID)
     if me then me:activate() end
     mark("  window: activated")
 end
