@@ -1,24 +1,16 @@
 local file=assert(io.open("Toolkit/init.lua"));local source=file:read("*a");file:close()
-local helper=assert(source:match("(local function ownWindow%(view%).-)\nfunction app.requestLeave"))
+local helper=assert(source:match("(local function showSettingsWindow%(view%).-)\nfunction app.requestLeave"))
 local calls={}
-local view={level=function(self,value) assert(value==0);table.insert(calls,"normal");return self end,show=function(self) table.insert(calls,"show");return self end,hswindow=function() return {application=function() return {activate=function() table.insert(calls,"activate") end} end,focus=function() table.insert(calls,"focus") end} end}
-local show=assert(load(helper.."\nreturn showSettingsWindow",nil,"t",{hs={drawing={windowLevels={normal=0}},dockicon={show=function() table.insert(calls,"dock") end}},table=table}))()
-show(view);assert(table.concat(calls,",")=="dock,normal,show,activate,focus")
-view.hswindow=function() return nil end;show(view)
+local view={level=function(self,value) assert(value==0);table.insert(calls,"normal");return self end,show=function(self) table.insert(calls,"show");return self end,
+ hswindow=function() error("must not search every window") end}
+local env={hs={drawing={windowLevels={normal=0}},dockicon={show=function() table.insert(calls,"dock") end},processInfo={processID=7},
+ application={applicationForPID=function(pid) assert(pid==7);return {activate=function() table.insert(calls,"activate") end,allWindows=function() error("must not query windows") end} end}},table=table}
+local show=assert(load(helper.."\nreturn showSettingsWindow",nil,"t",env))()
+show(view);assert(table.concat(calls,",")=="dock,normal,show,activate")
+env.hs.application.applicationForPID=function() return nil end;calls={};show(view);assert(table.concat(calls,",")=="dock,normal,show")
 assert(not source:find("bringToFront",1,true))
 local _,count=source:gsub("showSettingsWindow%(app.settings%)","");assert(count==3)
-print("Settings creation and reopening use normal window level; focus and missing window cases passed")
-
--- The window is found among Nivlet's own windows by title, without the system-wide hswindow() search.
-local own={title=function() return "Nivlet for Mac" end,application=function() return {activate=function() table.insert(calls,"activate") end} end,focus=function() table.insert(calls,"focus") end}
-local other={title=function() return "Console" end}
-calls={}
-local env={hs={drawing={windowLevels={normal=0}},dockicon={show=function() table.insert(calls,"dock") end},processInfo={processID=7},
- application={applicationForPID=function(pid) assert(pid==7);return {allWindows=function() return {other,own} end} end}},table=table,ipairs=ipairs}
-local showOwn=assert(load(helper.."\nreturn showSettingsWindow",nil,"t",env))()
-local titled={level=view.level,show=view.show,windowTitle=function() return "Nivlet for Mac" end,hswindow=function() error("must not search all windows") end}
-showOwn(titled);assert(table.concat(calls,",")=="dock,normal,show,activate,focus")
-print("Settings window lookup stays within Nivlet's own windows passed")
+print("Settings window opens at normal level and activates Nivlet without any window lookup passed")
 
 local callback=assert(source:match(':windowCallback%((function%(event%).-)%)\n    showSettingsWindow'))
 local hidden,requested=0,0

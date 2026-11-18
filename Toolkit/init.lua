@@ -511,28 +511,17 @@ local function silentRefresh()
     if silentTimer or not app.settings then return end
     silentTimer=hs.timer.doAfter(0.08,function() silentTimer=nil;reply(true,"","refreshPermissionsSilent") end)
 end
--- view:hswindow() searches every window of every running app (~1 s with many apps open), so the
--- settings window is looked up among Nivlet's own windows by its title first.
-local function ownWindow(view)
-    local me=hs.application and hs.application.applicationForPID and hs.processInfo and hs.application.applicationForPID(hs.processInfo.processID)
-    local title=me and view.windowTitle and view:windowTitle()
-    if title then for _,window in ipairs(me:allWindows()) do if window:title()==title then return window end end end
-    return view:hswindow()
-end
+-- Nivlet is brought forward without looking its window up: hs.window lookups go through
+-- Accessibility (hswindow() even walks every app's windows), and the first query Nivlet made about
+-- itself held the settings window back by about a second.
 local function showSettingsWindow(view)
     local mark=profile and profile.mark or function() end
     hs.dockicon.show()
     view:level(hs.drawing.windowLevels.normal):show()
     mark("  window: show")
-    local window=ownWindow(view)
-    mark("  window: found")
-    if window then
-        local owner=window:application()
-        if owner then owner:activate() end
-        mark("  window: activated")
-        window:focus()
-        mark("  window: focused")
-    end
+    local me=hs.application.applicationForPID(hs.processInfo.processID)
+    if me then me:activate() end
+    mark("  window: activated")
 end
 function app.requestLeave(intent)
     if not app.settings then
