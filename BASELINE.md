@@ -6,7 +6,7 @@
 
 2.1.0 为功能版：新增“截图”页（冻结屏幕框选、窗口识别、放大镜取色，矩形/箭头/画笔/文字/马赛克标注，复制、保存、钉在桌面，本机识别文字与二维码，复制的截图进入剪贴板历史）和“翻译”页（只用 macOS 自带翻译，双击修饰键翻译选中文字或截图区域，可区分左右 ⌃/⌥/⌘，自动方向并记住选择，需要 macOS 15+）；两项默认关闭。截图与翻译共用随包分发的原生辅助程序 `Toolkit/capture-helper`（源码 `Native/capture`，只用 Apple 框架），截图需要屏幕录制权限，权限统一在通用页显示。性能：剪贴板图片改存小预览图、原图按需从磁盘读取；启动内存峰值约 2.4 GB → 120 MB（含 5K 截图历史），⌘⇧V 菜单首次约 0.8 s → 0.05 s，打开设置约 2.3 s → 0.7 s；锁屏或睡眠时暂停网速采样；新增可选计时开关 `NIVLET_PROFILE`（默认关闭）。ZIP 8.18 MB、DMG 9.35 MB。
 
-63 项命令行回归本地通过；37 组设置页 UI 测试在四语言 × 深浅色、980 与 620 点宽下通过。候选包 Toolkit 与源码一致（另含 LICENSE、THIRD-PARTY-NOTICES.md、nivlet-icon.png、system-probe、capture-helper）、67 个 Mach-O 均为 arm64、无个人路径、`docs.json` 为 `[]`。本机 Developer ID 签名副本替换安装后启动完成、菜单栏项创建、无报错对话框、设置窗口可获得键盘焦点。截图、标注、识别、贴图、选词翻译与截图翻译在同源测试包上手工使用过；计时与内存在单台 Apple Silicon Mac（macOS 27.2，60 条历史含 10 张 5K 截图）上测得。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper；appcast 候选的版本、SHA-256、EdDSA 签名与篡改拒绝通过。未测试边界见[版本说明](documentation/RELEASE-v2.1.0.md)。
+63 项命令行回归本地通过；37 组设置页 UI 测试在四语言 × 深浅色、980 与 620 点宽下通过。候选包 Toolkit 与源码一致（另含 LICENSE、THIRD-PARTY-NOTICES.md、nivlet-icon.png、system-probe、capture-helper）、67 个 Mach-O 均为 arm64、无个人路径、`docs.json` 为 `[]`。本机 Developer ID 签名副本替换安装后启动完成、菜单栏项创建、无报错对话框、设置窗口可获得键盘焦点。截图、标注、识别、贴图、选词翻译与截图翻译在同源测试包上手工使用过；计时与内存在单台 Apple Silicon Mac（macOS 27.2，60 条历史含 10 张 5K 截图）上测得。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper；appcast 候选的版本、SHA-256、EdDSA 签名与篡改拒绝通过。正式 tag `v2.1.0` 指向 `0f6f3978963d6c59060eeb0f4ef031409b218771`；三份公开附件已匿名下载并与已验收产物逐字节比对，下载 App 的签名、票据及 Gatekeeper 检查通过，arm64 appcast 已发布。未测试边界见[版本说明](documentation/RELEASE-v2.1.0.md)。
 
 上一版 [2.0.6 / Build 66](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.6) 为 DMG 安装窗口更新，记录见 [2.0.6 版本说明](documentation/RELEASE-v2.0.6.md)。
 
