@@ -462,7 +462,16 @@ end
 local function reply(ok, message, action, requestID, saveBatch)
     local permission=permissionState()
     local icons=app.settings and configuredAppIcons()
-    if app.settings then local payload=profile.time("reply encode "..tostring(action),hs.json.encode,{ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.translations(),general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),capture=capture.config,capturePermission=capture.permissionGranted(),translate=translate.config,translateSupported=translate.supported(),translateRemembered=translate.memory,excludedAppNames=excludedAppNames(),appIcons=icons,applicationStates=applicationStates(icons),popupShortcut=app.popupShortcut or false,popupShortcutDefault=defaultPopup(),popupShortcutError=app.popupShortcutError and i18n.t(app.popupShortcutError) or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()});profile.mark("reply "..tostring(action).." bytes",#payload);app.settings:evaluateJavaScript("window.receive("..payload..")") end
+    if app.settings then local state={ok=ok,message=message,action=action,requestID=requestID,saveBatch=saveBatch,language=i18n.language(),translations=i18n.translations(),general=app.general,launcher=appNames.snapshot(launcher.config),config=app.config,input=appNames.snapshot(input.config),sources=input.sources(),clipboard=clipboard.snapshot(),capture=capture.config,capturePermission=capture.permissionGranted(),translate=translate.config,translateSupported=translate.supported(),translateRemembered=translate.memory,excludedAppNames=excludedAppNames(),appIcons=icons,applicationStates=applicationStates(icons),popupShortcut=app.popupShortcut or false,popupShortcutDefault=defaultPopup(),popupShortcutError=app.popupShortcutError and i18n.t(app.popupShortcutError) or false,system=system.config,browser=appNames.snapshot(browser.config),browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}
+        local payload=profile.time("reply encode "..tostring(action),hs.json.encode,state);profile.mark("reply "..tostring(action).." bytes",#payload)
+        if profile.enabled and not app.profiledFields then
+            app.profiledFields=true
+            local sizes={}
+            for key,value in pairs(state) do table.insert(sizes,{key,#hs.json.encode({value})}) end
+            table.sort(sizes,function(x,y) return x[2]>y[2] end)
+            for index=1,math.min(5,#sizes) do profile.mark("  field "..sizes[index][1],sizes[index][2]) end
+        end
+        app.settings:evaluateJavaScript("window.receive("..payload..")") end
 end
 -- Background status refreshes (window focus, permission checks, helper events) often arrive together;
 -- they are merged into one reply, since each reply re-sends and re-renders the whole settings state.
