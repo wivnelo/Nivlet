@@ -97,6 +97,8 @@ local function handleEvent(event)
         local query=M.permissionQuery
         M.permissionQuery=nil
         if query then query(event.granted==true) end
+    elseif kind=='recognitionError' then
+        print('Nivlet capture recognition error: '..tostring(event.detail))
     elseif M.handlers[kind] then
         M.handlers[kind](event)
     elseif kind=='pinned' or kind=='pinnedCapture' then

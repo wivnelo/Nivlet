@@ -15,24 +15,64 @@ enum Recognition {
     /// Accurate mode only: fast mode garbles Chinese and Japanese (S0 measurement).
     static func text(in image: CGImage, interface: String, completion: @escaping (Result<[String], Error>) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
-            let request = VNRecognizeTextRequest()
-            request.recognitionLevel = .accurate
-            request.usesLanguageCorrection = true
-            let supported = (try? request.supportedRecognitionLanguages()) ?? []
-            request.recognitionLanguages = languages(for: interface).filter { supported.isEmpty || supported.contains($0) }
+            let result: Result<[String], Error>
             do {
-                try VNImageRequestHandler(cgImage: image, options: [:]).perform([request])
-                let lines = (request.results ?? [])
-                    .sorted { a, b in
-                        // Top to bottom, then left to right (Vision uses a bottom-left origin).
-                        abs(a.boundingBox.midY - b.boundingBox.midY) > 0.01 ? a.boundingBox.midY > b.boundingBox.midY : a.boundingBox.minX < b.boundingBox.minX
-                    }
-                    .compactMap { $0.topCandidates(1).first?.string }
-                DispatchQueue.main.async { completion(.success(lines)) }
+                result = .success(try lines(in: image, interface: interface))
             } catch {
-                DispatchQueue.main.async { completion(.failure(error)) }
+                emit(["event": "recognitionError", "detail": String(describing: error)])
+                result = linesInFreshProcess(image, interface: interface)
             }
+            DispatchQueue.main.async { completion(result) }
         }
+    }
+
+    static func lines(in image: CGImage, interface: String) throws -> [String] {
+        let request = VNRecognizeTextRequest()
+        request.recognitionLevel = .accurate
+        request.usesLanguageCorrection = true
+        let supported = (try? request.supportedRecognitionLanguages()) ?? []
+        request.recognitionLanguages = languages(for: interface).filter { supported.isEmpty || supported.contains($0) }
+        try VNImageRequestHandler(cgImage: image, options: [:]).perform([request])
+        return (request.results ?? [])
+            .sorted { a, b in
+                abs(a.boundingBox.midY - b.boundingBox.midY) > 0.01 ? a.boundingBox.midY > b.boundingBox.midY : a.boundingBox.minX < b.boundingBox.minX
+            }
+            .compactMap { $0.topCandidates(1).first?.string }
+    }
+
+    enum FreshProcessError: Error { case unavailable, failed(Int32) }
+
+    static func linesInFreshProcess(_ image: CGImage, interface: String) -> Result<[String], Error> {
+        guard let exe = Bundle.main.executableURL, let png = NSBitmapImageRep(cgImage: image).representation(using: .png, properties: [:]) else {
+            return .failure(FreshProcessError.unavailable)
+        }
+        let child = Process()
+        child.executableURL = exe
+        child.arguments = ["--recognize", interface]
+        let input = Pipe(), output = Pipe()
+        child.standardInput = input; child.standardOutput = output; child.standardError = FileHandle.nullDevice
+        do { try child.run() } catch { return .failure(error) }
+        DispatchQueue.global(qos: .userInitiated).async {
+            input.fileHandleForWriting.write(png)
+            try? input.fileHandleForWriting.close()
+        }
+        let data = output.fileHandleForReading.readDataToEndOfFile()
+        child.waitUntilExit()
+        guard child.terminationStatus == 0, let lines = try? JSONSerialization.jsonObject(with: data) as? [String] else {
+            emit(["event": "recognitionError", "detail": "fresh process exited with \(child.terminationStatus)"])
+            return .failure(FreshProcessError.failed(child.terminationStatus))
+        }
+        return .success(lines)
+    }
+
+    static func recognizeStandardInput(interface: String) -> Int32 {
+        let data = FileHandle.standardInput.readDataToEndOfFile()
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let image = CGImageSourceCreateImageAtIndex(source, 0, nil),
+              let lines = try? lines(in: image, interface: interface),
+              let json = try? JSONSerialization.data(withJSONObject: lines) else { return 1 }
+        FileHandle.standardOutput.write(json)
+        return 0
     }
 
     /// The first text recognition by a newly built executable takes about 30 s while macOS prepares

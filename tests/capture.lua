@@ -72,6 +72,12 @@ assert(copied==1)
 tasks[1].stream(nil,'{"event":"saved","path":"/Volumes/Shots/Nivlet 1.png"}\n')
 assert(alerts[#alerts]:find('Nivlet 1.png',1,true))
 
+local alertCount,logged,originalPrint=#alerts,{},print
+print=function(...) logged[#logged+1]=table.concat({...},' ') end
+tasks[1].stream(nil,'{"event":"recognitionError","detail":"VNError 9"}\n')
+print=originalPrint
+assert(#alerts==alertCount and logged[1] and logged[1]:find('VNError 9',1,true), 'Recognition errors are logged without alerting the user')
+
 -- Conflicts reject the save and keep the working binding.
 external=true
 local ok,message=capture.save(config({enabled=true,shortcut={key='F2',mods={}}}))

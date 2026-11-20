@@ -11,6 +11,10 @@ if CommandLine.arguments.contains("--prewarm") {
     Recognition.prewarmNow()
     exit(0)
 }
+if let flag = CommandLine.arguments.firstIndex(of: "--recognize") {
+    let interface = CommandLine.arguments.indices.contains(flag + 1) ? CommandLine.arguments[flag + 1] : "zh-Hans"
+    exit(Recognition.recognizeStandardInput(interface: interface))
+}
 if CommandLine.arguments.contains("--permission") {
     print(CGPreflightScreenCaptureAccess() ? "granted" : "denied")
     exit(0)
