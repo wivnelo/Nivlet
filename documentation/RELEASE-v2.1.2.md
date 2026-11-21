@@ -44,3 +44,7 @@ Product source: `4adffefc5618848a1730c28960066765e53bd663`. The release tag adds
 ZIP: 8,195,266 bytes (2.1.1: 8,192,092); DMG: 9,369,963 bytes (2.1.1: 9,365,881). App notarization `5aad4c47-cdef-4ddc-9444-ba93ccbf0f61` and DMG notarization `46bfe562-6fe3-4825-9427-d84bf1e8f9b1` were Accepted. A first signing run stopped when the DMG timestamp request failed; its partial outputs were set aside and the whole signing and notarization was run again.
 
 [Release](https://github.com/wivnelo/Nivlet/releases/tag/v2.1.2) · [Installation](INSTALLATION.en.md) · [使用指南](USAGE.md)
+
+Public verification: `v2.1.2` resolves to `4bdee627423a0d2fa470f16100eea1a073882510`. All three public attachments were downloaded anonymously and match the accepted artifacts byte for byte; the downloaded app passes strict signing, stapling and Gatekeeper checks. `releases/latest` points to `v2.1.2`; 18 earlier releases remain listed.
+
+公开回核：三份附件匿名下载与已验收产物逐字节一致，下载 App 的严格签名、票据与 Gatekeeper 通过。正式 tag 对应上述提交，`releases/latest` 指向 `v2.1.2`，此前 18 个版本仍在列表中。

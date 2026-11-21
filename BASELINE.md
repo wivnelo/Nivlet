@@ -6,7 +6,7 @@
 
 2.1.2 修复截图文字识别：常驻截图助手长时间运行（报告中约 9 小时）后，Vision 识别每次立即失败，截图“识别文字”、截图翻译与双击 Ctrl 识别都提示“识别失败”，重启后恢复；同一截图在新进程中可正常识别。现在常驻进程识别失败时，改用一次性子进程（`capture-helper --recognize`，PNG 经标准输入、JSON 经标准输出，不落盘）重试，Vision 错误经 `recognitionError` 事件写入 Nivlet 日志、不弹窗。失效的确切原因未查明。产品改动仅 `Native/capture/Recognition.swift`、`main.swift` 与 `Toolkit/modules/capture.lua`；设置项、配置格式与权限不变。ZIP 8.20 MB、DMG 9.37 MB。
 
-65 项命令行回归本地与 CI 通过，新增 `tests/capture_recognition.py`（编译截图助手，验证子进程识别中英文与拒绝非图片输入）与 `tests/capture.lua` 的错误日志用例；设置页未改动，未重跑 UI 套件。候选包 Toolkit 与源码一致、67 个 Mach-O 均为 arm64、无个人路径、`docs.json` 为 `[]`，构建出的截图助手子进程识别正常。用户在本机签名测试版上确认截图识别与双击 Ctrl 识别正常；本地检查版启动后 291 ms 创建菜单栏项。长时间运行后的失效状态无法按需复现，重试路径只单独验证、未在真实故障中触发。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper；appcast 候选的版本、SHA-256、EdDSA 签名与篡改拒绝通过。
+65 项命令行回归本地与 CI 通过，新增 `tests/capture_recognition.py`（编译截图助手，验证子进程识别中英文与拒绝非图片输入）与 `tests/capture.lua` 的错误日志用例；设置页未改动，未重跑 UI 套件。候选包 Toolkit 与源码一致、67 个 Mach-O 均为 arm64、无个人路径、`docs.json` 为 `[]`，构建出的截图助手子进程识别正常。用户在本机签名测试版上确认截图识别与双击 Ctrl 识别正常；本地检查版启动后 291 ms 创建菜单栏项。长时间运行后的失效状态无法按需复现，重试路径只单独验证、未在真实故障中触发。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper；appcast 候选的版本、SHA-256、EdDSA 签名与篡改拒绝通过。正式 tag `v2.1.2` 指向 `4bdee627423a0d2fa470f16100eea1a073882510`；三份公开附件已匿名下载并与已验收产物逐字节比对，下载 App 的签名、票据及 Gatekeeper 检查通过，arm64 appcast 已发布。
 
 上一版 [2.1.1 / Build 68](https://github.com/wivnelo/Nivlet/releases/tag/v2.1.1) 为翻译提速与卡片重排，记录见 [2.1.1 版本说明](documentation/RELEASE-v2.1.1.md)。
 
