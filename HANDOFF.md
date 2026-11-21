@@ -1,6 +1,14 @@
-# Nivlet 会话交接 · 2026-11-18
+# Nivlet 会话交接 · 2026-11-21
 
-## 当前状态 · 2.1.1 / Build 68
+## 当前状态 · 2.1.2 / Build 69
+
+截图文字识别修复版，不新增功能。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.1.2 版本说明](documentation/RELEASE-v2.1.2.md)。产品源码 `4adffef`，仅 Apple Silicon。
+
+- 现象：常驻 `capture-helper` 运行约 9 小时后，`VNRecognizeTextRequest` 每次立即抛错且不写系统日志，重启即恢复；同机同屏（Dell U2725QE，Display P3）的独立进程截屏加识别正常，排除系统与图像格式。根因未查明；失效时助手占用约 350 MB（峰值 870 MB），可作为后续线索。
+- 修复：`Recognition.text` 失败后调用 `linesInFreshProcess`，以 `--recognize <界面语言>` 启动自身，PNG 走标准输入、JSON 行走标准输出；失败细节以 `recognitionError` 事件交给 `capture.lua` 打印到日志。二维码识别（`Recognition.codes`）未加同样的重试。
+- 下次再出现时，在 Nivlet 日志里查 `Nivlet capture recognition error`，即可拿到原始 Vision 错误。
+
+## 历史 · 2.1.1 / Build 68
 
 翻译提速与卡片重排的补丁版，不新增功能。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.1.1 版本说明](documentation/RELEASE-v2.1.1.md)。产品源码 `9667db6`，仅 Apple Silicon。
 

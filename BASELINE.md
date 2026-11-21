@@ -1,14 +1,16 @@
 # Nivlet 当前基准
 
-更新日期：2026-11-18。
+更新日期：2026-11-21。
 
-当前正式版本为 [2.1.1 / Build 68](https://github.com/wivnelo/Nivlet/releases/tag/v2.1.1)，macOS 13+、Apple Silicon（arm64）。产品源码 `9667db6e375abfdbe7fa858e86caad24cf4a5f63`；发行 tag 在该提交上增加公开说明和更新后的媒体，不把文档变动计为产品差异。
+当前正式版本为 [2.1.2 / Build 69](https://github.com/wivnelo/Nivlet/releases/tag/v2.1.2)，macOS 13+、Apple Silicon（arm64）。产品源码 `4adffefc5618848a1730c28960066765e53bd663`；发行 tag 在该提交上增加公开说明，不把文档变动计为产品差异。
 
-2.1.1 为翻译提速与卡片重排的补丁版，不新增功能：翻译后 50 秒内保持系统翻译模型加载（连续翻译约 1.4 s → 0.4–0.5 s，之后停止）；多句先出第一句（三句段落约 0.7 s 出第一句）；截图识别的折行先合并成段落；每次最多约 600 个英文字符或 200 个中日韩字，超出部分不翻译并提示；删除无效的启动预热；语言对可用性只查一次。翻译卡片改为顶部栏、内容区、底部操作栏。通用页权限说明补上选词翻译与截图翻译。设置项、配置格式与权限不变。ZIP 8.19 MB、DMG 9.37 MB。
+2.1.2 修复截图文字识别：常驻截图助手长时间运行（报告中约 9 小时）后，Vision 识别每次立即失败，截图“识别文字”、截图翻译与双击 Ctrl 识别都提示“识别失败”，重启后恢复；同一截图在新进程中可正常识别。现在常驻进程识别失败时，改用一次性子进程（`capture-helper --recognize`，PNG 经标准输入、JSON 经标准输出，不落盘）重试，Vision 错误经 `recognitionError` 事件写入 Nivlet 日志、不弹窗。失效的确切原因未查明。产品改动仅 `Native/capture/Recognition.swift`、`main.swift` 与 `Toolkit/modules/capture.lua`；设置项、配置格式与权限不变。ZIP 8.20 MB、DMG 9.37 MB。
 
-64 项命令行回归本地与 CI 通过（新增翻译文本分段测试）；37 组设置页 UI 测试在四语言 × 深浅色、980 与 620 点宽下通过；翻译卡片在四语言 × 深浅色下渲染并逐张查看。候选包 Toolkit 与源码一致、67 个 Mach-O 均为 arm64、无个人路径、`docs.json` 为 `[]`、发行版助手不含自测命令。本机 Developer ID 签名副本替换安装后启动完成、菜单栏项创建、设置窗口获得键盘焦点。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper；appcast 候选的版本、SHA-256、EdDSA 签名与篡改拒绝通过。正式 tag `v2.1.1` 指向 `686ed697a855cfd37a809cd05bf9bee0ac0ee977`；三份公开附件已匿名下载并与已验收产物逐字节比对，下载 App 的签名、票据及 Gatekeeper 检查通过，arm64 appcast 已发布。未测试边界见[版本说明](documentation/RELEASE-v2.1.1.md)。
+65 项命令行回归本地与 CI 通过，新增 `tests/capture_recognition.py`（编译截图助手，验证子进程识别中英文与拒绝非图片输入）与 `tests/capture.lua` 的错误日志用例；设置页未改动，未重跑 UI 套件。候选包 Toolkit 与源码一致、67 个 Mach-O 均为 arm64、无个人路径、`docs.json` 为 `[]`，构建出的截图助手子进程识别正常。用户在本机签名测试版上确认截图识别与双击 Ctrl 识别正常；本地检查版启动后 291 ms 创建菜单栏项。长时间运行后的失效状态无法按需复现，重试路径只单独验证、未在真实故障中触发。App/DMG 均已签名、公证、附加票据并通过 Gatekeeper；appcast 候选的版本、SHA-256、EdDSA 签名与篡改拒绝通过。
 
-上一版 [2.1.0 / Build 67](https://github.com/wivnelo/Nivlet/releases/tag/v2.1.0) 新增截图（标注、识别、贴图）与系统翻译，并大幅降低启动内存、加快菜单与设置窗口，记录见 [2.1.0 版本说明](documentation/RELEASE-v2.1.0.md)。
+上一版 [2.1.1 / Build 68](https://github.com/wivnelo/Nivlet/releases/tag/v2.1.1) 为翻译提速与卡片重排，记录见 [2.1.1 版本说明](documentation/RELEASE-v2.1.1.md)。
+
+更早的 [2.1.0 / Build 67](https://github.com/wivnelo/Nivlet/releases/tag/v2.1.0) 新增截图（标注、识别、贴图）与系统翻译，并大幅降低启动内存、加快菜单与设置窗口，记录见 [2.1.0 版本说明](documentation/RELEASE-v2.1.0.md)。
 
 更早的 [2.0.6 / Build 66](https://github.com/wivnelo/Nivlet/releases/tag/v2.0.6) 为 DMG 安装窗口更新，记录见 [2.0.6 版本说明](documentation/RELEASE-v2.0.6.md)。
 
