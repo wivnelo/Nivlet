@@ -53,6 +53,28 @@ func selfTestRecognition(_ done: @escaping ([String: Any]) -> Void) {
 @MainActor
 func selfTestSnapshotCard(path: String) -> Bool {
     guard let window = NSApp.windows.first(where: { $0 is TranslatePanelWindow && $0.isVisible }), let view = window.contentView else { return false }
+    return selfTestSnapshot(view, in: window, path: path)
+}
+
+@MainActor
+func selfTestSnapshotCodes(path: String) -> Bool {
+    let panel = ResultPanel()
+    panel.show(title: t("qrTitle"), content: .codes([Recognition.Code(payload: "https://wivnelo.github.io/Nivlet/", box: .zero), Recognition.Code(payload: "WIFI:S:Nivlet Demo;T:WPA;P:example;;", box: .zero)]))
+    let window = NSWindow(contentRect: NSRect(origin: NSPoint(x: -4000, y: -4000), size: panel.frame.size), styleMask: [.borderless], backing: .buffered, defer: false)
+    window.isOpaque = false; window.backgroundColor = .clear
+    panel.wantsLayer = true
+    window.contentView = panel
+    window.appearance = NSApp.appearance
+    window.orderFrontRegardless()
+    panel.layoutSubtreeIfNeeded()
+    window.display()
+    CATransaction.flush()
+    defer { window.orderOut(nil) }
+    return selfTestSnapshot(panel, in: window, path: path)
+}
+
+@MainActor
+func selfTestSnapshot(_ view: NSView, in window: NSWindow, path: String) -> Bool {
     let scale = window.backingScaleFactor
     let size = view.bounds.size
     guard let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: Int(size.width * scale), pixelsHigh: Int(size.height * scale), bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0) else { return false }

@@ -86,6 +86,8 @@ final class Helper {
         case "selftest-clicks":
             clickTest = true
             capture()
+        case "selftest-codes":
+            emit(["event": "selftest-codes", "ok": selfTestSnapshotCodes(path: command["path"] as? String ?? "")])
         case "selftest-card":
             emit(["event": "selftest-card", "ok": selfTestSnapshotCard(path: command["path"] as? String ?? "")])
         case "selftest-recognition":

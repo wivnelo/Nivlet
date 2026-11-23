@@ -99,6 +99,7 @@ final class PrimaryButton: NSButton {
 
 @MainActor
 final class Toolbar: NSView {
+    override func mouseDown(with event: NSEvent) {}
     var onAction: (ToolbarAction) -> Void = { _ in }
     private var toolButtons: [Tool: ToolButton] = [:]
     private let hud = makeHUD()
@@ -163,6 +164,7 @@ final class Toolbar: NSView {
 /// Second bar: colour, stroke or text size, and mosaic mode for the active tool.
 @MainActor
 final class PropertyBar: NSView {
+    override func mouseDown(with event: NSEvent) {}
     var onChange: () -> Void = {}
     var colorIndex = 0, sizeIndex = 1
     var mosaicMode: MosaicMode = .pixelate

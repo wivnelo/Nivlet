@@ -50,8 +50,8 @@ final class OverlayView: NSView {
 private enum Drag {
     case none
     case newSelection(start: CGPoint)
-    /// Mouse went down outside an existing selection; it only becomes a new selection once dragged.
-    case maybeReselect(start: CGPoint)
+    case outside(start: CGPoint, reselect: Bool)
+    case ignore
     case move(original: CGRect, start: CGPoint)
     case resize(handle: Int, original: CGRect, start: CGPoint)
     case annotate(Annotation)
@@ -299,7 +299,8 @@ final class Session: NSObject, NSTextFieldDelegate {
 
     func mouseDown(_ view: OverlayView, _ event: NSEvent) {
         let p = view.local(event)
-        if editor != nil { commitText() }
+        let wasEditing = editor != nil
+        if wasEditing { commitText() }
         switch phase {
         case .choosing:
             activeIndex = view.index
@@ -329,13 +330,9 @@ final class Session: NSObject, NSTextFieldDelegate {
                 } else {
                     drag = .move(original: selection, start: p); hideBars(); closeResults(); NSCursor.closedHand.set()
                 }
-            } else if annotations.isEmpty && tool == nil {
-                // A plain click keeps the selection; dragging outside starts a new one (see mouseDragged).
+            } else if !wasEditing {
                 closeResults()
-                drag = .maybeReselect(start: p)
-            } else {
-                // A click outside the selection dismisses the result panel, like clicking off a popover.
-                closeResults()
+                drag = .outside(start: p, reselect: annotations.isEmpty && tool == nil)
             }
         }
         redraw()
@@ -346,14 +343,16 @@ final class Session: NSObject, NSTextFieldDelegate {
         mouse = (view.index, p)
         let bounds = view.bounds
         switch drag {
-        case .maybeReselect(let start):
+        case .outside(let start, let reselect):
             guard hypot(p.x - start.x, p.y - start.y) > 4 else { return }
+            guard reselect else { drag = .ignore; return }
             phase = .choosing; hideBars()
             drag = .newSelection(start: start)
             selection = CGRect(x: min(start.x, p.x), y: min(start.y, p.y), width: abs(p.x - start.x), height: abs(p.y - start.y)).intersection(bounds)
         case .newSelection(let start):
             guard view.index == activeIndex else { return }
             selection = CGRect(x: min(start.x, p.x), y: min(start.y, p.y), width: abs(p.x - start.x), height: abs(p.y - start.y)).intersection(bounds)
+        case .ignore: return
         case .move(let original, let start):
             var r = original.offsetBy(dx: p.x - start.x, dy: p.y - start.y)
             r.origin.x = min(max(0, r.minX), bounds.width - r.width)
@@ -372,8 +371,11 @@ final class Session: NSObject, NSTextFieldDelegate {
 
     func mouseUp(_ view: OverlayView, _ event: NSEvent) {
         switch drag {
-        case .maybeReselect:
-            break
+        case .outside:
+            drag = .none
+            cancel()
+            return
+        case .ignore: break
         case .newSelection:
             if selection.width < 4 || selection.height < 4 { selection = hover?.index == view.index ? hover!.rect : view.bounds }
             phase = .selected
@@ -544,7 +546,9 @@ final class Session: NSObject, NSTextFieldDelegate {
         let key = event.charactersIgnoringModifiers?.lowercased() ?? ""
         switch event.keyCode {
         case 53: escape(); return true
-        case 36, 76: if phase == .selected { copyAndFinish() }; return true
+        case 36, 76:
+            if let code = resultPanel?.firstCode { copyRecognized(code, close: true) } else if phase == .selected { copyAndFinish() }
+            return true
         case 123, 124, 125, 126: nudge(event.keyCode, mods); return true
         default: break
         }
@@ -798,16 +802,17 @@ final class Session: NSObject, NSTextFieldDelegate {
             NSEvent.mouseEvent(with: type, location: view.convert(p, to: nil), modifierFlags: [], timestamp: 0, windowNumber: view.window?.windowNumber ?? 0, context: nil, eventNumber: 0, clickCount: 1, pressure: 1)!
         }
         let outside = CGPoint(x: sel.minX - 80, y: sel.minY - 80)
-        mouseDown(view, event(.leftMouseDown, outside)); mouseUp(view, event(.leftMouseUp, outside))
-        let clickKeeps = phase == .selected && selection == sel
         let end = CGPoint(x: outside.x - 120, y: outside.y - 90)
         mouseDown(view, event(.leftMouseDown, outside))
         mouseDragged(view, event(.leftMouseDragged, CGPoint(x: outside.x - 60, y: outside.y - 40)))
         mouseDragged(view, event(.leftMouseDragged, end))
         mouseUp(view, event(.leftMouseUp, end))
         let dragReselects = phase == .selected && abs(selection.width - 120) < 1 && abs(selection.height - 90) < 1
-        onEvent(["event": "clicks", "clickKeepsSelection": clickKeeps, "dragStartsNewSelection": dragReselects])
-        rightMouseDown(view)
+        toolbar.mouseDown(with: event(.leftMouseDown, CGPoint(x: toolbar.frame.minX + 1, y: toolbar.frame.minY + 1)))
+        let toolbarGapKeeps = phase == .selected
+        onEvent(["event": "clicks", "dragStartsNewSelection": dragReselects, "toolbarGapKeepsSelection": toolbarGapKeeps])
+        let away = CGPoint(x: selection.maxX + 60, y: selection.maxY + 60)
+        mouseDown(view, event(.leftMouseDown, away)); mouseUp(view, event(.leftMouseUp, away))
     }
 
     func testRecognize() {
@@ -829,8 +834,9 @@ final class Session: NSObject, NSTextFieldDelegate {
             let windowPoint = view.convert(away, to: nil)
             if let down = NSEvent.mouseEvent(with: .leftMouseDown, location: windowPoint, modifierFlags: [], timestamp: 0, windowNumber: view.window?.windowNumber ?? 0, context: nil, eventNumber: 0, clickCount: 1, pressure: 1) {
                 mouseDown(view, down)
+                onEvent(["event": "clickAway", "panelClosed": resultPanel == nil, "codeBoxesCleared": codeBoxes.isEmpty])
+                if let up = NSEvent.mouseEvent(with: .leftMouseUp, location: windowPoint, modifierFlags: [], timestamp: 0, windowNumber: view.window?.windowNumber ?? 0, context: nil, eventNumber: 0, clickCount: 1, pressure: 1) { mouseUp(view, up) }
             }
-            onEvent(["event": "clickAway", "panelClosed": resultPanel == nil, "codeBoxesCleared": codeBoxes.isEmpty, "newSelection": phase == .choosing])
         } }
     }
     /// Selects the text tool and clicks the existing text so the editor and property bar are visible.

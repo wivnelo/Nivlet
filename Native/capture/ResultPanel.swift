@@ -35,10 +35,10 @@ final class ResultPanel: NSView {
     private let stack = NSStackView()
     private var textView: NSTextView?
     private var payloads: [String] = []
-    private let width: CGFloat = 320
+    private let width: CGFloat = 360
 
     init() {
-        super.init(frame: NSRect(x: 0, y: 0, width: 320, height: 80))
+        super.init(frame: NSRect(x: 0, y: 0, width: 360, height: 80))
         addSubview(background)
         stack.orientation = .vertical; stack.alignment = .leading; stack.spacing = 10
         stack.edgeInsets = NSEdgeInsets(top: 12, left: 14, bottom: 12, right: 14)
@@ -46,8 +46,10 @@ final class ResultPanel: NSView {
     }
     required init?(coder: NSCoder) { fatalError() }
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+    override func mouseDown(with event: NSEvent) {}
 
     private(set) var isWorking = false
+    var firstCode: String? { payloads.first }
 
     func show(title: String, content: Content) {
         if case .working = content { isWorking = true } else { isWorking = false }
@@ -102,13 +104,15 @@ final class ResultPanel: NSView {
                 value.lineBreakMode = .byCharWrapping
                 add(value)
                 let buttons = NSStackView(); buttons.spacing = 8
-                let copy = FlatButton(title: t("copy"), target: self, action: #selector(copyCode(_:))); copy.tag = i
-                buttons.addArrangedSubview(copy)
                 if Recognition.webURL(code.payload) != nil {
-                    let open = PrimaryButton(title: t("openLink"), target: self, action: #selector(openCode(_:))); open.tag = i
-                    open.image = NSImage(systemSymbolName: "arrow.up.right.square", accessibilityDescription: nil)?.withSymbolConfiguration(.init(pointSize: 12, weight: .semibold))
+                    let open = FlatButton(title: t("openLink"), target: self, action: #selector(openCode(_:))); open.tag = i
                     buttons.addArrangedSubview(open)
                 }
+                let gap = NSView(); gap.setContentHuggingPriority(.defaultLow, for: .horizontal); buttons.addArrangedSubview(gap)
+                let copy = FlatButton(title: t("copy"), target: self, action: #selector(copyCode(_:))); copy.tag = i
+                buttons.addArrangedSubview(copy)
+                let copyClose = PrimaryButton(title: t("copyClose"), target: self, action: #selector(copyCodeAndClose(_:))); copyClose.tag = i
+                buttons.addArrangedSubview(copyClose)
                 add(buttons)
             }
         }
@@ -156,6 +160,7 @@ final class ResultPanel: NSView {
     @objc private func copyText(_ sender: NSButton) { onCopy(textView?.string ?? "", false); flash(sender) }
     @objc private func copyTextAndClose() { onCopy(textView?.string ?? "", true) }
     @objc private func copyCode(_ sender: NSButton) { if payloads.indices.contains(sender.tag) { onCopy(payloads[sender.tag], false); flash(sender) } }
+    @objc private func copyCodeAndClose(_ sender: NSButton) { if payloads.indices.contains(sender.tag) { onCopy(payloads[sender.tag], true) } }
     @objc private func openCode(_ sender: NSButton) {
         guard payloads.indices.contains(sender.tag), let url = Recognition.webURL(payloads[sender.tag]) else { return }
         onOpen(url)
