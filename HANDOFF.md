@@ -1,6 +1,15 @@
-# Nivlet 会话交接 · 2026-11-21
+# Nivlet 会话交接 · 2026-11-23
 
-## 当前状态 · 2.1.2 / Build 69
+## 当前状态 · 2.1.3 / Build 70
+
+截图交互补丁版，不新增功能。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.1.3 版本说明](documentation/RELEASE-v2.1.3.md)。产品源码 `7c226c9`，仅 Apple Silicon；包含 2.1.2 的文字识别重试。
+
+- 选区外的鼠标按下记为 `Drag.outside(start:reselect:)`：松开即 `cancel()`；拖动超过 4 pt 且无标注、无工具时改为重新框选，否则忽略；正在编辑文字时只提交文字。识别面板打开时同样直接退出。
+- `Toolbar`、`PropertyBar`、`ResultPanel` 吞掉空白处的 `mouseDown`，避免点击穿透到浮层。二维码结果行为“打开链接（网址）· 复制 · 复制并关闭”，回车复制第一条并关闭；面板宽度 360。
+- 自测版新增 `selftest-codes`（渲染二维码面板为 PNG），`selftest-clicks` 改为验证拖动重新框选、工具栏空白不影响、外部单击退出。Playwright 装在 `/tmp/claude-501/pw`，重启后需按发版 skill 重新安装。
+- 发版前先 `git fetch` 并核对 GitHub 最新 Release 与 `VERSION`：本次曾误用已被另一会话发布的 2.1.2 / Build 69，未推送前已撤回。
+
+## 历史 · 2.1.2 / Build 69
 
 截图文字识别修复版，不新增功能。范围、源码、验证与公开资产见 [BASELINE](BASELINE.md) 和 [2.1.2 版本说明](documentation/RELEASE-v2.1.2.md)。产品源码 `4adffef`，仅 Apple Silicon。
 

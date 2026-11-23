@@ -43,10 +43,10 @@ Press the screenshot shortcut (F1 by default — add fn on a built-in keyboard �
 | Annotate | Pick rectangle, arrow, pen, text or mosaic in the toolbar; undo and redo are available |
 | Copy | Click Copy, press Return or double-click the selection; copies go into clipboard history per the Clipboard settings, marked as screenshots |
 | Save | Click Save or press ⌘S to save to the chosen folder (default `~/Pictures/Nivlet`) as PNG or JPEG |
-| Recognize text or QR | Click the button (O / Q); results appear in a panel and can be copied. Recognition runs on device |
+| Recognize text or QR | Click the button (O / Q); results appear in a panel with Copy and Copy and Close. For QR results, Return also copies and closes. Recognition runs on device |
 | Pin to desktop | Click Pin (P); the image stays on top of the desktop and can be moved, faded or closed |
 | Translate | With System Translation on, a Translate button (L) appears |
-| Exit | Press Escape or right-click |
+| Exit | Press Escape, right-click or click outside the selection; dragging outside starts a new selection |
 
 The first text recognition may take tens of seconds while macOS prepares its model; later ones usually take under a second. With Screenshot enabled, images in the settings history can also be pinned to the desktop.
 

@@ -1,4 +1,12 @@
-# 当前验收：2.1.2 / Build 69
+# 当前验收：2.1.3 / Build 70
+
+65 项命令行回归本地与 CI 通过。37 组设置页 UI 测试在简中、繁中、英文、日文 × 浅色/深色，980 与 620 点宽各运行一遍，全部通过。自测版截图助手：`selftest-clicks` 报告外部拖动重新框选、工具栏空白点击后选区仍在，随后外部单击产生 `cancelled`；`selftest-codes` 渲染的二维码面板（网址与普通文本两条）在四语言 × 深浅色下逐张查看，按钮完整显示。
+
+候选包：版本 2.1.3 / 70，Toolkit 与源码 `7c226c9` 一致（另含 LICENSE、THIRD-PARTY-NOTICES.md、nivlet-icon.png、system-probe、capture-helper），67 个 Mach-O 均为 arm64，`strings` 无个人路径，`docs.json` 为 `[]`，发行版 capture-helper 不含 selftest 字符串，`release_architecture` 与 `signing_preflight` 通过。本机 Developer ID 签名副本替换安装：启动完成并创建菜单栏项，设置窗口 `document.hasFocus()` 为 true。App 公证 `c55fa062-6952-4248-9513-82906548d5ec`、DMG 公证 `d5aaee19-f78e-44b0-84b5-f5a78d840b39` 均 Accepted，票据与 Gatekeeper 通过；appcast 候选通过版本、SHA-256、EdDSA 签名与篡改拒绝检查。
+
+未覆盖：多显示器下的外部单击、其他设备与系统版本、Sparkle 实际升级。
+
+## 历史验收：2.1.2 / Build 69
 
 65 项命令行回归本地与 CI 通过，新增 `tests/capture_recognition.py`（编译截图助手，验证 `--recognize` 子进程识别中英混排文字、拒绝非图片输入并返回 1）与 `tests/capture.lua` 中“识别错误只写日志、不弹窗”的用例。设置页未改动，未重跑 UI 套件。候选包：Toolkit 与源码一致，67 个 Mach-O 均为 arm64，无个人路径，`docs.json` 为 `[]`，构建出的截图助手子进程识别正确。用户在本机签名测试版上确认截图识别与双击 Ctrl 识别正常；本地检查版替换安装后启动剖析显示 291 ms 创建菜单栏项。常驻进程长时间运行后的失效无法按需复现，故障后的自动重试未在真实故障中触发。首次签名时 DMG 时间戳请求失败，半成品移出后完整重跑签名与公证。最终 App/DMG 公证 Accepted、票据与 Gatekeeper 通过；appcast 版本、SHA-256、EdDSA 签名与篡改拒绝通过。见 [2.1.2 版本说明](RELEASE-v2.1.2.md)。
 
